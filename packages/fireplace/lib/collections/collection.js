@@ -1,0 +1,94 @@
+require('fireplace/model/live-mixin');
+
+var get = Ember.get,
+    set = Ember.set;
+
+FP.Collection = Ember.ArrayProxy.extend(FP.LiveMixin, {
+  firebaseEvents: ['child_added', 'child_removed', 'child_moved', 'value'],
+
+  model:             null,
+  parent:            null,
+  parentKey:         null,
+  snapshot:          null,
+  query:             null,  // only really used by indexed collection right now
+
+  onFirebaseChildAdded:   Ember.required,
+  onFirebaseChildRemoved: Ember.required,
+  onFirebaseChildMoved:   Ember.required,
+  toFirebaseJSON:         Ember.required,
+
+  isNew: Ember.computed(function(){
+    return !get(this, "snapshot");
+  }).property("snapshot"),
+
+  firebaseReference: null,
+
+  debugReference: function(){
+    return this.buildFirebaseReference().toString();
+  }.property(),
+
+  buildFirebaseReference: function() {
+    // do we have an explicit reference?
+    var ref = get(this, 'firebaseReference');
+    if (ref) {
+      return ref;
+    }
+
+    // do we have an explicit path to build from?
+    var path  = get(this, 'firebasePath'),
+        store = get(this, 'store');
+
+    if (path) {
+      var rootRef = store.buildFirebaseRootReference();
+      return rootRef.child(path);
+    }
+
+    // are we an embedded collection in a relationship?
+    var parent    = get(this, 'parent'),
+        parentKey = get(this, 'parentKey');
+
+    if (parent && parentKey) {
+      var childKey = parent.relationshipKeyFromName(parentKey);
+      return parent.buildFirebaseReference().child(childKey);
+    }
+
+    // otherwise we're a root collection, use the model reference
+    var modelName  = get(this, 'model'),
+        modelClass = store.modelFor(modelName);
+
+    return modelClass.buildFirebaseReference();
+  },
+
+  // Override to support polymorphism
+  modelClassFromSnapshot: function(snap) {
+    return get(this, 'model');
+  },
+
+  onFirebaseValue: function(snapshot) {
+    set(this, "snapshot", snapshot);
+  },
+
+  setupContent: Ember.on('init', function() {
+    if (!get(this, 'content')) {
+      set(this, 'content', []);
+    }
+  }),
+
+  insertAfter: function(prevItemName, item, collection) {
+    collection = collection || this;
+
+    var previous, previousIndex;
+    if (prevItemName) {
+      previous = collection.findProperty('id', prevItemName);
+      if (previous) {
+        previousIndex = collection.indexOf(previous);
+        collection.insertAt(previousIndex + 1, item);
+      } else {
+        collection.pushObject(item);
+      }
+    } else {
+      collection.unshiftObject(item);
+    }
+  }
+
+});

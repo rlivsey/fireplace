@@ -1,0 +1,1 @@
+FP.BooleanTransform = FP.Transform.extend({});

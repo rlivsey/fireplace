@@ -1,0 +1,16 @@
+{
+  "name": "fireplace",
+  "version": "0.0.1",
+  "main": "fireplace.js",
+  "dependencies": {
+    "ember": "1.2.0-beta.4"
+  },
+  "devDependencies": {
+    "qunit": "~1.11"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ]
+}

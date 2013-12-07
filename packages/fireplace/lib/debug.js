@@ -1,0 +1,1 @@
+require('fireplace/debug/debug_adapter');

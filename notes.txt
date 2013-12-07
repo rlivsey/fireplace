@@ -1,0 +1,64 @@
+Collection
+  content: [
+    Person({
+      name: "Bob"
+      addresses: EmbeddedCollection(
+        key: "addresses"
+        content: [
+          Address
+        ]
+      ),
+      avatar: Avatar({
+        name: "foo"
+      })
+    })
+  ]
+
+
+new Collection({firebasePath: "/people"})
+
+
+
+{
+  workspaces: {
+    1: {
+      name: "Some workspace"
+    }
+  },
+  workspace: {
+    1: {
+      people: {
+        2: {
+          name: "Bob"
+        }
+      }
+    }
+  }
+}
+
+/workspaces/1/name
+
+/workspace/1/people/2/name/
+
+new Collection({firebasePath: "/workspace/1/people"})
+
+Workspace
+  people: hasMany("person", reference: "/workspace/#{id}/people", embedded: false)
+    -> new Collection({firebasePath: "/workspace/1/people"})
+
+  flags: hasMany("flag")
+    -> new EmbeddedCollection({})
+
+  avatar: hasOne("avatar")
+    -> new Avatar()
+
+
+this.store.findOne("workspace", 1)
+  new Workspace()
+    .startListeningForChanges()
+    people.startListeningForChanges()
+    flags.startListeningForChanges()
+    avatar.startListeningForChanges()
+
+  on add to collection -> start listening
+  on remove from collection -> stop listening

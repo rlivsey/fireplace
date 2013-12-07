@@ -1,0 +1,1 @@
+FP.HashTransform = FP.Transform.extend({});
