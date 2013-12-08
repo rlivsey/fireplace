@@ -8,6 +8,11 @@
 var get = Ember.get;
 
 FP.hasOne = function(type, options) {
+  if (arguments.length === 1 && typeof type === "object") {
+    options = type;
+    type    = undefined;
+  }
+
   options = options || {};
 
   if (options.embedded === undefined && !options.detached) {
@@ -49,7 +54,7 @@ FP.hasOne = function(type, options) {
       }
 
       if (options.embedded) {
-        value = store.createRecord(type, {
+        value = store.createRecord(meta.type, {
           snapshot:  childSnap,
           parent:    this,
           parentKey: name
@@ -77,7 +82,7 @@ FP.hasOne = function(type, options) {
         if (typeof query === "function") {
           query = query.call(this);
         }
-        return store.findOne(type, itemID, query);
+        return store.findOne(meta.type, itemID, query);
       }
     }
   }).property().meta(meta);

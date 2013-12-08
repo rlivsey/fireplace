@@ -9,6 +9,7 @@ FP.RelationshipsClassMixin = Ember.Mixin.create({
       if (meta.isRelationship) {
         meta.name = name;
         meta.key  = keyForRelationship(name, meta);
+        meta.type = typeForRelationship(name, meta);
         map.set(name, meta);
       }
     });
@@ -23,6 +24,7 @@ FP.RelationshipsClassMixin = Ember.Mixin.create({
       if (meta.isRelationship) {
         meta.name = name;
         meta.key  = key = keyForRelationship(name, meta);
+        meta.type = typeForRelationship(name, meta);
         map.set(key, meta);
       }
     });
@@ -57,4 +59,16 @@ function keyForRelationship(name, meta) {
   } else {
     return underscore(name);
   }
+}
+
+function typeForRelationship(name, meta) {
+  var type = meta.type;
+
+  if (!type && meta.kind === 'hasMany') {
+    type = Ember.String.singularize(name);
+  } else if (!type) {
+    type = name;
+  }
+
+  return type;
 }

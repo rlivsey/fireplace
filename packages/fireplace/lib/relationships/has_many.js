@@ -10,6 +10,11 @@
 var get = Ember.get;
 
 FP.hasMany = function(type, options) {
+  if (arguments.length === 1 && typeof type === "object") {
+    options = type;
+    type    = undefined;
+  }
+
   options = options || {};
 
   if (options.embedded === undefined) {
@@ -47,7 +52,7 @@ FP.hasMany = function(type, options) {
         container      = get(this, "container"),
         collectionName = options.collection || (options.embedded ? "object" : "indexed"),
         collectionType = container.lookupFactory("collection:"+collectionName),
-        model          = store.modelFor(type),
+        model          = store.modelFor(meta.type),
         query          = options.query;
 
     Ember.assert("Collection type must exist: "+collectionName, !!collectionType);

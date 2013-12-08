@@ -175,7 +175,7 @@ this.store.fetch("task", {project: someProject}, {limit: 10, startAt: "123", end
 App.Person = FP.Model.extend({
   firstName: attr(),
   lastName: attr()
-  address: FP.hasOne("address")
+  address: FP.hasOne()
 });
 
 App.Address = FP.Model.address({
@@ -199,6 +199,17 @@ This maps to the Firebase JSON of:
 }
 ```
 
+By default `hasOne` guesses the name of the associated type based on the name of the property,
+in this case `address`.
+
+If you want to call the property something different to the model type, pass its name as the first argument:
+
+```javascript
+App.Person = FP.Model.extend({
+  residence: FP.hasOne("address")
+});
+```
+
 Firebase stores data in a tree structure, so Fireplace by default treats all relationships
 as embedded. We can set the `embedded: false` option to change this:
 
@@ -206,7 +217,7 @@ as embedded. We can set the `embedded: false` option to change this:
 App.Person = FP.Model.extend({
   firstName: attr(),
   lastName: attr(),
-  address: FP.hasOne("address", {embedded: false})
+  address: FP.hasOne({embedded: false})
 });
 ```
 
@@ -233,7 +244,7 @@ Lets say our person lives in many different places, we can model this like so:
 App.Person = FP.Model.extend({
   firstName: attr(),
   lastName: attr(),
-  address: FP.hasMany("address")
+  addresses: FP.hasMany()
 });
 
 App.Address = FP.Model.address({
@@ -262,6 +273,17 @@ The JSON for this is now:
     }
   }
 }
+```
+
+Like hasOne, `hasMany` guesses the name of the associated type based on the singular name of the property,
+in this case `addresses` -> `address`.
+
+If you want to call the property something different to the model type, pass its name as the first argument:
+
+```javascript
+App.Person = FP.Model.extend({
+  residences: FP.hasOne("address")
+});
 ```
 
 Again, we can change this to non-embedded by setting `{embedded: false}` to produce:
@@ -383,7 +405,7 @@ We can model this like so:
 ```javascript
 App.Person = FP.Model.extend({
   name: attr(),
-  avatar: FP.hasOne("avatar", {detached: true})
+  avatar: FP.hasOne({detached: true})
 });
 ```
 
@@ -442,7 +464,7 @@ App.Task = FP.Model.extend({
 
 App.Person = FP.Model.extend({
   name: attr(),
-  tasks: FP.hasMany("tasks", {detached: true, path: "tasks_by_person/%@"})
+  tasks: FP.hasMany({detached: true, path: "tasks_by_person/%@"})
 });
 ```
 
@@ -454,7 +476,7 @@ reference:
 
 ```javascript
 App.Person = FP.Model.extend({
-  tasks: FP.hasMany("tasks", {
+  tasks: FP.hasMany({
     detached: true,
     path: function() {
       return this.get("project").buildFirebaseReference().
@@ -587,7 +609,7 @@ and in relationships:
 
 ```javascript
 App.Person = FP.Model.extend({
-  tasks: hasMany("tasks", {collection: "random"})
+  tasks: hasMany({collection: "random"})
 });
 ```
 
