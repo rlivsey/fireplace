@@ -45,8 +45,10 @@ Fireplace supports the following types out of the box:
 * `number`
 * `timestamp` (the epoch returned from date.getTime())
 
-The only option is `key`, which sets what key the attribute maps to in Firebase, by default
-this is the underscored version of the name, so `firstName` maps to `first_name`.
+### Custom Keys
+
+You can change the key used to serialize the data to/from Firebase with the `key` option.
+By default this is the underscored version of the name, so `firstName` maps to `first_name`.
 
 For example, lets add a date of birth date attribute and map the lastName attribute to "surname":
 
@@ -55,6 +57,19 @@ App.Person = FP.Model.extend({
   firstName: attr(),
   lastName: attr({key: "surname"}),
   dob: attr("date")
+})
+```
+
+### Default Values
+
+Attributes can have default values, specify this with the `default` option which can be either
+the value itself or a function which returns the default value (good for dates etc...)
+
+```javascript
+App.Person = FP.Model.extend({
+  firstName: attr({default: "John"}),
+  lastName: attr({default: "Smith"}),
+  createdAt: attr("date", {default: function() { return new Date(); }})
 })
 ```
 
