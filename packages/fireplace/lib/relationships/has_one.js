@@ -7,8 +7,6 @@
 
 var get = Ember.get;
 
-// TODO - remove the hack of setting an automatic ID?
-
 FP.hasOne = function(type, options) {
   options = options || {};
 
@@ -32,9 +30,7 @@ FP.hasOne = function(type, options) {
       }
 
       if (options.embedded) {
-        // Generate an ID, as the name in FB isn't unique
         value.setProperties({
-          id:        get(this, "id") +"/"+ name,
           parent:    this,
           parentKey: name
         });
@@ -53,9 +49,7 @@ FP.hasOne = function(type, options) {
       }
 
       if (options.embedded) {
-        // Generate an ID, as the name in FB isn't unique
         value = store.createRecord(type, {
-          id:        get(this, "id") +"/"+ name,
           snapshot:  childSnap,
           parent:    this,
           parentKey: name

@@ -49,22 +49,6 @@
     equal(id, "generated id", "ID should have been generated");
   });
 
-  test("extends its parent's ID if it's embedded in a hasOne", function() {
-    var person = Person.create();
-
-    var Parent = FP.Model.extend({
-      child: FP.hasOne(Person)
-    });
-
-    var parent = Parent.create({
-      id: "parent-id",
-      child: person
-    });
-
-    var id = get(person, "id");
-    equal(id, "parent-id/child", "ID should have been generated");
-  });
-
   module("Model store helpers", {
     setup: function() {
       Person = FP.Model.extend({
