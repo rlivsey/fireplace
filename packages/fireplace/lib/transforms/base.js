@@ -29,6 +29,6 @@ FP.Transform.reopenClass({
       return value;
     }
 
-    return transform[kind](value);
+    return transform[kind](value, options, container);
   }
 });

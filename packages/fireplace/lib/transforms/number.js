@@ -1,15 +1,12 @@
-FP.NumberTransform    = FP.Transform.extend({
-  deserialize: function(value) {
-    if (!value && value !== 0) {
-      return null;
-    }
-    return Number(value);
+var empty = Ember.isEmpty;
+
+FP.NumberTransform = FP.Transform.extend({
+
+  deserialize: function(serialized) {
+    return empty(serialized) ? null : Number(serialized);
   },
 
-  serialize: function(value) {
-    if (!value && value !== 0) {
-      return null;
-    }
-    return Number(value);
+  serialize: function(deserialized) {
+    return empty(deserialized) ? null : Number(deserialized);
   }
 });

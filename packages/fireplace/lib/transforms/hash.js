@@ -1,1 +1,27 @@
-FP.HashTransform = FP.Transform.extend({});
+FP.HashTransform = FP.Transform.extend({
+  serialize: function(hash, options, container) {
+    return transformHash("serialize", hash, options, container);
+  },
+
+  deserialize: function(hash, options, container) {
+    return transformHash("deserialize", hash, options, container);
+  }
+});
+
+function transformHash(direction, hash, options, container) {
+  if (!hash) {
+    return null;
+  }
+
+  if (!options || !options.of) {
+    return hash;
+  }
+
+  var transform = container.lookup('transform:'+options.of);
+
+  var transformed = {}, key, value;
+  for (key in hash) {
+    transformed[key] = transform[direction](hash[key], options, container);
+  }
+  return transformed;
+}
