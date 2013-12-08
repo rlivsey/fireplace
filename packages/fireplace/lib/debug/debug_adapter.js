@@ -30,8 +30,15 @@ FP.DebugAdapter = Ember.DataAdapter.extend({
   },
 
   getRecordColumnValues: function(record) {
-    var self = this, count = 0,
-        columnValues = { id: get(record, 'id'), fbPath: record.buildFirebaseReference().toString() };
+    var self   = this,
+        count  = 0,
+        ref    = record.buildFirebaseReference(),
+        root   = ref.root().toString(),
+        fbPath = ref.toString().slice(root.length),
+        columnValues = {
+          id: get(record, 'id'),
+          fbPath: fbPath
+        };
 
     record.eachAttribute(function(key) {
       if (count++ > self.attributeLimit) {
