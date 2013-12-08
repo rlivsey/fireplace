@@ -178,6 +178,7 @@ FP.Store = Ember.Object.extend({
         Ember.run(function(){
           var value = snapshot.val();
           if (value) {
+            _this.storeInCache(type, record);
             set(record, "snapshot", snapshot);
             record.listenToFirebase();
             resolve(record);
