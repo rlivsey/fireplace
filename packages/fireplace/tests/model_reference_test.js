@@ -61,6 +61,19 @@
     equal(ref.toString(), rootRef + "/persons", "reference should point to the right place");
   });
 
+  test("expands firebasePath string if it contains {{paths}}", function(){
+    App.Person.reopenClass({
+      firebasePath: "accounts/{{account.name}}/projects/{{project.id}}/members"
+    });
+
+    var account = {name: "foo"},
+        project = {id: "bar"},
+        ref = App.Person.buildFirebaseReference({account: account, project: project});
+
+    ok(ref instanceof Firebase, "reference should be instance of Firebase");
+    equal(ref.toString(), rootRef + "/accounts/foo/projects/bar/members", "reference should have been expanded");
+  });
+
   test("uses firebasePath as a function", function(){
     expect(4);
 

@@ -1,6 +1,8 @@
 require('fireplace/model/model_mixin');
+require('fireplace/utils/expand_path');
 
-var get = Ember.get;
+var get        = Ember.get,
+    expandPath = FP.Utils.expandPath;
 
 FP.Model = Ember.Object.extend(FP.ModelMixin, {
   id: function(key, value) {
@@ -50,15 +52,17 @@ FP.Model.reopenClass(FP.ModelClassMixin, {
   },
 
   buildFirebaseReference: function(opts){
+    opts = opts || {};
 
     var path = this.firebasePath;
     if (typeof path === "function") {
-      opts = opts || {};
-      // so firebase path can do opts.get("...") regardless of being passed hash or model instance
+      // so firebase path  can do opts.get("...") regardless of being passed hash or model instance
       if (!(opts instanceof Ember.Object)) {
         opts = Ember.Object.create(opts);
       }
       path = path.call(this, opts);
+    } else if (typeof path === "string") {
+      path = expandPath(path, opts);
     }
 
     if (path instanceof Firebase) {

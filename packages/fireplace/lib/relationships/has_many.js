@@ -7,7 +7,10 @@
 // as: for indexed associations
 // key: (type)
 
-var get = Ember.get;
+require('fireplace/utils/expand_path');
+
+var get        = Ember.get,
+    expandPath = FP.Utils.expandPath;
 
 FP.hasMany = function(type, options) {
   if (arguments.length === 1 && typeof type === "object") {
@@ -80,7 +83,7 @@ FP.hasMany = function(type, options) {
         if (typeof path === "function") {
           path = path.call(this);
         } else {
-          path = Ember.String.fmt(path, [get(this, 'id')]);
+          path = expandPath(path, this);
         }
         reference = model.buildFirebaseRootReference().child(path);
       } else {

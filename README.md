@@ -464,12 +464,11 @@ App.Task = FP.Model.extend({
 
 App.Person = FP.Model.extend({
   name: attr(),
-  tasks: FP.hasMany({detached: true, path: "tasks_by_person/%@"})
+  tasks: FP.hasMany({detached: true, path: "tasks_by_person/{{id}}"})
 });
 ```
 
-If the given `path` is a string, as it is here, it's run through Ember.String.fmt with the object's ID and
-is appended to the model's root firebase path.
+If the given `path` is a string, as it is here, it's expanded and appended to the root Firebase path.
 
 For complete control over the path you can provide a function and return either a string or a Firebase
 reference:
@@ -551,9 +550,23 @@ App.Person.reopenClass({
 });
 ```
 
-For more advanced customisations, you can set `firebasePath` to be a function.
+Any handlebars style parameters will be expanded, so lets say we store each person under the project
+they are a member of, eg `/projects/123/people/456`, then we can provide a path like so:
 
-Lets say we store each person under the project they are a member of, eg `/projects/123/people/456`:
+```javascript
+App.Person.reopenClass({
+  firebasePath: "projects/{{project.id}}/people"
+});
+```
+
+In this case, whenever we look for a person we'll need to provide the project and the model should have
+a project property so that it knows where it is to be saved to.
+
+```javascript
+this.store.fetch("person", {project: someProject});
+```
+
+Finally, for complete control you can specify a function, the equivalent to the template string above would be:
 
 ```javascript
 App.Person.reopenClass({
@@ -562,13 +575,6 @@ App.Person.reopenClass({
     return "projects/"+projectID+"/people";
   }
 })
-```
-
-In this case, whenever we look for a person we'll need to provide the project and the model should have
-a project property so that it knows where it is to be saved to.
-
-```javascript
-this.store.fetch("person", {project: someProject});
 ```
 
 ## Custom collections
