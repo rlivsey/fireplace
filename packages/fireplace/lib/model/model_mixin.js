@@ -170,8 +170,15 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
       // Firebase doesn't like null values, so remove them
       if (value === undefined || value === null) { return; }
 
-      // TODO - indexed associations need to just include the ID
-      json[this.relationshipKeyFromName(name)] = value.toFirebaseJSON(true);
+      // TODO - ideally we shouldn't have to know about these details here
+      // can we farm this off to a function on the relationship?
+      if (meta.kind === "hasOne" && meta.options.embedded === false) {
+        value = get(value, "id");
+      } else {
+        value = value.toFirebaseJSON(true);
+      }
+
+      json[this.relationshipKeyFromName(name)] = value;
     }, this);
 
     return includePriority ? this.wrapValueAndPriority(json) : json;

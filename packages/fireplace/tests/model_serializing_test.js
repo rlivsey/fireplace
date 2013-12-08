@@ -152,12 +152,12 @@
     });
 
     var Person = FP.Model.extend({
-      id:   123,
       name: attr(),
       avatar: one(Avatar)
     });
 
     var person = Person.create({
+      id: 123,
       name: "Ted Thompson",
       avatar: Avatar.create({
         image: "my-face.png"
@@ -169,6 +169,31 @@
       avatar: {
         image: "my-face.png"
       }
+    });
+  });
+
+  test("serializes hasOne non-embedded relationships", function() {
+    var Avatar = FP.Model.extend({
+      image: attr()
+    });
+
+    var Person = FP.Model.extend({
+      name: attr(),
+      avatar: one(Avatar, {embedded: false})
+    });
+
+    var person = Person.create({
+      id: 123,
+      name: "Ted Thompson",
+      avatar: Avatar.create({
+        id: 234,
+        image: "my-face.png"
+      })
+    });
+
+    serializesTo(person, {
+      name: "Ted Thompson",
+      avatar: 234
     });
   });
 
@@ -199,6 +224,35 @@
         home: {
           street: "29 Acacia Road"
         }
+      }
+    });
+  });
+
+  test("serializes hasMany non-embedded relationships", function() {
+    container.register("collection:indexed", FP.IndexedCollection);
+
+    var Address = FP.Model.extend({
+      street: attr()
+    });
+
+    var Person = FP.Model.extend({
+      name: attr(),
+      addresses: many(Address, {embedded: false})
+    });
+
+    var person = Person.create({
+      container: container,
+      store: store,
+      name: "Eric Wimp",
+      addresses: [
+        Address.create({id: 234, street: "29 Acacia Road"})
+      ]
+    });
+
+    serializesTo(person, {
+      name: "Eric Wimp",
+      addresses: {
+        234: true
       }
     });
   });
