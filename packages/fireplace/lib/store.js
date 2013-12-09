@@ -45,8 +45,11 @@ FP.Store = Ember.Object.extend({
 
       if (attr) {
         if (attr !== 'priority') {
-          var key   = record.attributeKeyFromName(attr),
-              value = json[key];
+          var key = record.attributeKeyFromName(attr);
+
+          Ember.assert(Ember.inspect(record) +" has no attribute "+ attr, key);
+
+          var value = json[key];
           if (value) {
             ref.child(key).set(value, callback);
           } else {
