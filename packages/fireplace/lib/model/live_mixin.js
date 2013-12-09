@@ -1,8 +1,10 @@
 require('fireplace/transforms');
+require('fireplace/model/event_queue');
 
-var get      = Ember.get,
-    set      = Ember.set,
-    classify = Ember.String.classify;
+var get = Ember.get,
+    set = Ember.set;
+
+var firebaseQueue = new FP.FirebaseEventQueue();
 
 FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
   isListeningToFirebase:  false,
@@ -63,18 +65,13 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
   },
 
   _addHandler: function(eventName) {
-    var ref         = this.buildFirebaseReference(),
-        handlerName = 'onFirebase' + classify(eventName),
-        triggerName = 'firebase' + classify(eventName),
-        _this       = this;
+    var ref   = this.buildFirebaseReference(),
+        _this = this;
 
     var handler = function() {
-      var args = arguments;
-      Ember.run(function(){
-        _this.trigger(triggerName, args);
-        _this[handlerName].apply(_this, args);
-      });
+      firebaseQueue.enqueue(_this, eventName, arguments);
     };
+
     this._fbEventHandlers[eventName] = handler;
     ref.on(eventName, handler, this);
   }
