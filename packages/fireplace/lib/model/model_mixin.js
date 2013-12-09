@@ -8,6 +8,7 @@ require('fireplace/model/mutable_snapshot');
 
 var get       = Ember.get,
     set       = Ember.set,
+    cacheFor  = Ember.cacheFor,
     serialize = FP.Transform.serialize;
 
 FP.ModelClassMixin = Ember.Mixin.create(FP.AttributesClassMixin, FP.RelationshipsClassMixin);
@@ -56,23 +57,23 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
     this._super();
   },
 
-  eachRelatedItem: function(cb) {
+  eachActiveRelation: function(cb) {
     var item;
     get(this.constructor, 'relationships').forEach(function(name, meta) {
-      item = get(this, name);
+      item = cacheFor(this, name);
       if (item) { cb(item); }
     }, this);
   },
 
   listenToFirebase: function() {
-    this.eachRelatedItem(function(item) {
+    this.eachActiveRelation(function(item) {
       item.listenToFirebase();
     });
     return this._super();
   },
 
   stopListeningToFirebase: function() {
-    this.eachRelatedItem(function(item) {
+    this.eachActiveRelation(function(item) {
       item.stopListeningToFirebase();
     });
     return this._super();
