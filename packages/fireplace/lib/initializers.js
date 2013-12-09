@@ -53,6 +53,7 @@ Ember.onLoad('Ember.Application', function(Application) {
       application.inject('route',       'store', 'store:main');
       application.inject('dataAdapter', 'store', 'store:main');
       application.inject('collection',  'store', 'store:main');
+      application.inject('component',   'store', 'store:main');
     }
   });
 
