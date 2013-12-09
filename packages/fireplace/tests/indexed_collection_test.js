@@ -24,6 +24,33 @@
     });
   }
 
+  module("FP.IndexedCollection initializing", {
+    setup: function() {
+      setupEnv();
+    }
+  });
+
+  test("inflates from a snapshot if one exists", function() {
+    var snap = mockSnapshot({val: {
+      123: true,
+      234: true,
+      456: true
+    }});
+
+    // stub the find so we don't need to worry about the run-loop etc...
+    store.findOne = function(type, id) {
+      return App.Person.create({id: id});
+    };
+
+    var people = App.PeopleIndex.create({store: store, snapshot: snap});
+
+    equal(get(people, "length"), 3, "added 3 items");
+
+    var person = people.objectAt(0);
+    ok(person instanceof App.Person, "has instantiated the models");
+    deepEqual(people.mapBy("id"), ["123","234","456"], "has all the items in the right places");
+  });
+
   module("FP.IndexedCollection serializing", {
     setup: function() {
       setupEnv();

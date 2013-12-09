@@ -23,6 +23,21 @@ FP.IndexedCollection = FP.Collection.extend({
     }, {});
   },
 
+  // If we start listening straight after initializing then this is redundant
+  // as all the data gets sent in onFirebaseChildAdded anyway
+  // but we don't know if we're going to be live or not in the near future
+  // so inflate if we have a snapshot
+  inflateFromSnapshot: Ember.on("init", function() {
+    var snapshot = get(this, "snapshot");
+    if (!snapshot) { return; }
+
+    var content = [], _this = this;
+    snapshot.forEach(function(child) {
+      content.push(_this.itemFromSnapshot(child));
+    });
+    set(this, "content", content);
+  }),
+
   contentChanged: function() {
     if (this._updatingContent) { return; }
 
