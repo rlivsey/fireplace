@@ -152,8 +152,9 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
     var attributes    = get(this.constructor, 'attributes'),
         relationships = get(this.constructor, 'relationships'),
         container     = get(this, "container"),
+        snapshot      = get(this, "_snapshot"),
         json          = {},
-        value;
+        key, value;
 
     attributes.forEach(function(name, meta){
       value = get(this, name);
@@ -167,23 +168,28 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
       // we don't serialize detached relationships
       if (meta.options.detached) { return; }
 
-      // TODO - use cacheFor to see if we've built the association already
-      // if not, we could just use snapshot.val() / .exportVal() which is already serialized
-      // instead of building the associated objects
-      value = get(this, name);
+      key = this.relationshipKeyFromName(name);
 
-      // Firebase doesn't like null values, so remove them
-      if (value === undefined || value === null) { return; }
+      // if we haven't loaded the relationship yet, get the data from the snapshot
+      // no point materializing something we already know the data of
+      value = cacheFor(this, name);
 
-      // TODO - ideally we shouldn't have to know about these details here
-      // can we farm this off to a function on the relationship?
-      if (meta.kind === "hasOne" && meta.options.embedded === false) {
-        value = get(value, "id");
+      if (value === undefined && snapshot) {
+        value = snapshot.child(key).exportVal();
+      } else if (value === null) {
+        // Firebase doesn't like null values, so remove them
+        return;
       } else {
-        value = value.toFirebaseJSON(true);
+        // TODO - ideally we shouldn't have to know about these details here
+        // can we farm this off to a function on the relationship?
+        if (meta.kind === "hasOne" && meta.options.embedded === false) {
+          value = get(value, "id");
+        } else {
+          value = value.toFirebaseJSON(true);
+        }
       }
 
-      json[this.relationshipKeyFromName(name)] = value;
+      json[key] = value;
     }, this);
 
     return includePriority ? this.wrapValueAndPriority(json) : json;
