@@ -367,16 +367,19 @@
 
     equal(emptyCollection.get("length"), 1, "should have added an item");
 
-    var person  = emptyCollection.objectAt(0);
-    ok(person instanceof App.Member, "should be instance of Member");
+    var member  = emptyCollection.objectAt(0);
+    ok(member instanceof App.Member, "should be instance of Member");
 
-    var id = get(person, "id");
+    var id = get(member, "id");
     equal(id, "New", "should have set the ID");
 
-    var level = get(person, "level");
-    equal(level, "admin", "should have set the meta properties");
+    var level = get(member, "level");
+    equal(level, "admin", "should have set the atributes");
 
-    var priority = get(person, "priority");
+    var meta = get(member, "meta");
+    deepEqual(meta, {level: "admin"}, "should have set the meta");
+
+    var priority = get(member, "priority");
     equal(priority, 123, "should have set a priority");
   });
 

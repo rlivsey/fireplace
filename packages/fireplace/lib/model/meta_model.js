@@ -4,10 +4,23 @@ var get = Ember.get;
 
 FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
   id:        Ember.computed.alias('content.id'),
-  meta:      null,
   priority:  null,
   parent:    null,
   parentKey: null,
+
+  // meta is just the entire value of the snapshot
+  meta: Ember.computed(function(key, value){
+    if (arguments.length > 1) {
+      return value;
+    } else {
+      var snapshot = get(this, "_snapshot");
+      if (!snapshot) {
+        return null;
+      } else {
+        return snapshot.val();
+      }
+    }
+  }).property("_snapshot"),
 
   buildFirebaseReference: function(){
     var id        = get(this, 'id'),
