@@ -131,7 +131,11 @@
       title: attr("capitals")
     });
 
-    var page = Page.create({container: container, title: "a title"});
+    var snapshot = mockSnapshot({val: {
+      title: "a title"
+    }});
+
+    var page = Page.create({container: container, snapshot: snapshot});
     strictEqual(get(page, "title"), "A TITLE", "the attribute should be deserialized");
   });
 
@@ -145,7 +149,11 @@
       }})
     });
 
-    var page = Page.create({title: "the title"});
+    var snapshot = mockSnapshot({val: {
+      title: "the title"
+    }});
+
+    var page = Page.create({snapshot: snapshot});
     equal(get(page, "title"), "THE TITLE", "the value is deserialized");
   });
 

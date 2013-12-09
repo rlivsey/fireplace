@@ -19,8 +19,11 @@ FP.attr = function(type, options) {
 
   return Ember.computed(function(name, value) {
     var container = get(this, 'container');
-    if (arguments.length > 1 && value !== null && value !== undefined) {
-      return deserialize(this, value, meta, container);
+    if (arguments.length > 1) {
+      if (value === null || value === undefined) {
+        value = getDefaultValue(this, options);
+      }
+      return value;
     }
 
     var dataKey  = this.attributeKeyFromName(name),
