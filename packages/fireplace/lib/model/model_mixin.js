@@ -66,16 +66,20 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
   },
 
   listenToFirebase: function() {
-    this.eachActiveRelation(function(item) {
-      item.listenToFirebase();
-    });
+    if (!get(this, 'isListeningToFirebase')) {
+      this.eachActiveRelation(function(item) {
+        item.listenToFirebase();
+      });
+    }
     return this._super();
   },
 
   stopListeningToFirebase: function() {
-    this.eachActiveRelation(function(item) {
-      item.stopListeningToFirebase();
-    });
+    if (get(this, 'isListeningToFirebase')) {
+      this.eachActiveRelation(function(item) {
+        item.stopListeningToFirebase();
+      });
+    }
     return this._super();
   },
 
