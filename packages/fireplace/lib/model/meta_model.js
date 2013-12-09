@@ -3,9 +3,11 @@ require('fireplace/model/model_mixin');
 var get = Ember.get;
 
 FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
-  id:       Ember.computed.alias('content.id'),
-  meta:     null,
-  priority: null,
+  id:        Ember.computed.alias('content.id'),
+  meta:      null,
+  priority:  null,
+  parent:    null,
+  parentKey: null,
 
   buildFirebaseReference: function(){
     var id        = get(this, 'id'),

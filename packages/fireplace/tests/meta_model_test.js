@@ -1,35 +1,73 @@
-module("FP.MetaModel Serializing");
+(function() {
 
-test("with no attributes / relationships or meta data", function() {
+  var get = Ember.get;
 
-  var Member = FP.MetaModel.extend();
-  var member = Member.create();
+  module("FP.MetaModel Serializing");
 
-  equal(member.toFirebaseJSON(), true, "defaults to true");
-});
+  test("with no attributes / relationships or meta data", function() {
 
-test("with a meta value", function() {
-  var Member = FP.MetaModel.extend();
-  var member = Member.create({meta: "admin"});
+    var Member = FP.MetaModel.extend();
+    var member = Member.create();
 
-  equal(member.toFirebaseJSON(), "admin", "serializes the meta value");
-});
-
-test("with attributes / relationships", function() {
-  var Member = FP.MetaModel.extend({
-    level: FP.attr()
+    equal(member.toFirebaseJSON(), true, "defaults to true");
   });
-  var member = Member.create({level: "admin"});
 
-  deepEqual(member.toFirebaseJSON(), {level: "admin"}, "serializes attributes");
-});
+  test("with a meta value", function() {
+    var Member = FP.MetaModel.extend();
+    var member = Member.create({meta: "admin"});
 
-test("with priority", function() {
-  var Member = FP.MetaModel.extend();
-  var member = Member.create({priority: 123});
+    equal(member.toFirebaseJSON(), "admin", "serializes the meta value");
+  });
 
-  deepEqual(member.toFirebaseJSON(true), {
-    ".value": true,
-    ".priority": 123
-  }, "serializes with firebase's export format");
-});
+  test("with attributes / relationships", function() {
+    var Member = FP.MetaModel.extend({
+      level: FP.attr()
+    });
+    var member = Member.create({level: "admin"});
+
+    deepEqual(member.toFirebaseJSON(), {level: "admin"}, "serializes attributes");
+  });
+
+  test("with priority", function() {
+    var Member = FP.MetaModel.extend();
+    var member = Member.create({priority: 123});
+
+    deepEqual(member.toFirebaseJSON(true), {
+      ".value": true,
+      ".priority": 123
+    }, "serializes with firebase's export format");
+  });
+
+  module("FP.MetaModel properties");
+
+  test("should not bleed own properties into content", function() {
+    var Meta  = FP.MetaModel.extend();
+    var Child = FP.Model.extend();
+
+    var child = Child.create();
+    var meta  = Meta.create({content: child});
+
+    meta.setProperties({
+      meta:      "meta",
+      priority:  "priority",
+      parent:    "parent",
+      parentKey: "key"
+    });
+
+    ok(!get(child, "meta"),     "child should have not set meta");
+    ok(!get(child, "priority"), "child should have not set priority");
+    ok(!get(child, "parent"),   "child should have not set parent");
+    ok(!get(child, "parentKey"),"child should have not set parentKey");
+  });
+
+  test("uses child's ID", function() {
+    var Meta  = FP.MetaModel.extend();
+    var Child = FP.Model.extend();
+
+    var child = Child.create({id: 123});
+    var meta  = Meta.create({content: child});
+
+    equal(get(meta, 'id'), 123, "should have child ID");
+  });
+
+})();
