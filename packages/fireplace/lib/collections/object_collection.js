@@ -88,14 +88,15 @@ FP.ObjectCollection = FP.Collection.extend({
   },
 
   modelFromSnapshot: function(snapshot) {
-    var id        = snapshot.name();
-    var modelName = this.modelClassFromSnapshot(snapshot);
-    var store     = get(this, 'store');
+    var id        = snapshot.name(),
+        modelName = this.modelClassFromSnapshot(snapshot),
+        store     = get(this, 'store'),
+        query     = get(this, 'query') || {};
 
-    return store.findInCacheOrCreateRecord(modelName, snapshot.ref(), {
+    return store.findInCacheOrCreateRecord(modelName, snapshot.ref(), Ember.merge({
       snapshot: snapshot,
       priority: snapshot.getPriority()
-    });
+    }, query));
   },
 
   // TODO / OPTIMIZE - faster way of checking for existing inclusion instead of findBy("id") each check

@@ -10,7 +10,7 @@ FP.Collection = Ember.ArrayProxy.extend(FP.LiveMixin, {
   parent:            null,
   parentKey:         null,
   snapshot:          null,
-  query:             null,  // only really used by indexed collection right now
+  query:             null,
 
   onFirebaseChildAdded:   Ember.required,
   onFirebaseChildRemoved: Ember.required,

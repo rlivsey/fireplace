@@ -8,8 +8,7 @@ FP.IndexedCollection = FP.Collection.extend({
 
   firebaseEvents: "child_changed",
 
-  as: null,    // the meta model wrapper to use
-  query: null, // any query params to use when finding the item
+  as: null, // the meta model wrapper to use
 
   toFirebaseJSON: function() {
     var value;
