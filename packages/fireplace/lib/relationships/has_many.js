@@ -7,6 +7,8 @@
 // as: for indexed associations
 // key: (type)
 
+// TODO - allow startAt/endAt/limit options
+
 require('fireplace/utils/expand_path');
 
 var get        = Ember.get,

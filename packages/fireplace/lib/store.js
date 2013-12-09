@@ -203,13 +203,18 @@ FP.Store = Ember.Object.extend({
     // TODO - allow specifying a custom collection type
     var type    = options.collection || "object",
         factory = container.lookupFactory("collection:"+type),
-        collection, promise;
+        collection, promise, reference;
+
+    // the actual Firebase reference if ref is a Firebase::Query
+    // note that this means the collection doesn't know its filter options
+    // TODO - pass through the filter options so it can rebuild the query if neccessary?
+    reference = (ref.ref ? ref.ref() : ref);
 
     collection = factory.create({
       store: this,
       model: model,
       query: query,
-      firebaseReference: ref
+      firebaseReference: reference
     });
 
     promise = Ember.RSVP.Promise(function(resolve, reject){
