@@ -389,7 +389,8 @@
 
 
   test("fetchQuery with options", function() {
-    expect(6);
+    // would be 6, but buildFirebaseQuery is called twice so 2x startAt/endAt/limit
+    expect(9);
 
     var snapshot = mockSnapshot({val: {
       // ... value isn't used right now

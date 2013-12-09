@@ -5,9 +5,8 @@
 // query: any additional data for non-embedded fetching
 // path: for detached relationships
 // as: for indexed associations
+// startAt/endAt/limit for filtering
 // key: (type)
-
-// TODO - allow startAt/endAt/limit options
 
 require('fireplace/utils/expand_path');
 
@@ -71,7 +70,12 @@ FP.hasMany = function(type, options) {
       store:     store,
       model:     model,
       query:     query,
-      as:        options.as
+      as:        options.as,
+
+      // TODO - allow these to be functions?
+      startAt:   options.startAt,
+      endAt:     options.endAt,
+      limit:     options.limit
     };
 
     if (!options.detached) {

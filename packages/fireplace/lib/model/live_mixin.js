@@ -11,6 +11,16 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
   concatenatedProperties: ['firebaseEvents'],
   firebaseEvents:         ['value'], // always listen to value for listenToFirebase promise
 
+  buildFirebaseReference: function() {
+    Ember.assert("You must override buildFirebaseReference");
+  },
+
+  // override to limit the reference by startAt/endAt/limit
+  // this is mainly for collections
+  buildFirebaseQuery: function() {
+    return this.buildFirebaseReference();
+  },
+
   changeCameFromFirebase: function() {
     return !!this._settingFromFirebase;
   }.property().volatile(),
@@ -35,10 +45,21 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
     }
 
     set(this, 'isListeningToFirebase', true);
-    this._fbEventHandlers = {};
-    get(this, 'firebaseEvents').forEach(this._addHandler, this);
 
-    var _this = this;
+    this._fbEventHandlers = {};
+
+    var ref   = this.buildFirebaseQuery(),
+        _this = this;
+
+    get(this, 'firebaseEvents').forEach(function(eventName) {
+      var handler = function() {
+        firebaseQueue.enqueue(_this, eventName, arguments);
+      };
+
+      this._fbEventHandlers[eventName] = handler;
+      ref.on(eventName, handler, this);
+    }, this);
+
     return Ember.RSVP.Promise(function(resolve) {
       _this.one("firebaseValue", function() {
         resolve();
@@ -53,7 +74,7 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
 
     set(this, 'isListeningToFirebase', false);
 
-    var ref = this.buildFirebaseReference();
+    var ref = this.buildFirebaseQuery();
 
     var eventName, handler;
     for (eventName in this._fbEventHandlers) {
@@ -62,18 +83,6 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
     }
 
     this._fbEventHandlers = {};
-  },
-
-  _addHandler: function(eventName) {
-    var ref   = this.buildFirebaseReference(),
-        _this = this;
-
-    var handler = function() {
-      firebaseQueue.enqueue(_this, eventName, arguments);
-    };
-
-    this._fbEventHandlers[eventName] = handler;
-    ref.on(eventName, handler, this);
   }
 
 });

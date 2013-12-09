@@ -1,16 +1,22 @@
 require('fireplace/model/live-mixin');
 
 var get = Ember.get,
-    set = Ember.set;
+    set = Ember.set,
+    getProperties = Ember.getProperties;
 
 FP.Collection = Ember.ArrayProxy.extend(FP.LiveMixin, {
   firebaseEvents: ['child_added', 'child_removed', 'child_moved', 'value'],
 
-  model:             null,
-  parent:            null,
-  parentKey:         null,
-  snapshot:          null,
-  query:             null,
+  model:     null,
+  parent:    null,
+  parentKey: null,
+  snapshot:  null,
+  query:     null,
+
+  // filtering
+  startAt: null,
+  endAt:   null,
+  limit:   null,
 
   onFirebaseChildAdded:   Ember.required,
   onFirebaseChildRemoved: Ember.required,
@@ -57,6 +63,25 @@ FP.Collection = Ember.ArrayProxy.extend(FP.LiveMixin, {
         modelClass = store.modelFor(modelName);
 
     return modelClass.buildFirebaseReference();
+  },
+
+  buildFirebaseQuery: function() {
+    var reference = this.buildFirebaseReference(),
+        options = getProperties(this, 'startAt', 'endAt', 'limit');
+
+    if (options.startAt) {
+      reference = reference.startAt(options.startAt);
+    }
+
+    if (options.endAt) {
+      reference = reference.endAt(options.endAt);
+    }
+
+    if (options.limit) {
+      reference = reference.limit(options.limit);
+    }
+
+    return reference;
   },
 
   // Override to support polymorphism

@@ -138,25 +138,13 @@ FP.Store = Ember.Object.extend({
       query   = {};
     }
 
-    var model     = this.modelFor(type),
+    var model = this.modelFor(type),
         reference;
 
     if (options.path) {
       reference = model.buildFirebaseRootReference().child(options.path);
     } else {
       reference = model.buildFirebaseReference(query);
-    }
-
-    if (options.startAt) {
-      reference = reference.startAt(options.startAt);
-    }
-
-    if (options.endAt) {
-      reference = reference.endAt(options.endAt);
-    }
-
-    if (options.limit) {
-      reference = reference.limit(options.limit);
     }
 
     return this.findFetchCollectionByReference(model, reference, query, options, returnPromise);
@@ -203,22 +191,22 @@ FP.Store = Ember.Object.extend({
     // TODO - allow specifying a custom collection type
     var type    = options.collection || "object",
         factory = container.lookupFactory("collection:"+type),
-        collection, promise, reference;
-
-    // the actual Firebase reference if ref is a Firebase::Query
-    // note that this means the collection doesn't know its filter options
-    // TODO - pass through the filter options so it can rebuild the query if neccessary?
-    reference = (ref.ref ? ref.ref() : ref);
+        collection, promise, fbQuery;
 
     collection = factory.create({
       store: this,
       model: model,
       query: query,
-      firebaseReference: reference
+      firebaseReference: ref,
+      startAt: options.startAt,
+      endAt: options.endAt,
+      limit: options.limit
     });
 
+    fbQuery = collection.buildFirebaseQuery();
+
     promise = Ember.RSVP.Promise(function(resolve, reject){
-      ref.once('value', function(snapshot){
+      fbQuery.once('value', function(snapshot){
         Ember.run(function(){
           // we don't reject if snapshot is empty, an empty collection is still valid
           set(collection, "snapshot", snapshot);
