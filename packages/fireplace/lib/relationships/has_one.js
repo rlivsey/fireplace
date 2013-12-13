@@ -5,7 +5,8 @@
 // id: for detached queries, defaults to the object ID
 // key: (type)
 
-var get = Ember.get;
+var get    = Ember.get,
+    isNone = Ember.isNone;
 
 FP.hasOne = function(type, options) {
   if (arguments.length === 1 && typeof type === "object") {
@@ -30,7 +31,7 @@ FP.hasOne = function(type, options) {
 
   return Ember.computed(function(name, value) {
     if (arguments.length > 1) {
-      if (value === null || value === undefined) {
+      if (isNone(value)) {
         return null;
       }
 

@@ -11,6 +11,7 @@
 require('fireplace/utils/expand_path');
 
 var get        = Ember.get,
+    isNone     = Ember.isNone,
     expandPath = FP.Utils.expandPath;
 
 FP.hasMany = function(type, options) {
@@ -36,7 +37,7 @@ FP.hasMany = function(type, options) {
     var content, childSnap;
 
     if (arguments.length > 1) {
-      if (value === null || value === undefined) {
+      if (isNone(value)) {
         return null;
       }
       content = value;

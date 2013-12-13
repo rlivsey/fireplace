@@ -1,7 +1,8 @@
 require('fireplace/transforms');
 
 var get        = Ember.get,
-    deserialize= FP.Transform.deserialize;
+    deserialize= FP.Transform.deserialize,
+    isNone     = Ember.isNone;
 
 FP.attr = function(type, options) {
   if (arguments.length === 1 && typeof type === "object") {
@@ -20,7 +21,7 @@ FP.attr = function(type, options) {
   return Ember.computed(function(name, value) {
     var container = get(this, 'container');
     if (arguments.length > 1) {
-      if (value === null || value === undefined) {
+      if (isNone(value)) {
         value = getDefaultValue(this, options);
       }
       return value;
@@ -31,7 +32,7 @@ FP.attr = function(type, options) {
 
     value = snapshot && snapshot.val()[dataKey];
 
-    if (value === null || value === undefined) {
+    if (isNone(value)) {
       value = getDefaultValue(this, options);
     } else {
       value = deserialize(this, value, meta, container);

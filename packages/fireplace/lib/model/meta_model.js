@@ -1,6 +1,7 @@
 require('fireplace/model/model_mixin');
 
-var get = Ember.get;
+var get    = Ember.get,
+    isNone = Ember.isNone;
 
 FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
   id:        Ember.computed.alias('content.id'),
@@ -46,7 +47,7 @@ FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
     }
 
     var meta = get(this, "meta");
-    if (meta === null || meta === undefined) {
+    if (isNone(meta)) {
       meta = true;
     }
 

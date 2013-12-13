@@ -9,6 +9,7 @@ require('fireplace/model/mutable_snapshot');
 var get       = Ember.get,
     set       = Ember.set,
     cacheFor  = Ember.cacheFor,
+    isNone    = Ember.isNone,
     serialize = FP.Transform.serialize;
 
 FP.ModelClassMixin = Ember.Mixin.create(FP.AttributesClassMixin, FP.RelationshipsClassMixin);
@@ -159,7 +160,7 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
     attributes.forEach(function(name, meta){
       value = get(this, name);
       // Firebase doesn't like null values, so remove them
-      if (value === undefined || value === null) { return; }
+      if (isNone(value)) { return; }
 
       json[this.attributeKeyFromName(name)] = serialize(this, value, meta, container);
     }, this);
@@ -176,7 +177,7 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
 
       if (value === undefined && snapshot) {
         value = snapshot.child(key).exportVal();
-      } else if (value === null || value === undefined) {
+      } else if (isNone(value)) {
         // Firebase doesn't like null values, so remove them
         return;
       } else {
@@ -197,7 +198,7 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
 
   wrapValueAndPriority: function(json) {
     var priority = get(this, 'priority');
-    if (priority === undefined || priority === null) {
+    if (isNone(priority)) {
       return json;
     }
 
