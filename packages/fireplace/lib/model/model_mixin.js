@@ -176,7 +176,7 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
 
       if (value === undefined && snapshot) {
         value = snapshot.child(key).exportVal();
-      } else if (value === null) {
+      } else if (value === null || value === undefined) {
         // Firebase doesn't like null values, so remove them
         return;
       } else {
