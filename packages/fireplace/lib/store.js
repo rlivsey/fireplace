@@ -210,6 +210,7 @@ FP.Store = Ember.Object.extend({
         Ember.run(function(){
           // we don't reject if snapshot is empty, an empty collection is still valid
           set(collection, "snapshot", snapshot);
+          collection.inflateFromSnapshot();
           collection.listenToFirebase();
           resolve(collection);
         });
