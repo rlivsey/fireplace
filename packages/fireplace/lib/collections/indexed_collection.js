@@ -214,8 +214,9 @@ FP.IndexedCollection = FP.Collection.extend({
       parent:   this
     });
 
-    // TODO - should we be listening now?
-    meta.listenToFirebase();
+    if (snapshot) {
+      meta.listenToFirebase();
+    }
     return meta;
   },
 
