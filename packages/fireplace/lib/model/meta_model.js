@@ -36,7 +36,13 @@ FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
         relationships = get(this.constructor, 'relationships');
 
     if (attributes.length || attributes.length) {
-      return this._super(includePriority);
+      var attrJSON = this._super(includePriority);
+
+      // if attributes are null, then we'll get an empty object back
+      // we don't want to save this as that'll be treated as deleting the meta model!
+      if (!jQuery.isEmptyObject(attrJSON)) {
+        return attrJSON;
+      }
     }
 
     var meta = get(this, "meta");

@@ -29,7 +29,8 @@
         "expectAssertion",
         "mockSnapshot",
         "mockReference",
-        "stubReference"
+        "stubReference",
+        "jQuery"
     ],
 
     "node" : false,

@@ -28,6 +28,15 @@
     deepEqual(member.toFirebaseJSON(), {level: "admin"}, "serializes attributes");
   });
 
+  test("with attributes / relationships which are null", function() {
+    var Member = FP.MetaModel.extend({
+      level: FP.attr()
+    });
+    var member = Member.create({level: null});
+
+    deepEqual(member.toFirebaseJSON(), true, "falls back to true");
+  });
+
   test("with priority", function() {
     var Member = FP.MetaModel.extend();
     var member = Member.create({priority: 123});
