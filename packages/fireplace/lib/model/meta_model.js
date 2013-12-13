@@ -55,6 +55,10 @@ FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
     } else {
       return meta;
     }
+  },
+
+  saveContent: function() {
+    return this.get("content").save();
   }
 
 });

@@ -79,4 +79,22 @@
     equal(get(meta, 'id'), 123, "should have child ID");
   });
 
+  module("FP.MetaModel content");
+
+  test("saveContent saves a meta model's content", function() {
+    expect(1);
+
+    var Meta  = FP.MetaModel.extend();
+    var Child = FP.Model.extend();
+
+    var child = Child.create({id: 123});
+    var meta  = Meta.create({content: child});
+
+    child.save = function() {
+      ok(true, "called save on the content");
+    };
+
+    meta.saveContent();
+  });
+
 })();
