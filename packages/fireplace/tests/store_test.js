@@ -22,6 +22,22 @@
     }
   });
 
+  test("fork creates a new instance of the store with an empty cache", function() {
+    var MainStore = FP.Store.extend({
+      firebaseRoot: "https://something.firebaseio.com"
+    });
+
+    var main = MainStore.create({container: container});
+    main.createRecord(App.Person, {name: "Bob"});
+
+    ok(main.all(App.Person).length, "store has cached a record");
+
+    var forked = main.fork();
+
+    equal(get(main, "firebaseRoot"), get(forked, "firebaseRoot"), "fork has the same root");
+    ok(!forked.all(App.Person).length, "fork has no cached records");
+  });
+
   test("createRecord creates an instance of of the type", function() {
     var person = store.createRecord("person", {name: "Bob"});
 

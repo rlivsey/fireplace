@@ -6,6 +6,17 @@ FP.Store = Ember.Object.extend({
 
   firebaseRoot: null,
 
+  // just returns a new instance of the same store with the same container
+  // means the cache is isolated & any finds etc are operating
+  // independently of the forked store.
+  // no need to re-join, just save or discard your changes & firebase
+  // takes care of keeping the other models in sync
+  fork: function() {
+    return this.constructor.create({
+      container: get(this, "container")
+    });
+  },
+
   buildFirebaseRootReference: function(){
     var url = get(this, 'firebaseRoot');
     Ember.assert("Your store needs a firebaseRoot", url);
