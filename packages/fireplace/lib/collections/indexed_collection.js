@@ -116,13 +116,20 @@ FP.IndexedCollection = FP.Collection.extend({
     return {
       id:       get(record, 'id'),
       snapshot: null,
-      record:   record
+      record:   this.wrapRecordInMetaObjectIfNeccessary(record)
     };
   },
 
   replaceContent: function(start, numRemoved, objectsAdded) {
     objectsAdded = objectsAdded.map(function(object) {
-      return (object instanceof Ember.Object) ? this.itemFromRecord(object) : object;
+      if (object instanceof FP.MetaModel) {
+        object.set("parent", this);
+        return this.itemFromRecord(object);
+      } else if (object instanceof Ember.Object) {
+        return this.itemFromRecord(object);
+      } else {
+        return object;
+      }
     }, this);
     return this._super(start, numRemoved, objectsAdded);
   },
@@ -183,26 +190,27 @@ FP.IndexedCollection = FP.Collection.extend({
     if (returnPromise) {
       record = store.fetchOne(type, item.id, query);
       return record.then(function(resolved) {
-        return _this.wrapRecordInMetaObjectIfNeccessary(resolved, item);
+        return _this.wrapRecordInMetaObjectIfNeccessary(resolved, item.snapshot);
       });
     } else {
       record = store.findOne(type, item.id, query);
-      return this.wrapRecordInMetaObjectIfNeccessary(record, item);
+      return this.wrapRecordInMetaObjectIfNeccessary(record, item.snapshot);
     }
   },
 
-  wrapRecordInMetaObjectIfNeccessary: function(record, item) {
+  wrapRecordInMetaObjectIfNeccessary: function(record, snapshot) {
     var as = get(this, "as");
     if (!as) {
       return record;
     }
 
-    var store = get(this, "store");
+    var store    = get(this, "store"),
+        priority = snapshot ? snapshot.getPriority() : null;
 
     var meta = store.buildRecord(as, null, {
       content:  record,
-      priority: item.snapshot.getPriority(),
-      snapshot: item.snapshot,
+      priority: priority,
+      snapshot: snapshot,
       parent:   this
     });
 

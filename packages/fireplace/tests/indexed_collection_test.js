@@ -51,6 +51,25 @@
     deepEqual(people.mapBy("id"), ["123","234","456"], "has all the items in the right places");
   });
 
+  test("wraps plain objects in meta models if necessary", function() {
+    App.Member = FP.MetaModel.extend({
+      level: attr()
+    });
+
+    var person = store.createRecord(App.Person, {id: 123});
+    var people = App.PeopleIndex.create({
+      as: App.Member,
+      content: [
+        person
+      ]
+    });
+
+    var obj = people.get("firstObject");
+
+    ok(obj instanceof App.Member, "item is wrapped in meta model");
+    equal(get(obj, 'content'), person, "meta model has item as content");
+  });
+
   module("FP.IndexedCollection serializing", {
     setup: function() {
       setupEnv();
@@ -73,6 +92,12 @@
       234: true,
       345: true
     });
+  });
+
+  module("FP.IndexedCollection serializing", {
+    setup: function() {
+      setupEnv();
+    }
   });
 
   test("serializes children as id => meta model JSON if they are meta models", function() {
@@ -110,6 +135,52 @@
         level: "member"
       }
     });
+  });
+
+  module("FP.IndexedCollection adding items", {
+    setup: function() {
+      setupEnv();
+    }
+  });
+
+  test("sets the parent for meta-models so references are all setup", function() {
+    App.Member = FP.MetaModel.extend();
+
+    var people = App.PeopleIndex.create();
+
+    var person = store.createRecord(App.Person, {id: 123});
+    var member = store.createRecord(App.Member, {content: person});
+
+    people.pushObject(member);
+
+    equal(member.get("parent"), people, "sets the parent");
+  });
+
+  test("doesn't set the parent for non-meta-models", function() {
+    App.Member = FP.MetaModel.extend();
+
+    var people = App.PeopleIndex.create();
+
+    var person = store.createRecord(App.Person, {id: 123});
+    people.pushObject(person);
+
+    ok(!person.get("parent"), "parent is not set");
+  });
+
+  test("wraps objects in their meta models if `as` is set", function() {
+    App.Member = FP.MetaModel.extend({
+      level: attr()
+    });
+
+    var people = App.PeopleIndex.create({as: App.Member});
+
+    var person = store.createRecord(App.Person, {id: 123});
+    people.pushObject(person);
+
+    var obj = people.get("firstObject");
+
+    ok(obj instanceof App.Member, "item is wrapped in meta model");
+    equal(get(obj, 'content'), person, "meta model has item as content");
   });
 
   module("FP.IndexedCollection finding items", {
