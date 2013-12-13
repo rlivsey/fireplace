@@ -1,5 +1,6 @@
 var get        = Ember.get,
-    underscore = Ember.String.underscore;
+    underscore = Ember.String.underscore,
+    singularize= Ember.String.singularize;
 
 FP.RelationshipsClassMixin = Ember.Mixin.create({
   relationships: Ember.computed(function() {
@@ -65,7 +66,7 @@ function typeForRelationship(name, meta) {
   var type = meta.type;
 
   if (!type && meta.kind === 'hasMany') {
-    type = Ember.String.singularize(name);
+    type = singularize(name);
   } else if (!type) {
     type = name;
   }
