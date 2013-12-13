@@ -142,9 +142,9 @@ FP.Store = Ember.Object.extend({
         reference;
 
     if (options.path) {
-      reference = model.buildFirebaseRootReference().child(options.path);
+      reference = model.buildFirebaseRootReference(this).child(options.path);
     } else {
-      reference = model.buildFirebaseReference(query);
+      reference = model.buildFirebaseReference(this, query);
     }
 
     return this.findFetchCollectionByReference(model, reference, query, options, returnPromise);
@@ -231,7 +231,6 @@ FP.Store = Ember.Object.extend({
     } else {
       factory = type;
     }
-    factory.store = this;
     return factory;
   },
 

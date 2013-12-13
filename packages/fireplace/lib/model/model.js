@@ -7,7 +7,9 @@ var get        = Ember.get,
 FP.Model = Ember.Object.extend(FP.ModelMixin, {
   id: function(key, value) {
     if (value) { return value; }
-    return this.constructor.buildFirebaseRootReference().push().name();
+
+    var store = get(this, 'store');
+    return this.constructor.buildFirebaseRootReference(store).push().name();
   }.property(),
 
   debugReference: function(){
@@ -28,7 +30,8 @@ FP.Model = Ember.Object.extend(FP.ModelMixin, {
     if (parent) {
       ref = parent.buildFirebaseReference();
     } else {
-      ref = this.constructor.buildFirebaseReference(this);
+      var store = get(this, 'store');
+      ref = this.constructor.buildFirebaseReference(store, this);
     }
 
     return ref.child(id);
@@ -44,14 +47,11 @@ FP.Model.reopenClass(FP.ModelClassMixin, {
 
   // defaults to the store's root reference, normally won't be overridden
   // unless you have a different firebase per model, which could cause oddness!
-  buildFirebaseRootReference: function() {
-    // set by Store#modelFor
-    var store = this.store;
-    Ember.assert("Model "+this.constructor.toString()+" doesn't have a store, ensure it was created via Store#createRecord etc...", store);
+  buildFirebaseRootReference: function(store) {
     return store.buildFirebaseRootReference();
   },
 
-  buildFirebaseReference: function(opts){
+  buildFirebaseReference: function(store, opts){
     opts = opts || {};
 
     var path = this.firebasePath;
@@ -69,7 +69,7 @@ FP.Model.reopenClass(FP.ModelClassMixin, {
       return path;
     }
 
-    var root = this.buildFirebaseRootReference();
+    var root = this.buildFirebaseRootReference(store);
     return root.child(path);
   }
 });

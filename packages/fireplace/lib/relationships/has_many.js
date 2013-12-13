@@ -91,9 +91,9 @@ FP.hasMany = function(type, options) {
         } else {
           path = expandPath(path, this);
         }
-        reference = model.buildFirebaseRootReference().child(path);
+        reference = model.buildFirebaseRootReference(store).child(path);
       } else {
-        reference = model.buildFirebaseReference(query);
+        reference = model.buildFirebaseReference(store, query);
       }
       collectionOpts.firebaseReference = reference;
     }

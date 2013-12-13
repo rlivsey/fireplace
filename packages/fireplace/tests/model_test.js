@@ -34,7 +34,7 @@
     expect(2);
 
     var oldPush = Firebase.prototype.push;
-    var person = Person.create();
+    var person = Person.create({store: FP.Store.create()});
 
     Firebase.prototype.push = function() {
       ok(true, "push called on a firebase reference");

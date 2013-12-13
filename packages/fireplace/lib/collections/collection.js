@@ -62,7 +62,7 @@ FP.Collection = Ember.ArrayProxy.extend(FP.LiveMixin, {
     var modelName  = get(this, 'model'),
         modelClass = store.modelFor(modelName);
 
-    return modelClass.buildFirebaseReference();
+    return modelClass.buildFirebaseReference(store);
   },
 
   buildFirebaseQuery: function() {

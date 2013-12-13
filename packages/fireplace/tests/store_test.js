@@ -236,10 +236,7 @@
     expect(3);
 
     // set isNew to false as new items are hidden in the cache
-    var person = App.Person.create({id: 123, isNew: false});
-
-    // set manually because we don't go through the factory here
-    App.Person.store = store;
+    var person = store.createRecord(App.Person, {id: 123, isNew: false});
 
     // this would have happened automatically if we'd done it via the store
     // store.createRecord("person"), {id: 123}

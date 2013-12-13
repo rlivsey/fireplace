@@ -31,13 +31,12 @@
         firebaseRoot: rootRef
       });
 
-      App.Person = FP.Model.extend();
-      App.Person.store = store;
+      App.Person = FP.Model.extend({store: store});
     }
   });
 
   test("defaults to lowercase, underscored & pluralized class name", function(){
-    var ref = App.Person.buildFirebaseReference();
+    var ref = App.Person.buildFirebaseReference(store);
 
     ok(ref instanceof Firebase, "reference should be instance of Firebase");
     equal(ref.toString(), rootRef + "/people", "reference should be lowercased, underscored and pluralized");
@@ -45,8 +44,7 @@
     // people only tests lowercase & plural, lets test underscored
 
     App.SomeThing = FP.Model.extend();
-    App.SomeThing.store = store;
-    ref = App.SomeThing.buildFirebaseReference();
+    ref = App.SomeThing.buildFirebaseReference(store);
     equal(ref.toString(), rootRef + "/some_things", "reference should be lowercased, underscored and pluralized");
   });
 
@@ -56,7 +54,7 @@
       firebasePath: "persons"
     });
 
-    var ref = App.Person.buildFirebaseReference();
+    var ref = App.Person.buildFirebaseReference(store);
     ok(ref instanceof Firebase, "reference should be instance of Firebase");
     equal(ref.toString(), rootRef + "/persons", "reference should point to the right place");
   });
@@ -68,7 +66,7 @@
 
     var account = {name: "foo"},
         project = {id: "bar"},
-        ref = App.Person.buildFirebaseReference({account: account, project: project});
+        ref = App.Person.buildFirebaseReference(store, {account: account, project: project});
 
     ok(ref instanceof Firebase, "reference should be instance of Firebase");
     equal(ref.toString(), rootRef + "/accounts/foo/projects/bar/members", "reference should have been expanded");
@@ -87,7 +85,7 @@
       }
     });
 
-    var ref = App.Person.buildFirebaseReference(refOptions);
+    var ref = App.Person.buildFirebaseReference(store, refOptions);
     ok(ref instanceof Firebase, "reference should be instance of Firebase");
     equal(ref.toString(), rootRef + "/foo/bar", "reference should point to the right place");
   });
@@ -101,7 +99,7 @@
       }
     });
 
-    var ref = App.Person.buildFirebaseReference();
+    var ref = App.Person.buildFirebaseReference(store);
     ok(ref instanceof Firebase, "reference should be instance of Firebase");
     equal(ref.toString(), "https://somewhere.firebaseio.com/foo/bar/baz", "reference should point to the right place");
   });
@@ -114,8 +112,7 @@
         firebaseRoot: rootRef
       });
 
-      App.Person = FP.Model.extend();
-      App.Person.store = store;
+      App.Person = FP.Model.extend({store: store});
     }
   });
 
