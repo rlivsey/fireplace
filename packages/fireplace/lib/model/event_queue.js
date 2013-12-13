@@ -20,7 +20,15 @@ FP.FirebaseEventQueue.prototype = {
     var model, eventName, args, classyName, handlerName, triggerName;
 
     this.pending.forEach(function(item){
-      model     = item[0];
+      model = item[0];
+
+      // if the model has been destroyed since the event came in, then
+      // don't bother trying to update it - destroying stops listening to firebase
+      // so it doesn't expect to receive any more updates anyway
+      if (model.isDestroying || model.isDestroyed) {
+        return;
+      }
+
       eventName = item[1];
       args      = item[2];
       classyName= classify(eventName);
