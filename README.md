@@ -343,7 +343,7 @@ To change this to something more descriptive, you can use `Ember.computed.alias`
 
 ```javascript
 App.Member = FP.MetaModel.extend({
-  meta: Ember.computed.alias("accessLevel")
+  accessLevel: Ember.computed.alias("meta")
 });
 ```
 
