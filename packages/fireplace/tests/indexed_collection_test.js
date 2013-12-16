@@ -290,7 +290,9 @@
     equal(emptyCollection.get("length"), 1, "should have added an item");
 
     var person  = emptyCollection.objectAt(0);
-    ok(person instanceof App.Person, "should be instance of Person");
+    // it's an ObjectProxy at this point
+    // ok(person instanceof App.Person, "should be instance of Person");
+    ok(get(person, "content") instanceof App.Person, "should be instance of Person");
 
     var id = get(person, "id");
     equal(id, "New", "should have set the ID");
@@ -338,29 +340,6 @@
 
     deepEqual(collection.mapProperty("id"), ["1", "2", "New", "3"], "should have inserted after the previous item");
   });
-
-  test("firebaseChildAdded supports polymorphism", function(){
-
-    var PolyCollection = FP.IndexedCollection.extend({
-      modelClassFromSnapshot: function(snapshot) {
-        return snapshot.val().type;
-      }
-    });
-
-    var snapshot       = mockSnapshot({name: "New", val: {type: "thing"}});
-    var polyCollection = PolyCollection.create({store: store, firebasePath: "things"});
-
-    var Thing = FP.Model.extend();
-    container.register("model:thing", Thing);
-
-    Ember.run(function(){
-      polyCollection.onFirebaseChildAdded(snapshot);
-    });
-
-    var thing = polyCollection.objectAt(0);
-    ok(thing instanceof Thing, "should be instance of Thing");
-  });
-
 
   test("firebaseChildRemoved removes an item if it exists", function(){
     var snapshot = mockSnapshot({name: "2"});

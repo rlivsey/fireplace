@@ -1,3 +1,5 @@
+require('fireplace/model/promise_model');
+
 var get     = Ember.get,
     set     = Ember.set,
     guidFor = Ember.guidFor;
@@ -161,8 +163,6 @@ FP.Store = Ember.Object.extend({
     return this.findFetchCollectionByReference(model, reference, query, options, returnPromise);
   },
 
-  // TODO - return ObjectProxy instead of Model from find (returnPromise=false)
-  // so that polymorphic find works
   findFetchOne: function(type, id, query, returnPromise) {
     query = query || {};
 
@@ -185,10 +185,6 @@ FP.Store = Ember.Object.extend({
 
             // for polymorhism
             var modelType = _this.modelFor(type).typeFromSnapshot(snapshot);
-
-            // TODO - this currently breaks find as we've already returned a different record instance
-            // we only need to do this if the model is polymorphic
-            // should we add a polymorphic flag to the model class def?
             record = _this.createRecord(modelType, Ember.merge(query, {
               id: id,
               snapshot: snapshot
@@ -205,7 +201,7 @@ FP.Store = Ember.Object.extend({
       });
     });
 
-    return returnPromise ? promise : record;
+    return returnPromise ? promise : FP.PromiseModel.create({promise: promise, content: record});
   },
 
   findFetchCollectionByReference: function(model, ref, query, options, returnPromise) {
