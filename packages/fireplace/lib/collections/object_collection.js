@@ -58,9 +58,9 @@ FP.ObjectCollection = FP.Collection.extend({
     return Ember.RSVP.Promise(function(resolve, reject) {
       var observerFunc = function() {
         if (get(_this, "hasLoadedAllChildren")) {
+          _this.removeObserver("hasLoadedAllChildren", _this, observerFunc);
           resolve(_this);
         }
-        _this.removeObserver("hasLoadedAllChildren", _this, observerFunc);
       };
 
       _this.addObserver("hasLoadedAllChildren", _this, observerFunc);
