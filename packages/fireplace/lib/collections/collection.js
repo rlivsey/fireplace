@@ -84,9 +84,10 @@ FP.Collection = Ember.ArrayProxy.extend(FP.LiveMixin, {
     return reference;
   },
 
-  // Override to support polymorphism
   modelClassFromSnapshot: function(snap) {
-    return get(this, 'model');
+    var modelName = get(this, 'model');
+    var baseClass = this.store.modelFor(modelName);
+    return baseClass.typeFromSnapshot(snap);
   },
 
   onFirebaseValue: function(snapshot) {

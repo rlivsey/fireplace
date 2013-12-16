@@ -45,6 +45,11 @@ FP.Model.reopenClass(FP.ModelClassMixin, {
     return Ember.String.pluralize(Ember.String.underscore(className));
   },
 
+  // override for polymophism
+  typeFromSnapshot: function(snapshot) {
+    return this;
+  },
+
   // defaults to the store's root reference, normally won't be overridden
   // unless you have a different firebase per model, which could cause oddness!
   buildFirebaseRootReference: function(store) {

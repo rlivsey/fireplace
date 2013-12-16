@@ -161,27 +161,39 @@ FP.Store = Ember.Object.extend({
     return this.findFetchCollectionByReference(model, reference, query, options, returnPromise);
   },
 
+  // TODO - return ObjectProxy instead of Model from find (returnPromise=false)
+  // so that polymorphic find works
   findFetchOne: function(type, id, query, returnPromise) {
     query = query || {};
 
     var record   = this.buildRecord(type, id, query),
-        existing = this.findInCacheByReference(type, record.buildFirebaseReference());
+        ref      = record.buildFirebaseReference(),
+        existing = this.findInCacheByReference(type, ref);
 
     if (existing) {
       existing.listenToFirebase();
       return returnPromise ? Ember.RSVP.resolve(existing) : existing;
     }
 
-    var ref = record.buildFirebaseReference(),
-      _this = this;
+    var _this = this;
 
     var promise = Ember.RSVP.Promise(function(resolve, reject){
       ref.once('value', function(snapshot){
         Ember.run(function(){
           var value = snapshot.val();
           if (value) {
-            _this.storeInCache(type, record);
-            set(record, "snapshot", snapshot);
+
+            // for polymorhism
+            var modelType = _this.modelFor(type).typeFromSnapshot(snapshot);
+
+            // TODO - this currently breaks find as we've already returned a different record instance
+            // we only need to do this if the model is polymorphic
+            // should we add a polymorphic flag to the model class def?
+            record = _this.createRecord(modelType, Ember.merge(query, {
+              id: id,
+              snapshot: snapshot
+            }));
+
             record.listenToFirebase();
             resolve(record);
           } else {
