@@ -207,7 +207,6 @@ FP.Store = Ember.Object.extend({
   findFetchCollectionByReference: function(model, ref, query, options, returnPromise) {
     var container = get(this, 'container');
 
-    // TODO - allow specifying a custom collection type
     var type    = options.collection || "object",
         factory = container.lookupFactory("collection:"+type),
         collection, promise, fbQuery;
