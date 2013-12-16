@@ -168,16 +168,18 @@ FP.Store = Ember.Object.extend({
 
     var record   = this.buildRecord(type, id, query),
         ref      = record.buildFirebaseReference(),
-        existing = this.findInCacheByReference(type, ref);
+        existing = this.findInCacheByReference(type, ref),
+        promise;
 
     if (existing) {
       existing.listenToFirebase();
-      return returnPromise ? Ember.RSVP.resolve(existing) : existing;
+      promise = Ember.RSVP.resolve(existing);
+      return returnPromise ? promise : FP.PromiseModel.create({promise: promise});
     }
 
     var _this = this;
 
-    var promise = Ember.RSVP.Promise(function(resolve, reject){
+    promise = Ember.RSVP.Promise(function(resolve, reject){
       ref.once('value', function(snapshot){
         Ember.run(function(){
           var value = snapshot.val();
