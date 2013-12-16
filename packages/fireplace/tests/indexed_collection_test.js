@@ -180,6 +180,24 @@
     var obj = people.get("firstObject");
 
     ok(obj instanceof App.Member, "item is wrapped in meta model");
+    ok(get(obj, 'content') instanceof App.Person, "content is a person");
+    equal(get(obj, 'content'), person, "meta model has item as content");
+  });
+
+  test("doesn't double wrap", function() {
+    App.Member = FP.MetaModel.extend({
+      level: attr()
+    });
+
+    var people = App.PeopleIndex.create({as: App.Member});
+
+    var person = store.createRecord(App.Person, {id: 123});
+    var member = store.createRecord(App.Member, {content: person});
+    people.pushObject(member);
+
+    var obj = people.get("firstObject");
+
+    ok(obj instanceof App.Member, "item is wrapped in meta model");
     equal(get(obj, 'content'), person, "meta model has item as content");
   });
 

@@ -200,7 +200,7 @@ FP.IndexedCollection = FP.Collection.extend({
 
   wrapRecordInMetaObjectIfNeccessary: function(record, snapshot) {
     var as = get(this, "as");
-    if (!as) {
+    if (!as || record instanceof FP.MetaModel) {
       return record;
     }
 
