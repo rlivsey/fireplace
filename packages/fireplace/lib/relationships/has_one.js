@@ -72,7 +72,7 @@ FP.hasOne = function(type, options) {
         if (options.detached) {
           itemID = options.id || get(this, "id");
           if (typeof itemID === "function") {
-            itemID = query.call(this);
+            itemID = itemID.call(this);
           }
         } else {
           itemID = childSnap.val();
