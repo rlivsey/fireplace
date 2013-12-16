@@ -174,7 +174,7 @@ FP.Store = Ember.Object.extend({
     if (existing) {
       existing.listenToFirebase();
       promise = Ember.RSVP.resolve(existing);
-      return returnPromise ? promise : FP.PromiseModel.create({promise: promise});
+      return returnPromise ? promise : FP.PromiseModel.create({content: existing, promise: promise});
     }
 
     var _this = this;
