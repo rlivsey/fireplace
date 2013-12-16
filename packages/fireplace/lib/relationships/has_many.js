@@ -57,7 +57,6 @@ FP.hasMany = function(type, options) {
         container      = get(this, "container"),
         collectionName = options.collection || (options.embedded ? "object" : "indexed"),
         collectionType = container.lookupFactory("collection:"+collectionName),
-        model          = store.modelFor(meta.type),
         query          = options.query;
 
     Ember.assert("Collection type must exist: "+collectionName, !!collectionType);
@@ -69,7 +68,7 @@ FP.hasMany = function(type, options) {
     var collectionOpts = {
       content:   content,
       store:     store,
-      model:     model,
+      model:     meta.type,
       query:     query,
       as:        options.as,
 
@@ -84,7 +83,9 @@ FP.hasMany = function(type, options) {
       collectionOpts.parentKey = name;
       collectionOpts.snapshot  = childSnap;
     } else {
-      var reference;
+      var modelClass = store.modelFor(meta.type),
+          reference;
+
       if (options.path) {
         var path = options.path;
         if (typeof path === "function") {
@@ -92,9 +93,9 @@ FP.hasMany = function(type, options) {
         } else {
           path = expandPath(path, this);
         }
-        reference = model.buildFirebaseRootReference(store).child(path);
+        reference = modelClass.buildFirebaseRootReference(store).child(path);
       } else {
-        reference = model.buildFirebaseReference(store, query);
+        reference = modelClass.buildFirebaseReference(store, query);
       }
       collectionOpts.firebaseReference = reference;
     }
