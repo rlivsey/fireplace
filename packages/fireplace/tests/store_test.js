@@ -81,7 +81,7 @@
     });
 
     Ember.run(function() {
-      store.saveRecord(person).fail(function(e){
+      store.saveRecord(person).catch(function(e){
         equal(error, e, "fails with the error");
       });
     });
@@ -215,7 +215,7 @@
     });
 
     Ember.run(function() {
-      store.deleteRecord(person).fail(function(e){
+      store.deleteRecord(person).catch(function(e){
         equal(error, e, "fails with the error");
       });
     });
@@ -285,7 +285,7 @@
     };
 
     Ember.run(function(){
-      store.fetchOne("person", 123).fail(function(error) {
+      store.fetchOne("person", 123).catch(function(error) {
         equal(error, "not found");
       });
     });
@@ -308,7 +308,7 @@
     };
 
     Ember.run(function(){
-      store.fetchOne("person", 123).fail(function(error) {
+      store.fetchOne("person", 123).catch(function(error) {
         equal(error, "permission denied");
       });
     });
@@ -370,7 +370,7 @@
     });
 
     Ember.run(function(){
-      store.fetchAll(App.Person).fail(function(error) {
+      store.fetchAll(App.Person).catch(function(error) {
         equal(error, "permission denied");
       });
     });
