@@ -257,15 +257,27 @@ FP.IndexedCollection = FP.Collection.extend({
     this.insertAfter(prevItemName, item, content);
   },
 
-  // keep the snapshot up to date in-case we haven't materialized the record yet
-  // otherwise when we do contentAt(xxx) we'd get the old version of the record initially
-  // until it starts listening and then updates itself
+  // if the child changed then its meta information has changed
+  // if we're polymorphic this means we'll need to fetch a new content item
+  // otherwise the meta model will take care of it
+  // currently this replaces the item each time, but we should only need to do this
+  // when polymorphic and the polymorph key has changed - but we don't currently
+  // know what that is
+  // TODO - add polymorphic: true/key as an option where key defaults to 'type'
   onFirebaseChildChanged: function(snapshot) {
     var content = get(this, "content"),
         item    = content.findBy('id', snapshot.name());
 
     if (!item) { return; }
-    item.snapshot = snapshot;
+
+    // item.snapshot = snapshot;
+
+    // TODO - only do this if polymorphic and the polymorph key has changed
+    // otherwise just update the snapshot
+    var index   = content.indexOf(item),
+        newItem = this.itemFromSnapshot(snapshot);
+
+    content.replace(index, 1, [newItem]);
   }
 
 });
