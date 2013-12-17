@@ -7,8 +7,8 @@ FP.FirebaseEventQueue = function() {
 };
 
 FP.FirebaseEventQueue.prototype = {
-  enqueue: function(model, event, args) {
-    this.pending.push([model, event, args]);
+  enqueue: function(context, fn) {
+    this.pending.push([context, fn]);
 
     if (!this.running) {
       this.running = true;
@@ -17,27 +17,12 @@ FP.FirebaseEventQueue.prototype = {
   },
 
   flush: function() {
-    var model, eventName, args, classyName, handlerName, triggerName;
+    var context, fn;
 
     this.pending.forEach(function(item){
-      model = item[0];
-
-      // if the model has been destroyed since the event came in, then
-      // don't bother trying to update it - destroying stops listening to firebase
-      // so it doesn't expect to receive any more updates anyway
-      if (model.isDestroying || model.isDestroyed) {
-        return;
-      }
-
-      eventName = item[1];
-      args      = item[2];
-      classyName= classify(eventName);
-
-      handlerName = 'onFirebase' + classyName;
-      triggerName = 'firebase' + classyName;
-
-      model.trigger(triggerName, args);
-      model[handlerName].apply(model, args);
+      context = item[0];
+      fn      = item[1];
+      fn.call(context);
     });
 
     this.pending = [];

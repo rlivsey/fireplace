@@ -1,4 +1,5 @@
 require('fireplace/model/promise_model');
+require('fireplace/model/event_queue');
 
 var get     = Ember.get,
     set     = Ember.set,
@@ -7,6 +8,16 @@ var get     = Ember.get,
 FP.Store = Ember.Object.extend({
 
   firebaseRoot: null,
+
+  init: function() {
+    this._super();
+    this.clearCache();
+    this.queue = new FP.FirebaseEventQueue();
+  },
+
+  enqueueEvent: function(context, fn) {
+    this.queue.enqueue(context, fn);
+  },
 
   // just returns a new instance of the same store with the same container
   // means the cache is isolated & any finds etc are operating
@@ -275,9 +286,9 @@ FP.Store = Ember.Object.extend({
     return record;
   },
 
-  clearCache: Ember.on('init', function() {
+  clearCache: function() {
     this.cache = {};
-  }),
+  },
 
   cacheForType: function(type) {
     var model = this.modelFor(type),

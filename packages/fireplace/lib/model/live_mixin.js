@@ -1,10 +1,8 @@
 require('fireplace/transforms');
-require('fireplace/model/event_queue');
 
 var get = Ember.get,
-    set = Ember.set;
-
-var firebaseQueue = new FP.FirebaseEventQueue();
+    set = Ember.set,
+    classify = Ember.String.classify;
 
 FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
   isListeningToFirebase:  false,
@@ -49,13 +47,11 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
     this._fbEventHandlers = {};
 
     var ref   = this.buildFirebaseQuery(),
-        _this = this;
+        _this = this,
+        handler;
 
     get(this, 'firebaseEvents').forEach(function(eventName) {
-      var handler = function() {
-        firebaseQueue.enqueue(_this, eventName, arguments);
-      };
-
+      handler = this.buildHandler(eventName);
       this._fbEventHandlers[eventName] = handler;
       ref.on(eventName, handler, this);
     }, this);
@@ -65,6 +61,28 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
         resolve();
       });
     });
+  },
+
+  buildHandler: function(eventName) {
+    var classyName  = classify(eventName),
+        handlerName = 'onFirebase' + classyName,
+        triggerName = 'firebase'   + classyName,
+        store       = this.store;
+
+    return function() {
+      var args = arguments;
+      store.enqueueEvent(this, function(){
+        // if the we have been destroyed since the event came in, then
+        // don't bother trying to update - destroying stops listening to firebase
+        // so we don't expect to receive any more updates anyway
+        if (this.isDestroying || this.isDestroyed) {
+          return;
+        }
+
+        this.trigger(triggerName, args);
+        this[handlerName].apply(this, args);
+      });
+    };
   },
 
   stopListeningToFirebase: function() {

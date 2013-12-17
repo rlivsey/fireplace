@@ -230,7 +230,7 @@
     var snapshot = mockSnapshot({val: {name: "Bob"}});
 
     store.buildRecord = function(type) {
-      var p = App.Person.create();
+      var p = App.Person.create({store: store});
       stubReference(p, {
         once: function(type, success) {
           equal(type, "value", "called once with value on the reference");
