@@ -89,7 +89,17 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
     var attribute = this.attributeNameFromKey(key);
     if (!attribute) { return; }
 
-    get(this, "snapshot").set(key, snapshot.val());
+    var current     = get(this, "snapshot"),
+        currentData = current.val(),
+        newVal      = snapshot.val();
+
+    // don't bother triggering a property change if nothing has changed
+    // eg if we've got a snapshot & then started listening
+    if (currentData.hasOwnProperty(key) && currentData[key] === newVal) {
+      return;
+    }
+
+    current.set(key, newVal);
 
     this.settingFromFirebase(function(){
       this.notifyPropertyChange(attribute);
