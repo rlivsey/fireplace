@@ -293,6 +293,9 @@
         store.createRecord(App.Person, {id: "3", name: "Harry"})
       ];
 
+      // prime the cache otherwise Ember does a find for getting first/last object
+      store.createRecord(App.Person, {id: "New"});
+
       collection = FP.IndexedCollection.create({store: store, content: content, model: App.Person});
     }
   });
@@ -443,6 +446,9 @@
         store.createRecord(App.Person, {id: "2", name: "Dick"}),
         store.createRecord(App.Person, {id: "3", name: "Harry"})
       ];
+
+      // prime the cache otherwise it does a find
+      store.createRecord(App.Person, {id: "New"});
 
       App.Member = FP.MetaModel.extend({
         level: attr()
