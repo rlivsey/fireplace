@@ -52,7 +52,7 @@ FP.Store = Ember.Object.extend({
     var json     = record.toFirebaseJSON();
     var _this    = this;
 
-    return Ember.RSVP.Promise(function(resolve, reject){
+    return new Ember.RSVP.Promise(function(resolve, reject){
       var callback = function(error) {
         _this.enqueueEvent(function(){
           if (error) {
@@ -95,7 +95,7 @@ FP.Store = Ember.Object.extend({
   deleteRecord: function(record) {
     var ref   = record.buildFirebaseReference(),
         _this = this;
-    return Ember.RSVP.Promise(function(resolve, reject){
+    return new Ember.RSVP.Promise(function(resolve, reject){
       ref.remove(function(error) {
         _this.enqueueEvent(function(){
           if (error) {
@@ -191,7 +191,7 @@ FP.Store = Ember.Object.extend({
 
     var _this = this;
 
-    promise = Ember.RSVP.Promise(function(resolve, reject){
+    promise = new Ember.RSVP.Promise(function(resolve, reject){
       ref.once('value', function(snapshot){
         _this.enqueueEvent(function(){
           var value = snapshot.val();
@@ -238,7 +238,7 @@ FP.Store = Ember.Object.extend({
 
     fbQuery = collection.buildFirebaseQuery();
 
-    promise = Ember.RSVP.Promise(function(resolve, reject){
+    promise = new Ember.RSVP.Promise(function(resolve, reject){
       fbQuery.once('value', function(snapshot){
         _this.enqueueEvent(function(){
           // we don't reject if snapshot is empty, an empty collection is still valid

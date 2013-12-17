@@ -56,7 +56,7 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
       ref.on(eventName, handler, this);
     }, this);
 
-    return Ember.RSVP.Promise(function(resolve) {
+    return new Ember.RSVP.Promise(function(resolve) {
       _this.one("firebaseValue", function() {
         resolve();
       });
