@@ -71,7 +71,7 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
 
     return function() {
       var args = arguments;
-      store.enqueueEvent(this, function(){
+      store.enqueueEvent(function(){
         // if the we have been destroyed since the event came in, then
         // don't bother trying to update - destroying stops listening to firebase
         // so we don't expect to receive any more updates anyway
@@ -81,7 +81,7 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
 
         this.trigger(triggerName, args);
         this[handlerName].apply(this, args);
-      });
+      }, this);
     };
   },
 

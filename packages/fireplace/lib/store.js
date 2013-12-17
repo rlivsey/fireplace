@@ -54,7 +54,7 @@ FP.Store = Ember.Object.extend({
 
     return Ember.RSVP.Promise(function(resolve, reject){
       var callback = function(error) {
-        Ember.run(function(){
+        _this.enqueueEvent(function(){
           if (error) {
             reject(error);
           } else {
@@ -93,10 +93,11 @@ FP.Store = Ember.Object.extend({
   },
 
   deleteRecord: function(record) {
-    var ref = record.buildFirebaseReference();
+    var ref   = record.buildFirebaseReference(),
+        _this = this;
     return Ember.RSVP.Promise(function(resolve, reject){
       ref.remove(function(error) {
-        Ember.run(function(){
+        _this.enqueueEvent(function(){
           if (error) {
             reject(error);
           } else {
@@ -192,7 +193,7 @@ FP.Store = Ember.Object.extend({
 
     promise = Ember.RSVP.Promise(function(resolve, reject){
       ref.once('value', function(snapshot){
-        Ember.run(function(){
+        _this.enqueueEvent(function(){
           var value = snapshot.val();
           if (value) {
 
@@ -222,6 +223,7 @@ FP.Store = Ember.Object.extend({
 
     var type    = options.collection || "object",
         factory = container.lookupFactory("collection:"+type),
+        _this   = this,
         collection, promise, fbQuery;
 
     collection = factory.create({
@@ -238,7 +240,7 @@ FP.Store = Ember.Object.extend({
 
     promise = Ember.RSVP.Promise(function(resolve, reject){
       fbQuery.once('value', function(snapshot){
-        Ember.run(function(){
+        _this.enqueueEvent(function(){
           // we don't reject if snapshot is empty, an empty collection is still valid
           set(collection, "snapshot", snapshot);
           collection.inflateFromSnapshot();

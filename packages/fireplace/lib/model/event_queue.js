@@ -7,12 +7,15 @@ FP.FirebaseEventQueue = function() {
 };
 
 FP.FirebaseEventQueue.prototype = {
-  enqueue: function(context, fn) {
-    this.pending.push([context, fn]);
+  enqueue: function(fn, context) {
+    this.pending.push([fn, context]);
 
     if (!this.running) {
       this.running = true;
-      Ember.run.next(this, this.flush);
+      // TODO - running in the next runloop breaks the tests
+      // how to solve this without this hack?
+      var run = Ember.testing ? Ember.run : Ember.run.next;
+      run(this, this.flush);
     }
   },
 
@@ -20,8 +23,8 @@ FP.FirebaseEventQueue.prototype = {
     var context, fn;
 
     this.pending.forEach(function(item){
-      context = item[0];
-      fn      = item[1];
+      fn      = item[0];
+      context = item[1];
       fn.call(context);
     });
 
