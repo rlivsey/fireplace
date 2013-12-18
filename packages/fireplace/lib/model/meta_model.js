@@ -9,8 +9,16 @@ FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
   parent:    null,
   parentKey: null,
 
-  // meta is just the entire value of the snapshot
+  // meta is the simple value of the snapshot
+  // if attributes are defined then you can't also have a meta value
   meta: Ember.computed(function(key, value){
+    var attributes    = get(this.constructor, 'attributes'),
+        relationships = get(this.constructor, 'relationships');
+
+    if (attributes.length || relationships.length) {
+      return null;
+    }
+
     if (arguments.length > 1) {
       return value;
     } else {
@@ -36,7 +44,7 @@ FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
     var attributes    = get(this.constructor, 'attributes'),
         relationships = get(this.constructor, 'relationships');
 
-    if (attributes.length || attributes.length) {
+    if (attributes.length || relationships.length) {
       var attrJSON = this._super(includePriority);
 
       // if attributes are null, then we'll get an empty object back

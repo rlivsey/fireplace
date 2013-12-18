@@ -434,7 +434,7 @@
   });
 
 
-  module("FP.IndexedCollection with meta model receiving updates from Firebase", {
+  module("FP.IndexedCollection with complex meta model receiving updates from Firebase", {
     setup: function() {
       setupEnv();
 
@@ -469,10 +469,7 @@
     equal(id, "New", "should have set the ID");
 
     var level = get(member, "level");
-    equal(level, "admin", "should have set the atributes");
-
-    var meta = get(member, "meta");
-    deepEqual(meta, {level: "admin"}, "should have set the meta");
+    equal(level, "admin", "should have set the meta atributes");
 
     var priority = get(member, "priority");
     equal(priority, 123, "should have set a priority");
@@ -488,6 +485,41 @@
     var person   = collection.objectAt(0);
     var priority = get(person, "priority");
     equal(priority, 42, "should have changed the priority");
+  });
+
+  module("FP.IndexedCollection with simple meta model receiving updates from Firebase", {
+    setup: function() {
+      setupEnv();
+
+      // prime the cache otherwise it does a find
+      store.createRecord(App.Person, {id: "New"});
+
+      App.Member = FP.MetaModel.extend();
+
+      collection = FP.IndexedCollection.create({as: App.Member, store: store, model: App.Person});
+    }
+  });
+
+  test("firebaseChildAdded adds an item", function(){
+    var snapshot        = mockSnapshot({name: "New", val: "admin", priority: 123});
+
+    Ember.run(function(){
+      collection.onFirebaseChildAdded(snapshot);
+    });
+
+    equal(collection.get("length"), 1, "should have added an item");
+
+    var member  = collection.objectAt(0);
+    ok(member instanceof App.Member, "should be instance of Member");
+
+    var id = get(member, "id");
+    equal(id, "New", "should have set the ID");
+
+    var meta = get(member, "meta");
+    equal(meta, "admin", "should have set the meta value");
+
+    var priority = get(member, "priority");
+    equal(priority, 123, "should have set a priority");
   });
 
 })();

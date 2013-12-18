@@ -37,6 +37,16 @@
     deepEqual(member.toFirebaseJSON(), true, "falls back to true");
   });
 
+  // if you've got attributes, then meta should be ignored
+  test("with attributes / relationships which are null and a meta value", function() {
+    var Member = FP.MetaModel.extend({
+      level: FP.attr()
+    });
+    var member = Member.create({level: null, meta: "something"});
+
+    deepEqual(member.toFirebaseJSON(), true, "falls back to true, and not the meta value");
+  });
+
   test("with priority", function() {
     var Member = FP.MetaModel.extend();
     var member = Member.create({priority: 123});
