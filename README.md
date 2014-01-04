@@ -375,6 +375,22 @@ This would produce JSON like so:
 }
 ```
 
+Keep in mind that, when using `MetaModel`s, you have to set the actual model as the `content` property on the `MetaModel` and then add the `MetaModel` to the parent's collection like in this sample:
+
+```javascript
+// project and person (of class People) are loaded already
+var member = store.createRecord('member', {
+  accessLevel: "admin",
+  joinedAt: new Date(),
+  content: person // the actual "content" of this relationship
+});
+
+project.get('members').addObject(member);
+project.save();
+```
+
+When loading projects and getting members, the `MetaModel`'s properties are available on the *real* member (instance of `People`) as if they were a part of it. 
+
 ### Detached relationships
 
 All the above examples assume that the associated object itself or its ID is stored with the parent,
