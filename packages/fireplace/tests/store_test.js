@@ -49,7 +49,7 @@
   });
 
   test("saveRecord when successful", function() {
-    expect(2);
+    expect(4);
 
     var person = store.createRecord("person", {name: "Bob"});
 
@@ -57,6 +57,14 @@
       set: function(json, callback) {
         callback();
       }
+    });
+
+    person.on("save", function() {
+      ok(true, "triggers save event");
+    });
+
+    person.on("saved", function() {
+      ok(true, "triggers saved event");
     });
 
     Ember.run(function() {
@@ -183,13 +191,21 @@
   });
 
   test("deleteRecord when successful", function() {
-    expect(2);
+    expect(4);
 
     var person = store.createRecord("person", {name: "Bob"});
     stubReference(person, {
       remove: function(callback) {
         callback();
       }
+    });
+
+    person.on("delete", function() {
+      ok(true, "triggers delete event");
+    });
+
+    person.on("deleted", function() {
+      ok(true, "triggers deleted event");
     });
 
     Ember.run(function() {

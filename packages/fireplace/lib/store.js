@@ -52,6 +52,8 @@ FP.Store = Ember.Object.extend({
     var json     = record.toFirebaseJSON();
     var _this    = this;
 
+    record.trigger("save");
+
     return new Ember.RSVP.Promise(function(resolve, reject){
       var callback = function(error) {
         _this.enqueueEvent(function(){
@@ -63,6 +65,7 @@ FP.Store = Ember.Object.extend({
             }
             record.listenToFirebase();
             resolve(record);
+            record.trigger("saved");
           }
         });
       };
@@ -95,6 +98,9 @@ FP.Store = Ember.Object.extend({
   deleteRecord: function(record) {
     var ref   = record.buildFirebaseReference(),
         _this = this;
+
+    record.trigger("delete");
+
     return new Ember.RSVP.Promise(function(resolve, reject){
       ref.remove(function(error) {
         _this.enqueueEvent(function(){
@@ -103,6 +109,7 @@ FP.Store = Ember.Object.extend({
           } else {
             record.stopListeningToFirebase();
             resolve(record);
+            record.trigger("deleted");
           }
         });
       });
