@@ -852,7 +852,7 @@ var get       = Ember.get,
 
 FP.ModelClassMixin = Ember.Mixin.create(FP.AttributesClassMixin, FP.RelationshipsClassMixin);
 
-FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.RelationshipsMixin, {
+FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.RelationshipsMixin, Ember.Evented, {
   firebaseEvents: ['child_added', 'child_removed', 'child_changed', 'value'],
 
   store: null,
@@ -1919,6 +1919,8 @@ FP.Store = Ember.Object.extend({
     var json     = record.toFirebaseJSON();
     var _this    = this;
 
+    record.trigger("save");
+
     return new Ember.RSVP.Promise(function(resolve, reject){
       var callback = function(error) {
         _this.enqueueEvent(function(){
@@ -1930,6 +1932,7 @@ FP.Store = Ember.Object.extend({
             }
             record.listenToFirebase();
             resolve(record);
+            record.trigger("saved");
           }
         });
       };
@@ -1962,6 +1965,9 @@ FP.Store = Ember.Object.extend({
   deleteRecord: function(record) {
     var ref   = record.buildFirebaseReference(),
         _this = this;
+
+    record.trigger("delete");
+
     return new Ember.RSVP.Promise(function(resolve, reject){
       ref.remove(function(error) {
         _this.enqueueEvent(function(){
@@ -1970,6 +1976,7 @@ FP.Store = Ember.Object.extend({
           } else {
             record.stopListeningToFirebase();
             resolve(record);
+            record.trigger("deleted");
           }
         });
       });
