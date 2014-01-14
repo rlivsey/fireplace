@@ -1,6 +1,6 @@
 {
   "name": "fireplace",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "fireplace.js",
   "dependencies": {
     "ember": "1.3.0"

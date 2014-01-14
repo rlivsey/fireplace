@@ -4,8 +4,8 @@
 // License:   Licensed under MIT license (see license.js)
 // ==========================================================================
 
-// v0.0.2-7-g38f0fb2
-// 38f0fb2 (2014-01-08 13:10:24 +0000)
+// v0.0.3
+// a1bddf7 (2014-01-08 16:35:18 +0000)
 
 (function() {
 
@@ -24,7 +24,7 @@
 var FP;
 if ('undefined' === typeof FP) {
   FP = Ember.Namespace.create({
-    VERSION: '0.0.2'
+    VERSION: '0.0.4'
   });
 
   if ('undefined' !== typeof window) {
@@ -931,14 +931,21 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
     return this._super();
   },
 
-  setAttributeFromSnapshot: function(snapshot) {
+  setAttributeFromSnapshot: function(snapshot, valueRemoved) {
     var key       = snapshot.name();
     var attribute = this.attributeNameFromKey(key);
     if (!attribute) { return; }
 
     var current     = get(this, "snapshot"),
         currentData = current.val(),
-        newVal      = snapshot.val();
+        newVal;
+
+    // child_removed sends the old value back in the snapshot
+    if (valueRemoved) {
+      newVal = null;
+    } else {
+      newVal = snapshot.val();
+    }
 
     // don't bother triggering a property change if nothing has changed
     // eg if we've got a snapshot & then started listening
@@ -953,13 +960,21 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
     });
   },
 
-  notifyRelationshipOfChange: function(snapshot) {
+  notifyRelationshipOfChange: function(snapshot, valueRemoved) {
     var key       = snapshot.name();
     var attribute = this.relationshipNameFromKey(key);
 
     if (!attribute) { return; }
 
-    get(this, "snapshot").set(key, snapshot.val());
+    // child_removed sends the old value back in the snapshot
+    var newVal;
+    if (valueRemoved) {
+      newVal = null;
+    } else {
+      newVal = snapshot.val();
+    }
+
+    get(this, "snapshot").set(key, newVal);
 
     var meta = this.constructor.metaForProperty(attribute);
     if (meta.kind === "hasOne") {
@@ -975,8 +990,8 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
   },
 
   onFirebaseChildRemoved: function(snapshot) {
-    this.setAttributeFromSnapshot(snapshot);
-    this.notifyRelationshipOfChange(snapshot);
+    this.setAttributeFromSnapshot(snapshot, true);
+    this.notifyRelationshipOfChange(snapshot, true);
   },
 
   onFirebaseChildChanged: function(snapshot) {
