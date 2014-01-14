@@ -30,7 +30,9 @@
 
   test("onFirebaseChildRemoved clears an attribute", function() {
     var person   = Person.create({firstName: "Bobby"});
-    var snapshot = mockSnapshot({name: "first_name"});
+
+    // child_removed sends the old value with the snapshot, not null
+    var snapshot = mockSnapshot({name: "first_name", val: "Previous Value"});
 
     Ember.run(function() {
       person.onFirebaseChildRemoved(snapshot);
