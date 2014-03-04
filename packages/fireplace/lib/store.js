@@ -92,7 +92,7 @@ FP.Store = Ember.Object.extend({
           ref.set(json, callback);
         }
       }
-    });
+    }, "FP: Save "+ref.toString());
   },
 
   deleteRecord: function(record) {
@@ -113,7 +113,7 @@ FP.Store = Ember.Object.extend({
           }
         });
       });
-    });
+    }, "FP: Delete "+ref.toString());
   },
 
   find: function(type, idOrQuery, options) {
@@ -220,7 +220,7 @@ FP.Store = Ember.Object.extend({
       }, function(){
         reject('permission denied');
       });
-    });
+    }, "FP: Find one "+ref.toString());
 
     return returnPromise ? promise : FP.PromiseModel.create({promise: promise, content: record});
   },
@@ -257,7 +257,7 @@ FP.Store = Ember.Object.extend({
       }, function(){
         reject('permission denied');
       });
-    });
+    }, "FP: Find many "+fbQuery.toString());
 
     return returnPromise ? promise : collection;
   },

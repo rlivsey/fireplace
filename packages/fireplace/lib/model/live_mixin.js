@@ -60,7 +60,7 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
       _this.one("firebaseValue", function() {
         resolve();
       });
-    });
+    }, "FP: Value "+ref.toString());
   },
 
   buildHandler: function(eventName) {
