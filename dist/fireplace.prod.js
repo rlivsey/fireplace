@@ -4,8 +4,8 @@
 // License:   Licensed under MIT license (see license.js)
 // ==========================================================================
 
-// v0.0.3
-// a1bddf7 (2014-01-08 16:35:18 +0000)
+// v0.0.5
+// ea32e06 (2014-02-28 13:16:58 +0000)
 
 (function() {
 
@@ -24,7 +24,7 @@
 var FP;
 if ('undefined' === typeof FP) {
   FP = Ember.Namespace.create({
-    VERSION: '0.0.4'
+    VERSION: '0.0.6'
   });
 
   if ('undefined' !== typeof window) {
@@ -688,7 +688,7 @@ FP.LiveMixin = Ember.Mixin.create(Ember.Evented, {
       _this.one("firebaseValue", function() {
         resolve();
       });
-    });
+    }, "FP: Value "+ref.toString());
   },
 
   buildHandler: function(eventName) {
@@ -1983,7 +1983,7 @@ FP.Store = Ember.Object.extend({
           ref.set(json, callback);
         }
       }
-    });
+    }, "FP: Save "+ref.toString());
   },
 
   deleteRecord: function(record) {
@@ -2004,7 +2004,7 @@ FP.Store = Ember.Object.extend({
           }
         });
       });
-    });
+    }, "FP: Delete "+ref.toString());
   },
 
   find: function(type, idOrQuery, options) {
@@ -2111,7 +2111,7 @@ FP.Store = Ember.Object.extend({
       }, function(){
         reject('permission denied');
       });
-    });
+    }, "FP: Find one "+ref.toString());
 
     return returnPromise ? promise : FP.PromiseModel.create({promise: promise, content: record});
   },
@@ -2148,7 +2148,7 @@ FP.Store = Ember.Object.extend({
       }, function(){
         reject('permission denied');
       });
-    });
+    }, "FP: Find many "+fbQuery.toString());
 
     return returnPromise ? promise : collection;
   },
