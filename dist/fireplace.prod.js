@@ -4,8 +4,8 @@
 // License:   Licensed under MIT license (see license.js)
 // ==========================================================================
 
-// v0.0.5
-// ea32e06 (2014-02-28 13:16:58 +0000)
+// v0.0.6-1-g76f70dc
+// 76f70dc (2014-03-31 00:10:52 -0700)
 
 (function() {
 
@@ -2406,10 +2406,10 @@ Ember.onLoad('Ember.Application', function(Application) {
   });
 
   Application.initializer({
-    name: 'dataAdapter',
+    name: 'data-adapter',
 
     initialize: function(container, application) {
-      application.register('dataAdapter:main', FP.DebugAdapter);
+      application.register('data-adapter:main', FP.DebugAdapter);
     }
   });
 
@@ -2428,7 +2428,7 @@ Ember.onLoad('Ember.Application', function(Application) {
     initialize: function(container, application) {
       application.inject('controller',  'store', 'store:main');
       application.inject('route',       'store', 'store:main');
-      application.inject('dataAdapter', 'store', 'store:main');
+      application.inject('data-adapter', 'store', 'store:main');
       application.inject('collection',  'store', 'store:main');
       application.inject('component',   'store', 'store:main');
     }
