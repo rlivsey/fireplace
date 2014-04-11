@@ -1589,6 +1589,10 @@ FP.IndexedCollection = FP.Collection.extend({
       return;
     }
 
+    if (!value) {
+      return value;
+    }
+
     return value.map(function(item){
       if (item instanceof Ember.Object) {
         return this.itemFromRecord(item);
