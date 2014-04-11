@@ -1,3 +1,5 @@
+if (!Ember.DataAdapter) { return; }
+
 var get        = Ember.get,
     capitalize = Ember.String.capitalize,
     underscore = Ember.String.underscore;
