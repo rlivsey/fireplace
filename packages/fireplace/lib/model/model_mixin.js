@@ -23,6 +23,11 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
     return !get(this, "_snapshot");
   }).property("_snapshot"),
 
+  // null by default instead of undefined so that sorting works
+  priority: function() {
+    return null;
+  }.property(),
+
   // the actual Firebase::Snapshot, can be null if new record
   _snapshot: null,
 

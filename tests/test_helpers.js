@@ -1,8 +1,5 @@
 (function(env){
 
-  Ember.testing     = true;
-  Ember.LOG_VERSION = false;
-
   // Mock implementation of Firebase
   // TODO - flesh this out as necessary
 
