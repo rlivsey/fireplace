@@ -30,12 +30,6 @@
     }
   });
 
-  test("can be initialized without content", function() {
-    expect(0);
-    App.PeopleIndex.create({store: store, content: null});
-  });
-
-
   test("inflates from a snapshot if one exists", function() {
     var snap = mockSnapshot({val: {
       123: true,

@@ -4,8 +4,8 @@
 // License:   Licensed under MIT license (see license.js)
 // ==========================================================================
 
-// v0.0.7
-// 3bc7a7b (2014-04-12 00:52:56 +0100)
+// v0.0.6-6-g853c628
+// 853c628 (2014-04-12 00:51:52 +0100)
 
 (function() {
 
@@ -1596,10 +1596,6 @@ FP.IndexedCollection = FP.Collection.extend({
   content: function(k, value) {
     if (arguments.length === 1) {
       return;
-    }
-
-    if (!value) {
-      return value;
     }
 
     return value.map(function(item){
