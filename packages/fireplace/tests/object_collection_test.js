@@ -151,9 +151,9 @@
       setupEnv();
 
       var content = [
-        store.createRecord(App.Person, {id: "1", name: "Tom", priority: 10}),
-        store.createRecord(App.Person, {id: "2", name: "Dick", priority: 20}),
-        store.createRecord(App.Person, {id: "3", name: "Harry", priority: 30})
+        store.createRecord(App.Person, {id: "1", name: "Tom"}),
+        store.createRecord(App.Person, {id: "2", name: "Dick"}),
+        store.createRecord(App.Person, {id: "3", name: "Harry"})
       ];
 
       collection = FP.ObjectCollection.create({store: store, content: content, model: App.Person});
@@ -180,8 +180,8 @@
     equal(priority, 123, "should have set the priority");
   });
 
-  test("firebaseChildAdded adds an item to the start according to the priority", function(){
-    var snapshot = mockSnapshot({name: "New", priority: 1, val: {name: "A New Person"}});
+  test("firebaseChildAdded adds an item to the start when no previous item name specified", function(){
+    var snapshot = mockSnapshot({name: "New", val: {name: "A New Person"}});
 
     Ember.run(function(){
       collection.onFirebaseChildAdded(snapshot);
@@ -190,8 +190,8 @@
     deepEqual(collection.mapProperty("id"), ["New", "1", "2", "3"], "should have inserted at the start");
   });
 
-  test("firebaseChildAdded adds an item to the end according to the priority", function(){
-    var snapshot = mockSnapshot({name: "New", priority: 99, val: {name: "A New Person"}});
+  test("firebaseChildAdded adds an item to the end if the previous item doesn't exist", function(){
+    var snapshot = mockSnapshot({name: "New", val: {name: "A New Person"}});
 
     Ember.run(function(){
       collection.onFirebaseChildAdded(snapshot, "foo");
@@ -200,8 +200,8 @@
     deepEqual(collection.mapProperty("id"), ["1", "2", "3", "New"], "should have inserted at the end");
   });
 
-  test("firebaseChildAdded adds an item in the middle according to the priority", function(){
-    var snapshot = mockSnapshot({name: "New", priority: 22, val: {name: "A New Person"}});
+  test("firebaseChildAdded adds an item after the previous item name specified", function(){
+    var snapshot = mockSnapshot({name: "New", val: {name: "A New Person"}});
 
     Ember.run(function(){
       collection.onFirebaseChildAdded(snapshot, "2");
@@ -254,21 +254,21 @@
   });
 
 
+
   test("firebaseChildMoved updates the item's priority", function(){
-    var snapshot = mockSnapshot({name: "2", priority: 22});
+    var snapshot = mockSnapshot({name: "2", priority: 42});
 
     Ember.run(function(){
       collection.onFirebaseChildMoved(snapshot);
     });
 
-    var person   = collection.objectAt(1);
+    var person     = collection.objectAt(0);
     var priority = get(person, "priority");
-
-    equal(priority, 22, "should have changed the priority");
+    equal(priority, 42, "should have changed the priority");
   });
 
   test("firebaseChildMoved ignores items which don't exist", function(){
-    var snapshot = mockSnapshot({name: "New", priority: 1});
+    var snapshot = mockSnapshot({name: "New"});
 
     Ember.run(function(){
       collection.onFirebaseChildMoved(snapshot);
@@ -277,8 +277,8 @@
     deepEqual(collection.mapProperty("id"), ["1", "2", "3"], "should not have moved anything");
   });
 
-  test("firebaseChildMoved moves an item to the start according to the priority", function(){
-    var snapshot = mockSnapshot({name: "2", priority: 5});
+  test("firebaseChildMoved moves an item to the start when no previous item name specified", function(){
+    var snapshot = mockSnapshot({name: "2"});
 
     Ember.run(function(){
       collection.onFirebaseChildMoved(snapshot);
@@ -287,8 +287,8 @@
     deepEqual(collection.mapProperty("id"), ["2", "1", "3"], "should have moved to the start");
   });
 
-  test("firebaseChildMoved moves an item to the end according to the priority", function(){
-    var snapshot = mockSnapshot({name: "2", priority: 99});
+  test("firebaseChildMoved moves an item to the end if the previous item doesn't exist", function(){
+    var snapshot = mockSnapshot({name: "2"});
 
     Ember.run(function(){
       collection.onFirebaseChildMoved(snapshot, "foo");
@@ -297,8 +297,8 @@
     deepEqual(collection.mapProperty("id"), ["1", "3", "2"], "should have moved to the end");
   });
 
-  test("firebaseChildMoved moves an item in the middle according to the priority", function(){
-    var snapshot = mockSnapshot({name: "1", priority: 25});
+  test("firebaseChildMoved moves an item after the previous item name specified", function(){
+    var snapshot = mockSnapshot({name: "1"});
 
     Ember.run(function(){
       collection.onFirebaseChildMoved(snapshot, "2");

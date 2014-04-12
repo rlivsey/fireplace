@@ -3,7 +3,6 @@ require('fireplace/collections/collection');
 var get = Ember.get,
     set = Ember.set;
 
-
 FP.ObjectCollection = FP.Collection.extend({
 
   toFirebaseJSON: function() {
@@ -109,8 +108,7 @@ FP.ObjectCollection = FP.Collection.extend({
     if (this.findBy('id', id)) { return; }
 
     var obj = this.modelFromSnapshot(snapshot);
-    // just push, the order is maintained by arrangedContent
-    get(this, "content").pushObject(obj);
+    this.insertAfter(prevItemName, obj);
 
     // this needs to happen after insert, otherwise the parent isn't associated yet
     // and the reference is incorrect
@@ -126,12 +124,13 @@ FP.ObjectCollection = FP.Collection.extend({
     item.stopListeningToFirebase();
   },
 
-  // just set priority, arranged content defines the order
   onFirebaseChildMoved: function(snapshot, prevItemName) {
     var item = this.findBy('id', snapshot.name());
     if (!item) { return; }
 
+    this.removeObject(item);
     set(item, 'priority', snapshot.getPriority());
+    this.insertAfter(prevItemName, item);
   }
 
 });

@@ -287,16 +287,13 @@
     setup: function() {
       setupEnv();
 
-      var content = [ // poke in the internal format, should never do this for reals
-        {id: "1", priority: 10},
-        {id: "2", priority: 20},
-        {id: "3", priority: 30}
+      var content = [
+        store.createRecord(App.Person, {id: "1", name: "Tom"}),
+        store.createRecord(App.Person, {id: "2", name: "Dick"}),
+        store.createRecord(App.Person, {id: "3", name: "Harry"})
       ];
 
-      // prime the cache otherwise Ember does a find
-      store.createRecord(App.Person, {id: "1", name: "Tom"});
-      store.createRecord(App.Person, {id: "2", name: "Dick"});
-      store.createRecord(App.Person, {id: "3", name: "Harry"});
+      // prime the cache otherwise Ember does a find for getting first/last object
       store.createRecord(App.Person, {id: "New"});
 
       collection = FP.IndexedCollection.create({store: store, content: content, model: App.Person});
@@ -326,7 +323,7 @@
   });
 
   test("firebaseChildAdded adds an item to the start when no previous item name specified", function(){
-    var snapshot = mockSnapshot({name: "New", val: true, priority: 1});
+    var snapshot = mockSnapshot({name: "New", val: true});
 
     Ember.run(function(){
       collection.onFirebaseChildAdded(snapshot);
@@ -346,13 +343,21 @@
   });
 
   test("firebaseChildAdded adds an item after the previous item name specified", function(){
-    expect(1);
+    expect(3);
 
-    var snapshot = mockSnapshot({name: "New", val: true, priority: 25});
+    var snapshot = mockSnapshot({name: "New", val: true});
 
     Ember.run(function(){
       collection.onFirebaseChildAdded(snapshot, "2");
     });
+
+    // mapProperty calls contentAt which triggers a find, so stub that out
+    // otherwise we hit the run-loop etc..
+    store.findOne = function(type, id) {
+      equal(type, App.Person);
+      equal(id, "New");
+      return App.Person.create({id: id});
+    };
 
     deepEqual(collection.mapProperty("id"), ["1", "2", "New", "3"], "should have inserted after the previous item");
   });
@@ -402,7 +407,7 @@
   });
 
   test("firebaseChildMoved moves an item to the start when no previous item name specified", function(){
-    var snapshot = mockSnapshot({name: "2", priority: 1});
+    var snapshot = mockSnapshot({name: "2"});
 
     Ember.run(function(){
       collection.onFirebaseChildMoved(snapshot);
@@ -412,7 +417,7 @@
   });
 
   test("firebaseChildMoved moves an item to the end if the previous item doesn't exist", function(){
-    var snapshot = mockSnapshot({name: "2", priority: 99});
+    var snapshot = mockSnapshot({name: "2"});
 
     Ember.run(function(){
       collection.onFirebaseChildMoved(snapshot, "foo");
@@ -422,7 +427,7 @@
   });
 
   test("firebaseChildMoved moves an item after the previous item name specified", function(){
-    var snapshot = mockSnapshot({name: "1", priority: 25});
+    var snapshot = mockSnapshot({name: "1"});
 
     Ember.run(function(){
       collection.onFirebaseChildMoved(snapshot, "2");
@@ -436,16 +441,13 @@
     setup: function() {
       setupEnv();
 
-      var content = [ // poke in the internal format, should never do this for reals
-        {id: "1", priority: 10},
-        {id: "2", priority: 20},
-        {id: "3", priority: 30}
+      var content = [
+        store.createRecord(App.Person, {id: "1", name: "Tom"}),
+        store.createRecord(App.Person, {id: "2", name: "Dick"}),
+        store.createRecord(App.Person, {id: "3", name: "Harry"})
       ];
 
       // prime the cache otherwise it does a find
-      store.createRecord(App.Person, {id: "1", name: "Tom"});
-      store.createRecord(App.Person, {id: "2", name: "Dick"});
-      store.createRecord(App.Person, {id: "3", name: "Harry"});
       store.createRecord(App.Person, {id: "New"});
 
       App.Member = FP.MetaModel.extend({
@@ -479,8 +481,8 @@
     equal(priority, 123, "should have set a priority");
   });
 
-  test("firebaseChildMoved changes the item's priority", function(){
-    var snapshot = mockSnapshot({name: "2", priority: 1});
+  test("firebaseChildMoved changes change the item's priority", function(){
+    var snapshot = mockSnapshot({name: "2", priority: 42});
 
     Ember.run(function(){
       collection.onFirebaseChildMoved(snapshot);
@@ -488,7 +490,7 @@
 
     var person   = collection.objectAt(0);
     var priority = get(person, "priority");
-    equal(priority, 1, "should have changed the priority");
+    equal(priority, 42, "should have changed the priority");
   });
 
   module("FP.IndexedCollection with simple meta model receiving updates from Firebase", {

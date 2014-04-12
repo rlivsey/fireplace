@@ -38,21 +38,27 @@ FP.IndexedCollection = FP.Collection.extend({
     set(this, "content", content);
   }),
 
-  // transform content to underlying representation on assignment
-  // Note that these won't have any priorities unless they are meta models
-  content: function(k, value) {
-    if (arguments.length === 1) {
-      return;
-    }
+  contentChanged: function() {
+    if (this._updatingContent) { return; }
 
-    return value.map(function(item){
+    var content = get(this, "content");
+    if (!content) { return; }
+
+    var anyTransformed = false;
+    var transformed = content.map(function(item){
       if (item instanceof Ember.Object) {
-        return this.itemFromRecord(item);
-      } else {
-        return item;
+        item = this.itemFromRecord(item);
+        anyTransformed = true;
       }
+      return item;
     }, this);
-  }.property(),
+
+    if (anyTransformed) {
+      this._updatingContent = true;
+      set(this, "content", transformed);
+      this._updatingContent = false;
+    }
+  }.observes("content").on("init"),
 
   // if we're listening, then our meta model items should be too
   listenToFirebase: function() {
@@ -101,25 +107,16 @@ FP.IndexedCollection = FP.Collection.extend({
   itemFromSnapshot: function(snapshot) {
     return {
       id:       snapshot.name(),
-      priority: snapshot.getPriority(),
       snapshot: snapshot,
       record:   null
     };
   },
 
   itemFromRecord: function(record) {
-    record = this.wrapRecordInMetaObjectIfNeccessary(record);
-
-    var priority = null;
-    if (priority instanceof FP.MetaModel) {
-      priority = get(record, "priority");
-    }
-
     return {
       id:       get(record, 'id'),
       snapshot: null,
-      priority: priority,
-      record:   record
+      record:   this.wrapRecordInMetaObjectIfNeccessary(record)
     };
   },
 
@@ -139,7 +136,7 @@ FP.IndexedCollection = FP.Collection.extend({
 
   // TODO - can we replace this with objectAtContentAsPromise and always use fetch somehow?
   objectAtContent: function(idx) {
-    var content = get(this, "arrangedContent");
+    var content = get(this, "content");
     if (!content || !content.length) {
       return;
     }
@@ -160,7 +157,7 @@ FP.IndexedCollection = FP.Collection.extend({
   },
 
   objectAtContentAsPromise: function(idx) {
-    var content = get(this, "arrangedContent");
+    var content = get(this, "content");
     if (!content || !content.length) {
       return Ember.RSVP.reject();
     }
@@ -230,9 +227,7 @@ FP.IndexedCollection = FP.Collection.extend({
     if (content.findBy('id', id)) { return; }
 
     var item = this.itemFromSnapshot(snapshot);
-
-    // arrangedContent maintains order
-    content.pushObject(item);
+    this.insertAfter(prevItemName, item, content);
   },
 
   onFirebaseChildRemoved: function(snapshot) {
@@ -250,15 +245,16 @@ FP.IndexedCollection = FP.Collection.extend({
 
     if (!item) { return; }
 
-    var priority = snapshot.getPriority();
-    set(item, "priority", priority);
+    content.removeObject(item);
 
     // only set priority on the meta-model, otherwise we'd nuke the priority
     // on the underlying record which exists elsewhere in the tree and could have
     // its own priority
     if (get(this, "as") && item.record) {
-      set(item.record, 'priority', priority);
+      set(item.record, 'priority', snapshot.getPriority());
     }
+
+    this.insertAfter(prevItemName, item, content);
   },
 
   // if the child changed then its meta information has changed

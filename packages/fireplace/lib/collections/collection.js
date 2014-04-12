@@ -4,43 +4,6 @@ var get = Ember.get,
     set = Ember.set,
     getProperties = Ember.getProperties;
 
-// sort the same as firebase (hopefully!)
-// nulls, then numbers, then strings
-var sortByPriority = function(obja, objb){
-  var a = get(obja, "priority");
-  var b = get(objb, "priority");
-
-  if (a === b) { return 0; }
-
-  // nulls come first
-
-  if (a === null) {
-    return -1;
-  }
-
-  if (b === null) {
-    return 1;
-  }
-
-  // then numbers
-
-  if (typeof a === "number" && typeof b !== "number") {
-    return -1;
-  }
-
-  if (typeof b === "number" && typeof a !== "number") {
-    return 1;
-  }
-
-  // now we're comparing like with like
-
-  if (a < b) {
-    return -1;
-  } else {
-    return 1;
-  }
-};
-
 FP.Collection = Ember.ArrayProxy.extend(FP.LiveMixin, {
   firebaseEvents: ['child_added', 'child_removed', 'child_moved', 'value'],
 
@@ -49,8 +12,6 @@ FP.Collection = Ember.ArrayProxy.extend(FP.LiveMixin, {
   parentKey: null,
   snapshot:  null,
   query:     null,
-
-  arrangedContent: Ember.computed.sort("content.@each.priority", sortByPriority),
 
   // filtering
   startAt: null,
