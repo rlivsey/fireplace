@@ -4,8 +4,8 @@
 // License:   Licensed under MIT license (see license.js)
 // ==========================================================================
 
-// v0.0.8-2-g234f32f
-// 234f32f (2014-04-12 01:18:00 +0100)
+// v0.0.9
+// e439653 (2014-04-12 01:19:24 +0100)
 
 (function() {
 
@@ -24,7 +24,7 @@
 var FP;
 if ('undefined' === typeof FP) {
   FP = Ember.Namespace.create({
-    VERSION: '0.0.9'
+    VERSION: '0.0.10'
   });
 
   if ('undefined' !== typeof window) {
@@ -996,7 +996,7 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
 
   onFirebaseChildChanged: function(snapshot) {
     this.setAttributeFromSnapshot(snapshot);
-    // don't need to notify relationships as they handle changes
+    this.notifyRelationshipOfChange(snapshot);
   },
 
   onFirebaseValue: function(snapshot) {

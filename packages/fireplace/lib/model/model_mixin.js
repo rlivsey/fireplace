@@ -149,7 +149,7 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
 
   onFirebaseChildChanged: function(snapshot) {
     this.setAttributeFromSnapshot(snapshot);
-    // don't need to notify relationships as they handle changes
+    this.notifyRelationshipOfChange(snapshot);
   },
 
   onFirebaseValue: function(snapshot) {
