@@ -15,7 +15,7 @@
 var FP;
 if ('undefined' === typeof FP) {
   FP = Ember.Namespace.create({
-    VERSION: '0.0.10'
+    VERSION: '0.0.11'
   });
 
   if ('undefined' !== typeof window) {
@@ -853,7 +853,7 @@ var get       = Ember.get,
 FP.ModelClassMixin = Ember.Mixin.create(FP.AttributesClassMixin, FP.RelationshipsClassMixin);
 
 FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.RelationshipsMixin, Ember.Evented, {
-  firebaseEvents: ['child_added', 'child_removed', 'child_changed', 'value'],
+  firebaseEvents: ['child_added', 'child_removed', 'child_changed'],
 
   store: null,
 
@@ -1164,7 +1164,7 @@ var get = Ember.get,
     getProperties = Ember.getProperties;
 
 FP.Collection = Ember.ArrayProxy.extend(FP.LiveMixin, {
-  firebaseEvents: ['child_added', 'child_removed', 'child_moved', 'value'],
+  firebaseEvents: ['child_added', 'child_removed', 'child_moved'],
 
   model:     null,
   parent:    null,
