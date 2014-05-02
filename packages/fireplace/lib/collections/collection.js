@@ -5,7 +5,7 @@ var get = Ember.get,
     getProperties = Ember.getProperties;
 
 FP.Collection = Ember.ArrayProxy.extend(FP.LiveMixin, {
-  firebaseEvents: ['child_added', 'child_removed', 'child_moved', 'value'],
+  firebaseEvents: ['child_added', 'child_removed', 'child_moved'],
 
   model:     null,
   parent:    null,

@@ -15,7 +15,7 @@ var get       = Ember.get,
 FP.ModelClassMixin = Ember.Mixin.create(FP.AttributesClassMixin, FP.RelationshipsClassMixin);
 
 FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.RelationshipsMixin, Ember.Evented, {
-  firebaseEvents: ['child_added', 'child_removed', 'child_changed', 'value'],
+  firebaseEvents: ['child_added', 'child_removed', 'child_changed'],
 
   store: null,
 
