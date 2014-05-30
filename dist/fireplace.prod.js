@@ -4,8 +4,8 @@
 // License:   Licensed under MIT license (see license.js)
 // ==========================================================================
 
-// v0.0.10-1-g4f50c6f
-// 4f50c6f (2014-05-02 21:35:16 +0100)
+// v0.0.12
+// 53d52a6 (2014-05-30 13:55:31 +0100)
 
 (function() {
 
@@ -24,7 +24,7 @@
 var FP;
 if ('undefined' === typeof FP) {
   FP = Ember.Namespace.create({
-    VERSION: '0.0.11'
+    VERSION: '0.0.12'
   });
 
   if ('undefined' !== typeof window) {
@@ -1950,6 +1950,8 @@ FP.Store = Ember.Object.extend({
         _this.enqueueEvent(function(){
           if (error) {
             reject(error);
+          } else if (get(record, "isDeleted") || get(record, "isDeleting")) { // it was deleted in the time it took to save
+            reject("the record has since been deleted");
           } else {
             if (!attr) {
               _this.storeInCache(record.constructor, record);

@@ -15,7 +15,7 @@
 var FP;
 if ('undefined' === typeof FP) {
   FP = Ember.Namespace.create({
-    VERSION: '0.0.11'
+    VERSION: '0.0.12'
   });
 
   if ('undefined' !== typeof window) {
@@ -1941,6 +1941,8 @@ FP.Store = Ember.Object.extend({
         _this.enqueueEvent(function(){
           if (error) {
             reject(error);
+          } else if (get(record, "isDeleted") || get(record, "isDeleting")) { // it was deleted in the time it took to save
+            reject("the record has since been deleted");
           } else {
             if (!attr) {
               _this.storeInCache(record.constructor, record);
