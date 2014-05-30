@@ -97,6 +97,28 @@
     ok(!get(person, "isListeningToFirebase"), "should not have started listening for firebase updates");
   });
 
+  test("saveRecord when record has been deleted", function() {
+    expect(2);
+
+    var person = store.createRecord("person", {name: "Bob"});
+
+    stubReference(person, {
+      set: function(json, callback) {
+        callback();
+      }
+    });
+
+    person.set("isDeleted", true);
+
+    Ember.run(function() {
+      store.saveRecord(person).catch(function(e){
+        ok(true, "fails with error");
+      });
+    });
+
+    ok(!get(person, "isListeningToFirebase"), "should not have started listening for firebase updates");
+  });
+
   test("saveRecord with full record", function() {
     expect(1);
 
