@@ -68,7 +68,17 @@ FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
 
   saveContent: function() {
     return this.get("content").save();
-  }
+  },
+
+  changeCameFromFirebase: function() {
+    if (!!this._settingFromFirebase) {
+      return true;
+    } else if (get(this, "content.changeCameFromFirebase")) {
+      return true;
+    } else {
+      return false;
+    }
+  }.property().volatile()
 
 });
 

@@ -107,4 +107,24 @@
     meta.saveContent();
   });
 
+  module("FP.MetaModel changes");
+
+  test("considers a change having come from firebase if either itself or its content is being updated", function() {
+    expect(2);
+
+    var Meta  = FP.MetaModel.extend();
+    var Child = FP.Model.extend();
+
+    var child = Child.create({id: 123});
+    var meta  = Meta.create({content: child});
+
+    child._settingFromFirebase = true;
+    ok(get(meta, 'changeCameFromFirebase'), "should think change came from Firebase");
+    child._settingFromFirebase = false;
+
+    meta._settingFromFirebase = true;
+    ok(get(meta, 'changeCameFromFirebase'), "should think change came from Firebase");
+    meta._settingFromFirebase = false;
+  });
+
 })();
