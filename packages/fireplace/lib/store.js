@@ -98,18 +98,25 @@ FP.Store = Ember.Object.extend({
   },
 
   deleteRecord: function(record) {
-    var ref   = record.buildFirebaseReference(),
-        _this = this;
+    var ref         = record.buildFirebaseReference(),
+        _this       = this,
+        isListening = get(record, "isListeningToFirebase");
 
     record.trigger("delete");
+
+    if (isListening) {
+      record.stopListeningToFirebase();
+    }
 
     return new Ember.RSVP.Promise(function(resolve, reject){
       ref.remove(function(error) {
         _this.enqueueEvent(function(){
           if (error) {
+            if (isListening) { // the delete failed, start listening to changes again
+              record.startListeningToFirebase();
+            }
             reject(error);
           } else {
-            record.stopListeningToFirebase();
             resolve(record);
             record.trigger("deleted");
           }
