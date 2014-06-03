@@ -15,7 +15,7 @@
 var FP;
 if ('undefined' === typeof FP) {
   FP = Ember.Namespace.create({
-    VERSION: '0.0.12'
+    VERSION: '0.0.13'
   });
 
   if ('undefined' !== typeof window) {
@@ -1489,7 +1489,17 @@ FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
 
   saveContent: function() {
     return this.get("content").save();
-  }
+  },
+
+  changeCameFromFirebase: function() {
+    if (!!this._settingFromFirebase) {
+      return true;
+    } else if (get(this, "content.changeCameFromFirebase")) {
+      return true;
+    } else {
+      return false;
+    }
+  }.property().volatile()
 
 });
 
@@ -1865,16 +1875,27 @@ FP.FirebaseEventQueue.prototype = {
   },
 
   flush: function() {
+    var batch;
+
+    // if a batch queues items itself we want to make sure we run those too
+    // otherwise they'll be ignored
+    while (this.pending.length) {
+      batch = this.pending;
+      this.pending = [];
+      this.runBatch(batch);
+    }
+
+    this.running = false;
+  },
+
+  runBatch: function(batch) {
     var context, fn;
 
-    this.pending.forEach(function(item){
+    batch.forEach(function(item){
       fn      = item[0];
       context = item[1];
       fn.call(context);
     });
-
-    this.pending = [];
-    this.running = false;
   }
 };
 
@@ -1980,18 +2001,25 @@ FP.Store = Ember.Object.extend({
   },
 
   deleteRecord: function(record) {
-    var ref   = record.buildFirebaseReference(),
-        _this = this;
+    var ref         = record.buildFirebaseReference(),
+        _this       = this,
+        isListening = get(record, "isListeningToFirebase");
 
     record.trigger("delete");
+
+    if (isListening) {
+      record.stopListeningToFirebase();
+    }
 
     return new Ember.RSVP.Promise(function(resolve, reject){
       ref.remove(function(error) {
         _this.enqueueEvent(function(){
           if (error) {
+            if (isListening) { // the delete failed, start listening to changes again
+              record.startListeningToFirebase();
+            }
             reject(error);
           } else {
-            record.stopListeningToFirebase();
             resolve(record);
             record.trigger("deleted");
           }
