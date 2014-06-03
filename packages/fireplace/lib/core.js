@@ -13,7 +13,7 @@
 var FP;
 if ('undefined' === typeof FP) {
   FP = Ember.Namespace.create({
-    VERSION: '0.0.12'
+    VERSION: '0.0.13'
   });
 
   if ('undefined' !== typeof window) {
