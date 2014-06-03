@@ -20,15 +20,26 @@ FP.FirebaseEventQueue.prototype = {
   },
 
   flush: function() {
+    var batch;
+
+    // if a batch queues items itself we want to make sure we run those too
+    // otherwise they'll be ignored
+    while (this.pending.length) {
+      batch = this.pending;
+      this.pending = [];
+      this.runBatch(batch);
+    }
+
+    this.running = false;
+  },
+
+  runBatch: function(batch) {
     var context, fn;
 
-    this.pending.forEach(function(item){
+    batch.forEach(function(item){
       fn      = item[0];
       context = item[1];
       fn.call(context);
     });
-
-    this.pending = [];
-    this.running = false;
   }
 };
