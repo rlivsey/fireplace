@@ -1,6 +1,6 @@
 {
   "name": "fireplace",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "main": "dist/fireplace.js",
   "dependencies": {
     "ember": "^1.5.0",

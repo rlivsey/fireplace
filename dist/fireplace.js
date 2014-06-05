@@ -15,7 +15,7 @@
 var FP;
 if ('undefined' === typeof FP) {
   FP = Ember.Namespace.create({
-    VERSION: '0.0.13'
+    VERSION: '0.0.14'
   });
 
   if ('undefined' !== typeof window) {
@@ -95,9 +95,11 @@ FP.hasMany = function(type, options) {
       content = value;
     } else if (!options.detached) {
       var dataKey   = this.relationshipKeyFromName(name),
-          snapshot  = get(this, "_snapshot");
+          snapshot  = get(this, "snapshot");
 
-      childSnap = snapshot && snapshot.child(dataKey);
+      // collections use an actual snapshot, not a MutableSnapshot
+      // TODO - should be able to pass the mutable one?
+      childSnap = snapshot.child(dataKey).snapshot;
     }
 
     // regardless of getting or setting, we create a new collection
@@ -213,13 +215,13 @@ FP.hasOne = function(type, options) {
       return value;
     } else {
       var store    = get(this, "store"),
-          snapshot = get(this, "_snapshot"),
+          snapshot = get(this, "snapshot"),
           childSnap;
 
       if (!options.detached) {
         var dataKey = this.relationshipKeyFromName(name);
-        childSnap = snapshot && snapshot.child(dataKey);
-        if (!(childSnap && childSnap.val())) { return null; }
+        childSnap = snapshot.child(dataKey);
+        if (!childSnap.val()) { return null; }
       }
 
       if (options.embedded) {
@@ -515,7 +517,7 @@ FP.attr = function(type, options) {
     var dataKey  = this.attributeKeyFromName(name),
         snapshot = get(this, 'snapshot');
 
-    value = snapshot && snapshot.val()[dataKey];
+    value = snapshot.child(dataKey).val();
 
     if (isNone(value)) {
       value = getDefaultValue(this, options);
@@ -805,40 +807,48 @@ function keyForAttribute(name, meta) {
 
 FP.MutableSnapshot = function(snapshot) {
   this.snapshot = snapshot;
-  this.data = snapshot ? snapshot.val() : {};
+  this.children = {};
 };
 
 FP.MutableSnapshot.prototype.name = function() {
+  if (!this.snapshot) { return null; }
   return this.snapshot.name();
 };
 
 FP.MutableSnapshot.prototype.val = function() {
-  return this.data;
+  if (!this.snapshot) { return null; }
+  return this.snapshot.val();
 };
 
 FP.MutableSnapshot.prototype.getPriority = function() {
+  if (!this.snapshot) { return null; }
   return this.snapshot.getPriority();
 };
 
 FP.MutableSnapshot.prototype.numChildren = function() {
+  if (!this.snapshot) { return 0; }
   return this.snapshot.numChildren();
 };
 
 FP.MutableSnapshot.prototype.ref = function() {
+  if (!this.snapshot) { return null; }
   return this.snapshot.ref();
 };
 
-FP.MutableSnapshot.prototype.set = function(key, value) {
-  this.data[key] = value;
-  return value;
+FP.MutableSnapshot.prototype.setChild = function(key, snapshot) {
+  this.children[key] = snapshot;
 };
 
-// NOTE - currently only used for associations which we don't care about data changes
-// so we return original snapshot child
-// TODO - this should probably wrap in its own MutableSnapshot
 FP.MutableSnapshot.prototype.child = function(key) {
-  return this.snapshot.child(key);
+  var childSnapshot;
+  if (this.children.hasOwnProperty(key)) {
+    childSnapshot = this.children[key];
+  } else if (this.snapshot) {
+    childSnapshot = this.snapshot.child(key);
+  }
+  return new FP.MutableSnapshot(childSnapshot);
 };
+
 
 })();
 
@@ -868,6 +878,9 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
   snapshot: Ember.computed(function(key, value) {
     var snapshot;
     if (arguments.length > 1) {
+      if (value instanceof FP.MutableSnapshot) {
+        value = value.snapshot;
+      }
       set(this, "_snapshot", value);
       snapshot = value;
     } else {
@@ -928,23 +941,24 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
     if (!attribute) { return; }
 
     var current     = get(this, "snapshot"),
-        currentData = current.val(),
+        currentData = current.child(key).val(),
         newVal;
 
     // child_removed sends the old value back in the snapshot
     if (valueRemoved) {
-      newVal = null;
+      newVal   = null;
+      snapshot = null;
     } else {
       newVal = snapshot.val();
     }
 
     // don't bother triggering a property change if nothing has changed
     // eg if we've got a snapshot & then started listening
-    if (currentData.hasOwnProperty(key) && currentData[key] === newVal) {
+    if (currentData === newVal) {
       return;
     }
 
-    current.set(key, newVal);
+    current.setChild(key, snapshot);
 
     this.settingFromFirebase(function(){
       this.notifyPropertyChange(attribute);
@@ -958,14 +972,11 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
     if (!attribute) { return; }
 
     // child_removed sends the old value back in the snapshot
-    var newVal;
     if (valueRemoved) {
-      newVal = null;
-    } else {
-      newVal = snapshot.val();
+      snapshot = null;
     }
 
-    get(this, "snapshot").set(key, newVal);
+    get(this, "snapshot").setChild(key, snapshot);
 
     var meta = this.constructor.metaForProperty(attribute);
     if (meta.kind === "hasOne") {
@@ -1443,14 +1454,9 @@ FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
     if (arguments.length > 1) {
       return value;
     } else {
-      var snapshot = get(this, "_snapshot");
-      if (!snapshot) {
-        return null;
-      } else {
-        return snapshot.val();
-      }
+      return get(this, "snapshot").val();
     }
-  }).property("_snapshot"),
+  }).property("snapshot"),
 
   buildFirebaseReference: function(){
     var id        = get(this, 'id'),
