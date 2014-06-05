@@ -22,14 +22,9 @@ FP.MetaModel = Ember.ObjectProxy.extend(FP.ModelMixin, {
     if (arguments.length > 1) {
       return value;
     } else {
-      var snapshot = get(this, "_snapshot");
-      if (!snapshot) {
-        return null;
-      } else {
-        return snapshot.val();
-      }
+      return get(this, "snapshot").val();
     }
-  }).property("_snapshot"),
+  }).property("snapshot"),
 
   buildFirebaseReference: function(){
     var id        = get(this, 'id'),

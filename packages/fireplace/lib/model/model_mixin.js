@@ -30,6 +30,9 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
   snapshot: Ember.computed(function(key, value) {
     var snapshot;
     if (arguments.length > 1) {
+      if (value instanceof FP.MutableSnapshot) {
+        value = value.snapshot;
+      }
       set(this, "_snapshot", value);
       snapshot = value;
     } else {
@@ -90,23 +93,24 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
     if (!attribute) { return; }
 
     var current     = get(this, "snapshot"),
-        currentData = current.val(),
+        currentData = current.child(key).val(),
         newVal;
 
     // child_removed sends the old value back in the snapshot
     if (valueRemoved) {
-      newVal = null;
+      newVal   = null;
+      snapshot = null;
     } else {
       newVal = snapshot.val();
     }
 
     // don't bother triggering a property change if nothing has changed
     // eg if we've got a snapshot & then started listening
-    if (currentData.hasOwnProperty(key) && currentData[key] === newVal) {
+    if (currentData === newVal) {
       return;
     }
 
-    current.set(key, newVal);
+    current.setChild(key, snapshot);
 
     this.settingFromFirebase(function(){
       this.notifyPropertyChange(attribute);
@@ -120,14 +124,11 @@ FP.ModelMixin = Ember.Mixin.create(FP.LiveMixin, FP.AttributesMixin, FP.Relation
     if (!attribute) { return; }
 
     // child_removed sends the old value back in the snapshot
-    var newVal;
     if (valueRemoved) {
-      newVal = null;
-    } else {
-      newVal = snapshot.val();
+      snapshot = null;
     }
 
-    get(this, "snapshot").set(key, newVal);
+    get(this, "snapshot").setChild(key, snapshot);
 
     var meta = this.constructor.metaForProperty(attribute);
     if (meta.kind === "hasOne") {

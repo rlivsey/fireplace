@@ -43,9 +43,11 @@ FP.hasMany = function(type, options) {
       content = value;
     } else if (!options.detached) {
       var dataKey   = this.relationshipKeyFromName(name),
-          snapshot  = get(this, "_snapshot");
+          snapshot  = get(this, "snapshot");
 
-      childSnap = snapshot && snapshot.child(dataKey);
+      // collections use an actual snapshot, not a MutableSnapshot
+      // TODO - should be able to pass the mutable one?
+      childSnap = snapshot.child(dataKey).snapshot;
     }
 
     // regardless of getting or setting, we create a new collection

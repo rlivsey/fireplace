@@ -1,36 +1,43 @@
 FP.MutableSnapshot = function(snapshot) {
   this.snapshot = snapshot;
-  this.data = snapshot ? snapshot.val() : {};
+  this.children = {};
 };
 
 FP.MutableSnapshot.prototype.name = function() {
+  if (!this.snapshot) { return null; }
   return this.snapshot.name();
 };
 
 FP.MutableSnapshot.prototype.val = function() {
-  return this.data;
+  if (!this.snapshot) { return null; }
+  return this.snapshot.val();
 };
 
 FP.MutableSnapshot.prototype.getPriority = function() {
+  if (!this.snapshot) { return null; }
   return this.snapshot.getPriority();
 };
 
 FP.MutableSnapshot.prototype.numChildren = function() {
+  if (!this.snapshot) { return 0; }
   return this.snapshot.numChildren();
 };
 
 FP.MutableSnapshot.prototype.ref = function() {
+  if (!this.snapshot) { return null; }
   return this.snapshot.ref();
 };
 
-FP.MutableSnapshot.prototype.set = function(key, value) {
-  this.data[key] = value;
-  return value;
+FP.MutableSnapshot.prototype.setChild = function(key, snapshot) {
+  this.children[key] = snapshot;
 };
 
-// NOTE - currently only used for associations which we don't care about data changes
-// so we return original snapshot child
-// TODO - this should probably wrap in its own MutableSnapshot
 FP.MutableSnapshot.prototype.child = function(key) {
-  return this.snapshot.child(key);
+  var childSnapshot;
+  if (this.children.hasOwnProperty(key)) {
+    childSnapshot = this.children[key];
+  } else if (this.snapshot) {
+    childSnapshot = this.snapshot.child(key);
+  }
+  return new FP.MutableSnapshot(childSnapshot);
 };

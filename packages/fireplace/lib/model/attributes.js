@@ -30,7 +30,7 @@ FP.attr = function(type, options) {
     var dataKey  = this.attributeKeyFromName(name),
         snapshot = get(this, 'snapshot');
 
-    value = snapshot && snapshot.val()[dataKey];
+    value = snapshot.child(dataKey).val();
 
     if (isNone(value)) {
       value = getDefaultValue(this, options);

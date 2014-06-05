@@ -69,6 +69,15 @@
       name:        function() { return attrs.name;     },
       val:         function() { return attrs.val;      },
       getPriority: function() { return attrs.priority; },
+      child:       function(key) {
+        var childData = this.val()[key];
+        if (childData) {
+          return mockSnapshot({name: key, val: childData});
+        }
+      },
+      numChildren: function() {
+        return Object.keys(this.val()).length
+      },
       // TODO - sort by priority if we rely on that in the tests
       forEach: function(cb) {
         var data = this.val(), snap, childData;
