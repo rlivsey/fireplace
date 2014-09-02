@@ -98,4 +98,26 @@
     deepEqual(transform.deserialize({a: timestamp}, {of: "timestamp"}, container), {a: date});
   });
 
+  test("array - plain", function() {
+    var transform = FP.ArrayTransform.create();
+
+    transforms(transform, null, null);
+    transforms(transform, undefined, null);
+
+    transforms(transform, [1, 2], [1, 2]);
+  });
+
+  test("array - with sub-transform", function() {
+    var transform = FP.ArrayTransform.create(),
+        container = new Ember.Container();
+
+    container.register('transform:timestamp', FP.TimestampTransform);
+
+    var date      = new Date(Date.UTC(1981, 7, 21, 12, 30)),
+        timestamp = 367245000000;
+
+    deepEqual(transform.serialize([date], {of: "timestamp"}, container), [timestamp]);
+    deepEqual(transform.deserialize([timestamp], {of: "timestamp"}, container), [date]);
+  });
+
 })();
