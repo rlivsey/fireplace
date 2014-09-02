@@ -25,6 +25,7 @@ Ember.onLoad('Ember.Application', function(Application) {
       application.register('transform:number',    FP.NumberTransform);
       application.register('transform:hash',      FP.HashTransform);
       application.register('transform:string',    FP.StringTransform);
+      application.register('transform:array',     FP.ArrayTransform);
     }
   });
 

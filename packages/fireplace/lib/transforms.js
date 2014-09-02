@@ -5,3 +5,4 @@ require('fireplace/transforms/date');
 require('fireplace/transforms/hash');
 require('fireplace/transforms/number');
 require('fireplace/transforms/timestamp');
+require('fireplace/transforms/array');
