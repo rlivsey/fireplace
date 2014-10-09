@@ -1,6 +1,5 @@
-tmp/
-components/
-bower_components/
-node_modules/
+/bower_components/
+/node_modules/
+/tmp/
+/dist/
 .DS_Store
-tests/index.html

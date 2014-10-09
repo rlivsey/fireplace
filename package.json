@@ -1,35 +1,44 @@
 {
   "name": "fireplace",
   "description": "A Firebase model library for Ember.js",
-  "main": "Gruntfile.js",
+  "version": "0.1.0-pre",
   "directories": {
+    "doc": "doc",
     "test": "tests"
   },
   "scripts": {
-    "test": "grunt test"
+    "start": "ember server",
+    "build": "ember build",
+    "test": "ember test"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/rlivsey/fireplace.git"
   },
-  "author": "no",
-  "license": "BSD",
-  "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-neuter": "~0.5.0",
-    "grunt-contrib-jshint": "~0.6.0",
-    "grunt-contrib-uglify": "~0.2.2",
-    "grunt-contrib-qunit": "~0.2.2",
-    "grunt-contrib-clean": "~0.4.1",
-    "grunt-strip-node": "~0.1.1",
-    "matchdep": "~0.1.2",
-    "grunt-curl": "~1.1.1",
-    "grunt-strip": "~0.2.1",
-    "grunt-release": "git+https://github.com/trek/grunt-release.git#7b766605c85605",
-    "glob": "~3.2.1",
-    "grunt-contrib-copy": "~0.4.1",
-    "grunt-contrib-connect": "~0.3.0",
-    "grunt-contrib-watch": "~0.4.4"
+  "engines": {
+    "node": ">= 0.10.0"
   },
-  "version": "0.0.9"
+  "author": {
+    "name": "Richard Livsey",
+    "email": "richard@livsey.org"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "body-parser": "^1.2.0",
+    "broccoli-asset-rev": "0.3.0",
+    "broccoli-ember-hbs-template-compiler": "^1.6.1",
+    "ember-cli": "0.1.1",
+    "ember-cli-content-security-policy": "0.2.0",
+    "ember-cli-inject-live-reload": "^1.2.2",
+    "ember-cli-qunit": "0.1.0",
+    "express": "^4.8.5",
+    "glob": "^4.0.5"
+  },
+  "keywords": [
+    "ember-addon",
+    "firebase"
+  ],
+  "ember-addon": {
+    "configPath": "tests/dummy/config"
+  }
 }

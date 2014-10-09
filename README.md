@@ -1,6 +1,20 @@
 # Fireplace
 
-Fireplace is an [Ember.js](http://emberjs.com) adapter for [Firebase](http://firebase.com).
+Fireplace is an [Ember.js](http://emberjs.com) addon for [Firebase](http://firebase.com).
+
+## Installation
+
+Install as an Ember CLI addon:
+
+```
+npm install --save-dev fireplace
+```
+
+Then run the generator to install dependencies (Firebase from Bower):
+
+```
+ember generate fireplace
+```
 
 ## Getting Started
 
@@ -389,7 +403,7 @@ project.get('members').addObject(member);
 project.save();
 ```
 
-When loading projects and getting members, the `MetaModel`'s properties are available on the *real* member (instance of `People`) as if they were a part of it. 
+When loading projects and getting members, the `MetaModel`'s properties are available on the *real* member (instance of `People`) as if they were a part of it.
 
 ### Detached relationships
 
@@ -654,33 +668,26 @@ When you save `personClone` then `person` will also update, but not until then.
 We fork the store instead of just copying the record because this makes sure we have a completely fresh
 cache & that all embedded records are also isolated.
 
-## Ember Inspector
+### Development
 
-Fireplace supports the [Chrome Ember Inspector](https://chrome.google.com/webstore/detail/ember-inspector/bmdblncegkenkacieihfhpjfppoconhi?hl=en)
+## Installation
 
-## Building Fireplace
+* `git clone` this repository
+* `npm install`
+* `bower install`
 
-Fireplace uses [node.js](http://nodejs.org/) and [grunt](http://gruntjs.com/) as a build system,
-These two libraries will need to be installed before building.
+## Running
 
-To build Fireplace, clone the repository, and run `npm install` to install build dependencies
-and `grunt` to build the library.
+* `ember server`
+* Visit your app at http://localhost:4200.
 
-Unminified and minified builds of Fireplace will be placed in the `dist`
-directory.
+## Running Tests
 
-## How to Run Unit Tests
+* `ember test`
+* `ember test --server`
 
-### Setup
+## Building
 
-Fireplace uses [node.js](http://nodejs.org/) and [grunt](http://gruntjs.com/) as a build system
-and test runner, and [bower](http://bower.io/) for dependency management.
+* `ember build`
 
-If you have not used any of these tools before, you will need to run `npm install -g bower` and
-`npm install -g grunt-cli` to be able to use them.
-
-To test Fireplace run `npm install` to install build dependencies, `bower install` to install the
-runtime dependencies and `grunt test` to execute the test suite headlessly via phantomjs.
-
-If you prefer to run tests in a browser, you may start a development server using
-`grunt develop`. Tests are available at http://localhost:8000/tests
+For more information on using ember-cli, visit [http://www.ember-cli.com/](http://www.ember-cli.com/).
