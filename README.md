@@ -2,6 +2,10 @@
 
 Fireplace is an [Ember.js](http://emberjs.com) addon for [Firebase](http://firebase.com).
 
+## Note
+
+The Ember CLI version on master is a work in progress and isn't yet published to NPM - but will be shortly.
+
 ## Installation
 
 Install as an Ember CLI addon:
