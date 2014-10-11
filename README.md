@@ -24,37 +24,30 @@ ember generate fireplace
 
 ## Getting Started
 
-Setup your Firebase root path:
+Setup your Firebase root path by extending the default Store.
 
 ```javascript
-App.Store = FP.Store.extend({
+// app/stores/main.js
+import {Store} from 'fireplace';
+export default Store.extend({
   firebaseRoot: "https://your-firebase.firebaseio.com"
 });
 ```
 
 ## Models & Attributes
 
-Define a model by extending from `FP.Model` and giving it some attributes:
+Define a model by extending from `Model` and giving it some attributes:
 
 ```javascript
-App.Person = FP.Model.extend({
-  firstName: FP.attr(),
-  lastName: FP.attr()
-});
-```
-
-Typing `FP.attr()` all the time can get a bit repetitive, so you can assign that to a variable
-to reduce the amount of typing. All subsequent examples will assume this:
-
-```javascript
-var attr = FP.attr;
-App.Person = FP.Model.extend({
+// app/models/person.js
+import {Model, attr} from 'fireplace';
+export default Model.extend({
   firstName: attr(),
   lastName: attr()
 });
 ```
 
-`FP.attr` takes a type which tells it how to transform to and from Firebase, and options.
+`attr` takes a type which tells it how to transform to and from Firebase, and options.
 
 Fireplace supports the following types out of the box:
 
@@ -73,7 +66,9 @@ By default this is the underscored version of the name, so `firstName` maps to `
 For example, lets add a date of birth date attribute and map the lastName attribute to "surname":
 
 ```javascript
-App.Person = FP.Model.extend({
+// app/models/person.js
+import {Model, attr} from 'fireplace';
+export default Model.extend({
   firstName: attr(),
   lastName: attr({key: "surname"}),
   dob: attr("date")
@@ -86,7 +81,9 @@ Attributes can have default values, specify this with the `default` option which
 the value itself or a function which returns the default value (good for dates etc...)
 
 ```javascript
-App.Person = FP.Model.extend({
+// app/models/person.js
+import {Model, attr} from 'fireplace';
+export default Model.extend({
   firstName: attr({default: "John"}),
   lastName: attr({default: "Smith"}),
   createdAt: attr("date", {default: function() { return new Date(); }})
@@ -192,13 +189,17 @@ this.store.fetch("task", {project: someProject}, {limit: 10, startAt: "123", end
 ### hasOne
 
 ```javascript
-App.Person = FP.Model.extend({
+// app/models/person.js
+import {Model, attr, hasOne} from 'fireplace';
+export default Model.extend({
   firstName: attr(),
   lastName: attr()
-  address: FP.hasOne()
+  address: hasOne()
 });
 
-App.Address = FP.Model.address({
+// app/models/address.js
+import {Model, attr} from 'fireplace';
+export default Model.extend({
   street: attr(),
   city: attr(),
   postcode: attr()
@@ -225,8 +226,10 @@ in this case `address`.
 If you want to call the property something different to the model type, pass its name as the first argument:
 
 ```javascript
-App.Person = FP.Model.extend({
-  residence: FP.hasOne("address")
+// app/models/person.js
+import {Model, hasOne} from 'fireplace';
+export default Model.extend({
+  residence: hasOne("address")
 });
 ```
 
@@ -234,10 +237,12 @@ Firebase stores data in a tree structure, so Fireplace by default treats all rel
 as embedded. We can set the `embedded: false` option to change this:
 
 ```javascript
-App.Person = FP.Model.extend({
+// app/models/person.js
+import {Model, attr, hasOne} from 'fireplace';
+export default Model.extend({
   firstName: attr(),
   lastName: attr(),
-  address: FP.hasOne({embedded: false})
+  address: hasOne({embedded: false})
 });
 ```
 
@@ -261,13 +266,17 @@ We'll cover configuring the path of the item in Firebase later.
 Lets say our person lives in many different places, we can model this like so:
 
 ```javascript
-App.Person = FP.Model.extend({
+// app/models/person.js
+import {Model, attr, hasMany} from 'fireplace';
+export default Model.extend({
   firstName: attr(),
   lastName: attr(),
-  addresses: FP.hasMany()
+  addresses: hasMany()
 });
 
-App.Address = FP.Model.address({
+// app/models/address.js
+import {Model, attr} from 'fireplace';
+export default Model.extend({
   street: attr(),
   city: attr(),
   postcode: attr()
@@ -301,8 +310,10 @@ in this case `addresses` -> `address`.
 If you want to call the property something different to the model type, pass its name as the first argument:
 
 ```javascript
-App.Person = FP.Model.extend({
-  residences: FP.hasOne("address")
+// app/models/person.js
+import {hasOne} from 'fireplace';
+export default Model.extend({
+  residences: hasOne("address")
 });
 ```
 
@@ -331,12 +342,16 @@ on the model itself because that person object can belong to many different proj
 Instead we use a `MetaModel` which lets us store the information for this particular member.
 
 ```javascript
-App.Project = FP.Model.extend({
+// app/models/project.js
+import {Model, attr, hasMany} from 'fireplace';
+export default Model.extend({
   title: attr(),
-  members: FP.hasMany("people", {embedded: false, as: "member"})
+  members: hasMany("people", {embedded: false, as: "member"})
 });
 
-App.Member = FP.MetaModel.extend();
+// app/models/member.js
+import {MetaModel} from 'fireplace';
+export default MetaModel.extend();
 ```
 
 The JSON for this would now be something like:
@@ -362,7 +377,10 @@ member.get("meta"); => "admin"
 To change this to something more descriptive, you can use `Ember.computed.alias`:
 
 ```javascript
-App.Member = FP.MetaModel.extend({
+// app/models/member.js
+import Ember from 'ember';
+import {MetaModel} from 'fireplace';
+export default MetaModel.extend({
   accessLevel: Ember.computed.alias("meta")
 });
 ```
@@ -371,7 +389,9 @@ If you want to store more complex data on a relationship, you can give the `Meta
 and relationships just like a normal model. All the same rules apply:
 
 ```javascript
-App.Member = FP.MetaModel.extend({
+// app/models/member.js
+import {MetaModel, attr} from 'fireplace';
+export default MetaModel.extend({
   accessLevel: attr(),
   joinedAt: attr("date")
 });
@@ -439,9 +459,11 @@ We don't store the avatar ID with the person because maybe every person has an a
 We can model this like so:
 
 ```javascript
-App.Person = FP.Model.extend({
+// app/models/person.js
+import {Model, attr, hasOne} from 'fireplace';
+export default Model.extend({
   name: attr(),
-  avatar: FP.hasOne({detached: true})
+  avatar: hasOne({detached: true})
 });
 ```
 
@@ -493,14 +515,18 @@ Here we've got a list of people, a list of tasks and an index which maps each pe
 We can model this like so:
 
 ```javascript
-App.Task = FP.Model.extend({
+// app/models/task.js
+import {Model, attr, hasMany} from 'fireplace';
+export default Model.extend({
   title: attr(),
-  assignees: FP.hasMany("people")
+  assignees: hasMany("people")
 });
 
-App.Person = FP.Model.extend({
+// app/models/person.js
+import {Model, attr, hasMany} from 'fireplace';
+export default Model.extend({
   name: attr(),
-  tasks: FP.hasMany({detached: true, path: "tasks_by_person/{{id}}"})
+  tasks: hasMany({detached: true, path: "tasks_by_person/{{id}}"})
 });
 ```
 
@@ -510,8 +536,10 @@ For complete control over the path you can provide a function and return either 
 reference:
 
 ```javascript
-App.Person = FP.Model.extend({
-  tasks: FP.hasMany({
+// app/models/person.js
+import {Model, hasMany} from 'fireplace';
+export default Model.extend({
+  tasks: hasMany({
     detached: true,
     path: function() {
       return this.get("project").buildFirebaseReference().
@@ -531,7 +559,9 @@ If a model has a `priority` property, then that's used when saving to Firebase.
 For example, lets say we want to order all people by their full name, last name first:
 
 ```javascript
-App.Person = FP.Model.extend({
+// app/models/person.js
+import {Model, attr} from 'fireplace';
+export default Model.extend({
   firstName: attr(),
   lastName: attr(),
   priority: function(){
@@ -540,7 +570,7 @@ App.Person = FP.Model.extend({
 })
 ```
 
-Note that the priority here is a normal Ember property and not an `FP.attr`. That's because we're not
+Note that the priority here is a normal Ember property and not an `attr`. That's because we're not
 storing it as an attribute in the JSON.
 
 The same applies to a `MetaModel` so you can order items in an indexed list.
@@ -548,17 +578,23 @@ The same applies to a `MetaModel` so you can order items in an indexed list.
 For example, lets order a list of members by the date they were added to a project:
 
 ```javascript
-App.Person = FP.Model.extend({
+// app/models/person.js
+import {Model, attr} from 'fireplace';
+export default Model.extend({
   firstName: attr(),
   lastName: attr()
 })
 
-App.Project = FP.Model.extend({
+// app/models/project.js
+import {Model, attr, hasMany} from 'fireplace';
+export default Model.extend({
   title: attr(),
   members: hasMany("people", {as: "member"})
 })
 
-App.Member = FP.MetaModel.extend({
+// app/models/member.js
+import {MetaModel, attr} from 'fireplace';
+export default MetaModel.extend({
   createdAt: attr("date"),
 
   priority: function(){
@@ -581,7 +617,12 @@ To customise this you can override the `firebasePath` property on the model's cl
 Let's change `App.Person` to store its data at `/member/profiles` instead of `/people`:
 
 ```javascript
-App.Person.reopenClass({
+// app/models/person.js
+import {Model} from 'fireplace';
+var Person = Model.extend();
+export default Person;
+
+Person.reopenClass({
   firebasePath: "member/profiles"
 });
 ```
@@ -590,7 +631,7 @@ Any handlebars style parameters will be expanded, so lets say we store each pers
 they are a member of, eg `/projects/123/people/456`, then we can provide a path like so:
 
 ```javascript
-App.Person.reopenClass({
+Person.reopenClass({
   firebasePath: "projects/{{project.id}}/people"
 });
 ```
@@ -605,7 +646,7 @@ this.store.fetch("person", {project: someProject});
 Finally, for complete control you can specify a function, the equivalent to the template string above would be:
 
 ```javascript
-App.Person.reopenClass({
+Person.reopenClass({
   firebasePath: function(options) {
     var projectID = options.get("project.id");
     return "projects/"+projectID+"/people";
@@ -617,15 +658,17 @@ App.Person.reopenClass({
 
 There are two types of collection built in:
 
-* `FP.ObjectCollection` - returned from finders and hasMany embedded relationships
-* `FP.IndexedCollection` - returned from hasMany non-embedded / detached relationships
+* `ObjectCollection` - returned from finders and hasMany embedded relationships
+* `IndexedCollection` - returned from hasMany non-embedded / detached relationships
 
 You can create a custom collection by extending either of these as a starting point.
 
 For example, lets make a collection of objects which sets a random priority when items are added:
 
 ```javascript
-App.RandomCollection = FP.ObjectCollection.extend({
+// app/collections/random.js
+import {ObjectCollection} from 'fireplace';
+export default ObjectCollection.extend({
 
   replaceContent: function(idx, numRemoved, objectsAdded) {
     var priority;
@@ -650,7 +693,9 @@ this.store.fetch("person", {collection: "random"})
 and in relationships:
 
 ```javascript
-App.Person = FP.Model.extend({
+// app/models/person.js
+import {Model} from 'fireplace';
+export default Model.extend({
   tasks: hasMany({collection: "random"})
 });
 ```
