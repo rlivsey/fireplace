@@ -5,8 +5,6 @@ module.exports = {
     // to us
   },
   afterInstall: function() {
-    return this.addBowerPackagesToProject([
-      {name: 'firebase', version: '~1.1.0'}
-    ]);
+    return this.addBowerPackageToProject('firebase', '~1.1.0');
   }
 };
