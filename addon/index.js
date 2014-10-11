@@ -8,16 +8,34 @@ import Collection         from './collections/base';
 import ObjectCollection   from './collections/object';
 import IndexedCollection  from './collections/indexed';
 
+import Transform          from './transforms/base';
+import BooleanTransform   from './transforms/boolean';
+import DateTransform      from './transforms/date';
+import HashTransform      from './transforms/hash';
+import NumberTransform    from './transforms/number';
+import StringTransform    from './transforms/string';
+import TimestampTransform from './transforms/timestamp';
 
 export {
   Model,
+
   attr,
   hasOne,
   hasMany,
+
   Store,
+
   Collection,
   ObjectCollection,
-  IndexedCollection
+  IndexedCollection,
+
+  Transform,
+  BooleanTransform,
+  DateTransform,
+  HashTransform,
+  NumberTransform,
+  StringTransform,
+  TimestampTransform
 };
 
 export default Model;
