@@ -13,6 +13,9 @@ import {
   RelationshipsMixin
 } from '../relationships/mixin';
 
+// Map#forEach argument order changed - https://github.com/emberjs/data/issues/2323
+var LEGACY_MAP = Ember.Map.prototype.forEach.length === 2;
+
 var get       = Ember.get;
 var set       = Ember.set;
 var cacheFor  = Ember.cacheFor;
@@ -197,7 +200,9 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
       json[this.attributeKeyFromName(name)] = serialize(this, value, meta, container);
     }, this);
 
-    relationships.forEach(function(name, meta){
+    relationships.forEach(function(meta, name) {
+      if (LEGACY_MAP) { var tmp = name; name = meta; meta = tmp; }
+
       // we don't serialize detached relationships
       if (meta.options.detached) { return; }
 

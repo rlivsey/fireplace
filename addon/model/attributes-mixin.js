@@ -3,6 +3,9 @@ import Ember from 'ember';
 var get        = Ember.get;
 var underscore = Ember.String.underscore;
 
+// Map#forEach argument order changed - https://github.com/emberjs/data/issues/2323
+var LEGACY_MAP = Ember.Map.prototype.forEach.length === 2;
+
 export var AttributesClassMixin = Ember.Mixin.create({
   attributes: Ember.computed(function() {
     var map = Ember.Map.create();
@@ -33,7 +36,8 @@ export var AttributesClassMixin = Ember.Mixin.create({
   }),
 
   eachAttribute: function(callback, binding) {
-    get(this, 'attributes').forEach(function(name, meta) {
+    get(this, 'attributes').forEach(function(meta, name) {
+      if (LEGACY_MAP) { var tmp = name; name = meta; meta = tmp; }
       callback.call(binding, name, meta);
     }, binding);
   },

@@ -6,6 +6,9 @@ var get        = Ember.get;
 var capitalize = Ember.String.capitalize;
 var underscore = Ember.String.underscore;
 
+// Map#forEach argument order changed - https://github.com/emberjs/data/issues/2323
+var LEGACY_MAP = Ember.Map.prototype.forEach.length === 2;
+
 export default Ember.DataAdapter.extend({
   getFilters: function() {
     return [
@@ -20,7 +23,8 @@ export default Ember.DataAdapter.extend({
 
   columnsForType: function(type) {
     var columns = [{ name: 'id', desc: 'Id' }], count = 0, self = this;
-    get(type, 'attributes').forEach(function(name/*, meta */) {
+    get(type, 'attributes').forEach(function(meta, name) {
+        if (LEGACY_MAP) { var tmp = name; name = meta; meta = tmp; }
         if (count++ > self.attributeLimit) { return false; }
         var desc = capitalize(underscore(name).replace('_', ' '));
         columns.push({ name: name, desc: desc });
