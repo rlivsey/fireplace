@@ -10,3 +10,4 @@
 
 * Converted to Ember CLI addon
 * Converted to ES6 modules
+* Changed store injection initializer name to 'fireplace:inject-store'
