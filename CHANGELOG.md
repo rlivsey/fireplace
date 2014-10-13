@@ -2,6 +2,8 @@
 
 ## Master
 
+* Fix race condition when listening to firebase
+
 ## v0.2.0
 
 * Added `fetch` to collections to return a promise which resolves when their content is fully loaded

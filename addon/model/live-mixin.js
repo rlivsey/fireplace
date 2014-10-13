@@ -38,6 +38,12 @@ export default Ember.Mixin.create(Ember.Evented, {
       return Ember.RSVP.reject();
     }
 
+    // prevent race condition where we're waiting for FB to respond
+    // and another listen call comes in
+    if (this._listenPromise) {
+      return this._listenPromise;
+    }
+
     if (get(this, 'isListeningToFirebase')) {
       return Ember.RSVP.resolve();
     }
@@ -65,10 +71,17 @@ export default Ember.Mixin.create(Ember.Evented, {
       ref.on(eventName, handler, errHandler, this);
     }, this);
 
-    return new Ember.RSVP.Promise(function(resolve, reject) {
+    this._listenPromise = new Ember.RSVP.Promise(function(resolve, reject) {
       _this.one("firebaseValue",      resolve);
       _this.one("firebaseValueError", reject);
-    }, "FP: Value "+ref.toString());
+    }, "FP: Value "+ref.toString()).catch(function(e) {
+      set(_this, 'isListeningToFirebase', false);
+      return Ember.RSVP.reject(e);
+    }).finally(function() {
+      _this._listenPromise = null;
+    });
+
+    return this._listenPromise;
   },
 
   buildErrorHandler: function(eventName) {
@@ -101,6 +114,8 @@ export default Ember.Mixin.create(Ember.Evented, {
   },
 
   stopListeningToFirebase: function() {
+    this._listenPromise = null;
+
     if (!get(this, 'isListeningToFirebase')) {
       return;
     }
