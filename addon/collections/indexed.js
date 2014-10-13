@@ -76,33 +76,16 @@ export default Collection.extend({
     return this._super();
   },
 
-  hasLoadedAllChildren: function() {
-    var snapshot = get(this, "snapshot");
-    if (!snapshot || snapshot.numChildren() !== get(this, "length")) { return false; }
-
-    // we go through content instead of this.forEach as that would issue finds for all unloaded items
-    var content = get(this, "content");
-
-    // we've loaded all children if every item has a record object
-    return content.every(function(item) { return !!item.record; });
-  }.property("length", "snapshot"),
-
-  // WIP - experimental & untested
   fetch: function() {
-    if (get(this, "hasLoadedAllChildren")) {
-      return Ember.RSVP.resolve(this);
-    }
+    return this.listenToFirebase().
+      then(this._fetchAll.bind(this)).
+      then(Ember.K.bind(this));
+  },
 
-    var _this = this;
-    return this.listenToFirebase().then(function() {
-      var content  = get(_this, "content");
-      var promises = content.map(function(item, index){
-        return _this.objectAtContentAsPromise(index);
-      });
-      return Ember.RSVP.all(promises);
-    }).then(function() {
-      return _this;
-    });
+  _fetchAll: function() {
+    return Ember.RSVP.all(get(this, "content").map(function(item, index) {
+      return this.objectAtContentAsPromise(index);
+    }.bind(this)));
   },
 
   itemFromSnapshot: function(snapshot) {
@@ -135,7 +118,6 @@ export default Collection.extend({
     return this._super(start, numRemoved, objectsAdded);
   },
 
-  // TODO - can we replace this with objectAtContentAsPromise and always use fetch somehow?
   objectAtContent: function(idx) {
     var content = get(this, "content");
     if (!content || !content.length) {
@@ -154,6 +136,14 @@ export default Collection.extend({
 
     item.record = this.findFetchRecordFromItem(item, false);
 
+    item.record.get("promise").then(function(obj) {
+      if (item.record instanceof MetaModel) {
+        item.record.set("content", obj);
+      } else {
+        item.record = obj;
+      }
+    });
+
     return item.record;
   },
 
@@ -170,6 +160,12 @@ export default Collection.extend({
 
     // already inflated
     if (item.record) {
+      // is the item.record a promise proxy, if so return that
+      // so we end up with the actual object
+      var promise = item.record.get("promise");
+      if (promise) {
+        return promise;
+      }
       return Ember.RSVP.resolve(item.record);
     }
 

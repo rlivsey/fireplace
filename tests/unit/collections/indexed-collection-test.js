@@ -81,6 +81,60 @@ test("wraps plain objects in meta models if necessary", function() {
   equal(get(obj, 'content'), person, "meta model has item as content");
 });
 
+module("IndexedCollection - fetching", {
+  setup: function() {
+    setupEnv();
+
+    // stick some data in to find
+    firebase.child("people").set({
+      tom:   {name: "Tom"},
+      dick:  {name: "Dick"},
+      harry: {name: "Harry"}
+    });
+
+    firebase.child("people-index").set({
+      tom:   true,
+      dick:  true,
+      harry: true
+    });
+
+    firebase.flush();
+  }
+});
+
+test("fetch returns a promise which resolves when the collection has a value", function() {
+  expect(2);
+
+  var people = PeopleIndex.create();
+
+  people.fetch().then(function(c) {
+    equal(c, people, "resolves with itself");
+    equal(people.get("length"), 3, "has the items");
+  });
+
+  // we need two flushes because the first kicks off the fetches for the objects
+  firebase.flush();
+  firebase.flush();
+});
+
+test("resolves immediately if already listening to firebase", function() {
+  expect(2);
+
+  var people = PeopleIndex.create();
+  people.listenToFirebase();
+  // we need two flushes because the first kicks off the fetches for the objects
+  firebase.flush();
+  firebase.flush();
+
+  Ember.run(function() {
+    people.fetch().then(function(c) {
+      equal(c, people, "resolves with itself");
+      equal(people.get("length"), 3, "has the items");
+    });
+  });
+});
+
+
 
 module("IndexedCollection - serializing", {
   setup: setupEnv
