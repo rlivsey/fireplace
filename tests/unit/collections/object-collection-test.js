@@ -108,6 +108,38 @@ test("Removing an item doesn't lose its reference", function() {
 });
 
 
+module("ObjectCollection - fetching", {
+  setup: setupEnv
+});
+
+test("fetch returns a promise which resolves when the collection has a value", function() {
+  expect(2);
+
+  var people = People.create();
+
+  people.fetch().then(function(c) {
+    equal(c, people, "resolves with itself");
+    equal(people.get("length"), 3, "has the items");
+  });
+
+  firebase.flush();
+});
+
+test("resolves immediately if already listening to firebase", function() {
+  expect(2);
+
+  var people = People.create();
+  people.listenToFirebase();
+  firebase.flush();
+
+  Ember.run(function() {
+    people.fetch().then(function(c) {
+      equal(c, people, "resolves with itself");
+      equal(people.get("length"), 3, "has the items");
+    });
+  });
+});
+
 module("ObjectCollection - serializing", {
   setup: setupEnv
 });

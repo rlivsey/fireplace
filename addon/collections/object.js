@@ -44,35 +44,13 @@ export default Collection.extend({
     return this._super(start, numRemoved, objectsAdded);
   },
 
-  hasLoadedAllChildren: function() {
-    var snapshot = get(this, "snapshot");
-    return snapshot && snapshot.numChildren() === get(this, "length");
-  }.property("length", "snapshot"),
-
-  // WIP - experimental & untested
+  // when we have a value (which is when listenToFirebase resolves)
+  // then we know we have all our content because it all comes in
+  // the same result
   fetch: function() {
-    if (get(this, "hasLoadedAllChildren")) {
-      return Ember.RSVP.resolve(this);
-    }
-
-    var _this = this;
-    return new Ember.RSVP.Promise(function(resolve /*,reject */) {
-      var observerFunc = function() {
-        if (get(_this, "hasLoadedAllChildren")) {
-          _this.removeObserver("hasLoadedAllChildren", _this, observerFunc);
-          resolve(_this);
-        }
-      };
-
-      _this.addObserver("hasLoadedAllChildren", _this, observerFunc);
-
-      // TODO - how do we know if this fails?
-      // should we have a private promise / var somewhere to know the status?
-      // or maybe listenToFirebase returns a promise against on("value")?
-      if (!get(this, "isListeningToFirebase")) {
-        _this.listenToFirebase();
-      }
-    });
+    return this.listenToFirebase().then(function() {
+      return this;
+    }.bind(this));
   },
 
   contentChanged: function() {

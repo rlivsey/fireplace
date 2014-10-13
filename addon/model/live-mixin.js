@@ -35,7 +35,7 @@ export default Ember.Mixin.create(Ember.Evented, {
 
   listenToFirebase: function() {
     if (this.isDestroying || this.isDestroyed) {
-      return;
+      return Ember.RSVP.reject();
     }
 
     if (get(this, 'isListeningToFirebase')) {
@@ -46,11 +46,16 @@ export default Ember.Mixin.create(Ember.Evented, {
 
     this._fbEventHandlers = {};
 
-    var ref   = this.buildFirebaseQuery(),
-        _this = this,
-        handler;
+    // ensure value is listened to last, this doesn't matter for Firebase
+    // as child_added is called before value, but in MockFirebase it appears
+    // that the events are triggered in the order they are setup
+    var events = get(this, 'firebaseEvents').slice().reverse();
 
-    get(this, 'firebaseEvents').forEach(function(eventName) {
+    var ref    = this.buildFirebaseQuery();
+    var _this  = this;
+    var handler;
+
+    events.forEach(function(eventName) {
       handler = this.buildHandler(eventName);
       this._fbEventHandlers[eventName] = handler;
       ref.on(eventName, handler, this);
@@ -78,7 +83,6 @@ export default Ember.Mixin.create(Ember.Evented, {
         if (this.isDestroying || this.isDestroyed) {
           return;
         }
-
         this.trigger(triggerName, args);
         this[handlerName].apply(this, args);
       }, this);
