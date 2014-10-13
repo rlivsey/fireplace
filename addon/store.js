@@ -9,7 +9,6 @@ import MetaModel    from './model/meta-model';
 import { singularize } from 'ember-inflector';
 
 var get     = Ember.get;
-var set     = Ember.set;
 var guidFor = Ember.guidFor;
 
 var camelize = Ember.String.camelize;
@@ -245,13 +244,10 @@ export default Ember.Object.extend({
 
   findFetchCollectionByReference: function(model, ref, query, options, returnPromise) {
     var container = get(this, 'container');
+    var type      = options.collection || "object";
+    var factory   = container.lookupFactory("collection:"+type);
 
-    var type    = options.collection || "object",
-        factory = container.lookupFactory("collection:"+type),
-        _this   = this,
-        collection, promise, fbQuery;
-
-    collection = factory.create({
+    var collection = factory.create({
       store: this,
       model: model,
       query: query,
@@ -261,23 +257,12 @@ export default Ember.Object.extend({
       limit: options.limit
     });
 
-    fbQuery = collection.buildFirebaseQuery();
-
-    promise = new Ember.RSVP.Promise(function(resolve, reject){
-      fbQuery.once('value', function(snapshot){
-        _this.enqueueEvent(function(){
-          // we don't reject if snapshot is empty, an empty collection is still valid
-          set(collection, "snapshot", snapshot);
-          collection.inflateFromSnapshot();
-          collection.listenToFirebase();
-          resolve(collection);
-        });
-      }, function(){
-        reject('permission denied');
-      });
-    }, "FP: Find many "+fbQuery.toString());
-
-    return returnPromise ? promise : collection;
+    if (returnPromise) {
+      return collection.fetch();
+    } else {
+      collection.listenToFirebase();
+      return collection;
+    }
   },
 
   modelFor: function(type) {

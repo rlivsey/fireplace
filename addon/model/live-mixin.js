@@ -53,30 +53,41 @@ export default Ember.Mixin.create(Ember.Evented, {
 
     var ref    = this.buildFirebaseQuery();
     var _this  = this;
+
     var handler;
+    var errHandler;
 
     events.forEach(function(eventName) {
-      handler = this.buildHandler(eventName);
+      handler    = this.buildHandler(eventName);
+      errHandler = this.buildErrorHandler(eventName);
+
       this._fbEventHandlers[eventName] = handler;
-      ref.on(eventName, handler, this);
+      ref.on(eventName, handler, errHandler, this);
     }, this);
 
-    return new Ember.RSVP.Promise(function(resolve) {
-      _this.one("firebaseValue", function() {
-        resolve();
-      });
+    return new Ember.RSVP.Promise(function(resolve, reject) {
+      _this.one("firebaseValue",      resolve);
+      _this.one("firebaseValueError", reject);
     }, "FP: Value "+ref.toString());
   },
 
+  buildErrorHandler: function(eventName) {
+    var triggerName = 'firebase' + classify(eventName) + "Error";
+    return function(e) {
+      this.trigger(triggerName, e);
+    };
+  },
+
   buildHandler: function(eventName) {
-    var classyName  = classify(eventName),
-        handlerName = 'onFirebase' + classyName,
-        triggerName = 'firebase'   + classyName,
-        store       = this.store;
+    var classyName  = classify(eventName);
+    var handlerName = 'onFirebase' + classyName;
+    var triggerName = 'firebase'   + classyName;
+    var store       = this.store;
 
     return function() {
       var args = arguments;
       store.enqueueEvent(function(){
+
         // if the we have been destroyed since the event came in, then
         // don't bother trying to update - destroying stops listening to firebase
         // so we don't expect to receive any more updates anyway
