@@ -16,66 +16,67 @@
   </head>
 
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Fireplace</h1>
-        <p>Firebase addon for Ember.js</p>
-        <ul>
-          <li><a href="https://github.com/rlivsey/fireplace">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
+    <div class="l-wrapper">
+      <div class="wrapper">
+        <header>
+          <h1>Fireplace</h1>
+          <p>Firebase addon for Ember.js</p>
+          <ul>
+            <li><a href="https://github.com/rlivsey/fireplace">View On <strong>GitHub</strong></a></li>
+          </ul>
+        </header>
 
-      <nav class="section-nav">
-        <ul class="section-nav__list">
-          
-            <li class="section-nav__item">
-              <a href="#introduction" class="section-nav__link">Introduction</a>
-            </li>
-          
-            <li class="section-nav__item">
-              <a href="#attributes" class="section-nav__link">Models &amp; Attributes</a>
-            </li>
-          
-            <li class="section-nav__item">
-              <a href="#saving" class="section-nav__link">Saving</a>
-            </li>
-          
-            <li class="section-nav__item">
-              <a href="#deleting" class="section-nav__link">Deleting</a>
-            </li>
-          
-            <li class="section-nav__item">
-              <a href="#finding" class="section-nav__link">Finding</a>
-            </li>
-          
-            <li class="section-nav__item">
-              <a href="#relationships" class="section-nav__link">Relationships</a>
-            </li>
-          
-            <li class="section-nav__item">
-              <a href="#priorities" class="section-nav__link">Priorities</a>
-            </li>
-          
-            <li class="section-nav__item">
-              <a href="#custom-paths" class="section-nav__link">Custom Paths</a>
-            </li>
-          
-            <li class="section-nav__item">
-              <a href="#custom-collections" class="section-nav__link">Custom Collections</a>
-            </li>
-          
-            <li class="section-nav__item">
-              <a href="#forking" class="section-nav__link">Forking</a>
-            </li>
-          
-        </ul>
-      </nav>
+        <nav class="section-nav">
+          <ul class="section-nav__list">
+            
+              <li class="section-nav__item">
+                <a href="#introduction" class="section-nav__link">Introduction</a>
+              </li>
+            
+              <li class="section-nav__item">
+                <a href="#attributes" class="section-nav__link">Models &amp; Attributes</a>
+              </li>
+            
+              <li class="section-nav__item">
+                <a href="#saving" class="section-nav__link">Saving</a>
+              </li>
+            
+              <li class="section-nav__item">
+                <a href="#deleting" class="section-nav__link">Deleting</a>
+              </li>
+            
+              <li class="section-nav__item">
+                <a href="#finding" class="section-nav__link">Finding</a>
+              </li>
+            
+              <li class="section-nav__item">
+                <a href="#relationships" class="section-nav__link">Relationships</a>
+              </li>
+            
+              <li class="section-nav__item">
+                <a href="#priorities" class="section-nav__link">Priorities</a>
+              </li>
+            
+              <li class="section-nav__item">
+                <a href="#custom-paths" class="section-nav__link">Custom Paths</a>
+              </li>
+            
+              <li class="section-nav__item">
+                <a href="#custom-collections" class="section-nav__link">Custom Collections</a>
+              </li>
+            
+              <li class="section-nav__item">
+                <a href="#forking" class="section-nav__link">Forking</a>
+              </li>
+            
+          </ul>
+        </nav>
 
-      
-        <section>
-          <div id="introduction" class="section-content">
-            <h1>Introduction</h1>
-            <p>Fireplace is an <a href="http://emberjs.com">Ember.js</a> addon for <a href="http://firebase.com">Firebase</a>.</p>
+        
+          <section>
+            <div id="introduction" class="section-content">
+              <h1>Introduction</h1>
+              <p>Fireplace is an <a href="http://emberjs.com">Ember.js</a> addon for <a href="http://firebase.com">Firebase</a>.</p>
 
 <p><a href="https://travis-ci.org/rlivsey/fireplace"><img src="https://travis-ci.org/rlivsey/fireplace.svg?branch=master" alt="Build Status" /></a></p>
 
@@ -100,13 +101,13 @@
 <span class="p">});</span></code></pre></div>
 
 
-          </div>
-        </section>
-      
-        <section>
-          <div id="attributes" class="section-content">
-            <h1>Models &amp; Attributes</h1>
-            <p>Define a model by extending from <code>Model</code> and giving it some attributes:</p>
+            </div>
+          </section>
+        
+          <section>
+            <div id="attributes" class="section-content">
+              <h1>Models &amp; Attributes</h1>
+              <p>Define a model by extending from <code>Model</code> and giving it some attributes:</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
 <span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
@@ -157,13 +158,13 @@ the value itself or a function which returns the default value (good for dates e
 <span class="p">})</span></code></pre></div>
 
 
-          </div>
-        </section>
-      
-        <section>
-          <div id="saving" class="section-content">
-            <h1>Saving</h1>
-            <p>Now that we’ve defined a basic model, let’s save it to Firebase.</p>
+            </div>
+          </section>
+        
+          <section>
+            <div id="saving" class="section-content">
+              <h1>Saving</h1>
+              <p>Now that we’ve defined a basic model, let’s save it to Firebase.</p>
 
 <p>As with Ember Data, the <code>Store</code> is our access point into Fireplace and it’s injected into all controllers
 and routes.</p>
@@ -195,25 +196,25 @@ be re-written as:</p>
 
 <span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">saveRecord</span><span class="p">(</span><span class="nx">person</span><span class="p">);</span></code></pre></div>
 
-          </div>
-        </section>
-      
-        <section>
-          <div id="deleting" class="section-content">
-            <h1>Deleting</h1>
-            <p>Simply call <code>delete</code> on a model to delete it.</p>
+            </div>
+          </section>
+        
+          <section>
+            <div id="deleting" class="section-content">
+              <h1>Deleting</h1>
+              <p>Simply call <code>delete</code> on a model to delete it.</p>
 
 <p>As with saving, we return a promise so you can wait for Firebase to confirm that the save succeeded.</p>
 
 <p>Likewise with saving, <code>Model#delete</code> is syntactic sugar for <code>Store#deleteRecord</code>.</p>
 
-          </div>
-        </section>
-      
-        <section>
-          <div id="finding" class="section-content">
-            <h1>Finding</h1>
-            <p>We’ve now saved some data to Firebase, lets go get it back out again.</p>
+            </div>
+          </section>
+        
+          <section>
+            <div id="finding" class="section-content">
+              <h1>Finding</h1>
+              <p>We’ve now saved some data to Firebase, lets go get it back out again.</p>
 
 <p>All examples below use <code>store.fetch</code> as that returns a promise which works with Ember’s router.
 You can use <code>store.find</code> instead to immediately return a model / collection.</p>
@@ -248,13 +249,13 @@ we can provide them as a 3rd argument:</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">project</span><span class="o">:</span> <span class="nx">someProject</span><span class="p">},</span> <span class="p">{</span><span class="nx">limit</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span> <span class="nx">startAt</span><span class="o">:</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span> <span class="nx">endAt</span><span class="o">:</span> <span class="s2">&quot;456&quot;</span><span class="p">})</span></code></pre></div>
 
 
-          </div>
-        </section>
-      
-        <section>
-          <div id="relationships" class="section-content">
-            <h1>Relationships</h1>
-            <h2 id="hasone">hasOne</h2>
+            </div>
+          </section>
+        
+          <section>
+            <div id="relationships" class="section-content">
+              <h1>Relationships</h1>
+              <h2 id="hasone">hasOne</h2>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
 <span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">,</span> <span class="nx">hasOne</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
@@ -577,13 +578,13 @@ reference:</p>
 
 <p>A detached hasMany is assumed to be an indexed collection, as opposed to a collection of the items itself.</p>
 
-          </div>
-        </section>
-      
-        <section>
-          <div id="priorities" class="section-content">
-            <h1>Priorities</h1>
-            <p>If a model has a <code>priority</code> property, then that’s used when saving to Firebase.</p>
+            </div>
+          </section>
+        
+          <section>
+            <div id="priorities" class="section-content">
+              <h1>Priorities</h1>
+              <p>If a model has a <code>priority</code> property, then that’s used when saving to Firebase.</p>
 
 <p>For example, lets say we want to order all people by their full name, last name first:</p>
 
@@ -629,13 +630,13 @@ storing it as an attribute in the JSON.</p>
 <span class="p">})</span></code></pre></div>
 
 
-          </div>
-        </section>
-      
-        <section>
-          <div id="custom-paths" class="section-content">
-            <h1>Custom Paths</h1>
-            <p>By default Fireplace assumes that non-embedded records will be stored at the root of your store’s Firebase reference
+            </div>
+          </section>
+        
+          <section>
+            <div id="custom-paths" class="section-content">
+              <h1>Custom Paths</h1>
+              <p>By default Fireplace assumes that non-embedded records will be stored at the root of your store’s Firebase reference
 with each model type stored under its pluralized underscored name.</p>
 
 <p>Embedded records are stored relative to their parent records.</p>
@@ -676,13 +677,13 @@ a project property so that it knows where it is to be saved to.</p>
   <span class="p">}</span>
 <span class="p">})</span></code></pre></div>
 
-          </div>
-        </section>
-      
-        <section>
-          <div id="custom-collections" class="section-content">
-            <h1>Custom Collections</h1>
-            <p>There are two types of collection built in:</p>
+            </div>
+          </section>
+        
+          <section>
+            <div id="custom-collections" class="section-content">
+              <h1>Custom Collections</h1>
+              <p>There are two types of collection built in:</p>
 
 <ul>
   <li><code>ObjectCollection</code> - returned from finders and hasMany embedded relationships</li>
@@ -722,13 +723,13 @@ a project property so that it knows where it is to be saved to.</p>
   <span class="nx">tasks</span><span class="o">:</span> <span class="nx">hasMany</span><span class="p">({</span><span class="nx">collection</span><span class="o">:</span> <span class="s2">&quot;random&quot;</span><span class="p">})</span>
 <span class="p">});</span></code></pre></div>
 
-          </div>
-        </section>
-      
-        <section>
-          <div id="forking" class="section-content">
-            <h1>Forking</h1>
-            <p>You can fork the store to make changes which don’t affect any existing data until you save.</p>
+            </div>
+          </section>
+        
+          <section>
+            <div id="forking" class="section-content">
+              <h1>Forking</h1>
+              <p>You can fork the store to make changes which don’t affect any existing data until you save.</p>
 
 <p>For example, if you have an editing interface and you don’t want changes to affect parts of the
 page which are being displayed with that record’s details then you can fork the store and
@@ -743,15 +744,15 @@ get a new copy of the record which is totally isolated:</p>
 <p>We fork the store instead of just copying the record because this makes sure we have a completely fresh
 cache &amp; that all embedded records are also isolated.</p>
 
-          </div>
-        </section>
-      
-
+            </div>
+          </section>
+        
+      </div>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/rlivsey">rlivsey</a></p>
+        <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+      </footer>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/rlivsey">rlivsey</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
   </body>
 </html>

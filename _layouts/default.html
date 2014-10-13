@@ -16,39 +16,40 @@
   </head>
 
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Fireplace</h1>
-        <p>Firebase addon for Ember.js</p>
-        <ul>
-          <li><a href="https://github.com/rlivsey/fireplace">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
+    <div class="l-wrapper">
+      <div class="wrapper">
+        <header>
+          <h1>Fireplace</h1>
+          <p>Firebase addon for Ember.js</p>
+          <ul>
+            <li><a href="https://github.com/rlivsey/fireplace">View On <strong>GitHub</strong></a></li>
+          </ul>
+        </header>
 
-      <nav class="section-nav">
-        <ul class="section-nav__list">
-          {% for section in site.sections %}
-            <li class="section-nav__item">
-              <a href="#{{section.permalink}}" class="section-nav__link">{{section.title}}</a>
-            </li>
-          {% endfor %}
-        </ul>
-      </nav>
+        <nav class="section-nav">
+          <ul class="section-nav__list">
+            {% for section in site.sections %}
+              <li class="section-nav__item">
+                <a href="#{{section.permalink}}" class="section-nav__link">{{section.title}}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
 
-      {% for section in site.sections %}
-        <section>
-          <div id="{{section.permalink}}" class="section-content">
-            <h1>{{section.title}}</h1>
-            {{section.content}}
-          </div>
-        </section>
-      {% endfor %}
-
+        {% for section in site.sections %}
+          <section>
+            <div id="{{section.permalink}}" class="section-content">
+              <h1>{{section.title}}</h1>
+              {{section.content}}
+            </div>
+          </section>
+        {% endfor %}
+      </div>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/rlivsey">rlivsey</a></p>
+        <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+      </footer>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/rlivsey">rlivsey</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
   </body>
 </html>
