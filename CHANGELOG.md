@@ -5,7 +5,7 @@
 * Added `fetch` to collections to return a promise which resolves when their content is fully loaded
 * Store fetch for query now waits for content to be loaded instead of just a collection's index
 
-## v0.1.1
+## v0.2.0
 
 * exported transforms under app namespace
 

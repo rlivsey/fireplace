@@ -1,0 +1,121 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'publish' ]
+2 info using npm@2.0.2
+3 info using node@v0.10.29
+4 verbose node symlink /usr/local/bin/node
+5 verbose publish [ '.' ]
+6 verbose cache add [ '.', null ]
+7 verbose cache add spec="." args=[".",null]
+8 verbose parsed spec { raw: '.',
+8 verbose parsed spec   scope: null,
+8 verbose parsed spec   name: null,
+8 verbose parsed spec   rawSpec: '.',
+8 verbose parsed spec   spec: '/Users/rlivsey/Sites/minutebase3/fireplace',
+8 verbose parsed spec   type: 'local' }
+9 verbose cache add local package /Users/rlivsey/Sites/minutebase3/fireplace
+10 silly lockFile 3a52ce78- .
+11 verbose lock . /Users/rlivsey/.npm/3a52ce78-.lock
+12 verbose tar pack [ '/Users/rlivsey/.npm/fireplace/0.2.0/package.tgz', '.' ]
+13 verbose tarball /Users/rlivsey/.npm/fireplace/0.2.0/package.tgz
+14 verbose folder .
+15 info prepublish fireplace@0.2.0
+16 silly lockFile 1f1177db-tar tar://.
+17 verbose lock tar://. /Users/rlivsey/.npm/1f1177db-tar.lock
+18 silly lockFile 034c8e45--npm-fireplace-0-1-1-package-tgz tar:///Users/rlivsey/.npm/fireplace/0.2.0/package.tgz
+19 verbose lock tar:///Users/rlivsey/.npm/fireplace/0.2.0/package.tgz /Users/rlivsey/.npm/034c8e45--npm-fireplace-0-1-1-package-tgz.lock
+20 silly lockFile 1f1177db-tar tar://.
+21 silly lockFile 1f1177db-tar tar://.
+22 silly lockFile 034c8e45--npm-fireplace-0-1-1-package-tgz tar:///Users/rlivsey/.npm/fireplace/0.2.0/package.tgz
+23 silly lockFile 034c8e45--npm-fireplace-0-1-1-package-tgz tar:///Users/rlivsey/.npm/fireplace/0.2.0/package.tgz
+24 silly lockFile fef354dc-vsey-npm-fireplace-0-1-1-package /Users/rlivsey/.npm/fireplace/0.2.0/package
+25 verbose lock /Users/rlivsey/.npm/fireplace/0.2.0/package /Users/rlivsey/.npm/fef354dc-vsey-npm-fireplace-0-1-1-package.lock
+26 silly lockFile fef354dc-vsey-npm-fireplace-0-1-1-package /Users/rlivsey/.npm/fireplace/0.2.0/package
+27 silly lockFile fef354dc-vsey-npm-fireplace-0-1-1-package /Users/rlivsey/.npm/fireplace/0.2.0/package
+28 silly lockFile 3a52ce78- .
+29 silly lockFile 3a52ce78- .
+30 silly publish { name: 'fireplace',
+30 silly publish   description: 'A Firebase model library for Ember.js',
+30 silly publish   version: '0.2.0',
+30 silly publish   directories: { doc: 'doc', test: 'tests' },
+30 silly publish   scripts:
+30 silly publish    { start: 'ember server',
+30 silly publish      build: 'ember build',
+30 silly publish      test: 'ember test' },
+30 silly publish   repository: { type: 'git', url: 'git://github.com/rlivsey/fireplace.git' },
+30 silly publish   engines: { node: '>= 0.10.0' },
+30 silly publish   author: { name: 'Richard Livsey', email: 'richard@livsey.org' },
+30 silly publish   license: 'MIT',
+30 silly publish   devDependencies:
+30 silly publish    { 'body-parser': '^1.2.0',
+30 silly publish      'broccoli-asset-rev': '0.3.0',
+30 silly publish      'broccoli-ember-hbs-template-compiler': '^1.6.1',
+30 silly publish      'ember-cli': '0.2.0',
+30 silly publish      'ember-cli-content-security-policy': '0.2.0',
+30 silly publish      'ember-cli-inject-live-reload': '^1.2.2',
+30 silly publish      'ember-cli-qunit': '0.1.0',
+30 silly publish      express: '^4.8.5',
+30 silly publish      glob: '^4.0.5' },
+30 silly publish   keywords: [ 'ember-addon', 'firebase' ],
+30 silly publish   'ember-addon': { configPath: 'tests/dummy/config' },
+30 silly publish   readme: '# Fireplace\n\nFireplace is an [Ember.js](http://emberjs.com) addon for [Firebase](http://firebase.com).\n\n[![Build Status](https://travis-ci.org/rlivsey/fireplace.svg?branch=master)](https://travis-ci.org/rlivsey/fireplace)\n\n## Installation\n\nInstall as an Ember CLI addon:\n\n```\nnpm install --save-dev fireplace\n```\n\nThen run the generator to install dependencies (Firebase from Bower):\n\n```\nember generate fireplace\n```\n\n## Quick Example\n\n```javascript\n// app/models/person.js\nimport {Model, attr, hasOne, hasMany} from \'fireplace\';\n\nexport default Model.extend({\n  firstName: attr(),\n  lastName: attr(),\n  age: attr("number"),\n  avatar: hasOne()  \n});\n```\n\n```javascript\n// app/routes/people.js\nimport Ember from \'ember\';\nexport default Ember.Route.extend({\n  model: function() {\n    // list all people\n    return this.store.fetch("person");\n  }\n});\n```\n\n```javascript\n// app/routes/person.js\nimport Ember from \'ember\';\nexport default Ember.Route.extend({\n  model: function(params) {\n    return this.store.fetch("person", params.person_id);\n  }\n});\n```\n\nSee the [documentation](http://livsey.org/fireplace) for more details.\n\n### Development\n\n## Installation\n\n* `git clone` this repository\n* `npm install`\n* `bower install`\n\n## Running\n\n* `ember server`\n* Visit your app at http://localhost:4200.\n\n## Running Tests\n\n* `ember test`\n* `ember test --server`\n\n## Building\n\n* `ember build`\n\nFor more information on using ember-cli, visit [http://www.ember-cli.com/](http://www.ember-cli.com/).\n',
+30 silly publish   readmeFilename: 'README.md',
+30 silly publish   gitHead: 'ceb00db2a6edcbc0a7cbffd4e14a9da13f8c9d45',
+30 silly publish   bugs: { url: 'https://github.com/rlivsey/fireplace/issues' },
+30 silly publish   homepage: 'https://github.com/rlivsey/fireplace',
+30 silly publish   _id: 'fireplace@0.2.0',
+30 silly publish   _shasum: 'fd7aa4e0a04970cf0607433c49971f950031f2af',
+30 silly publish   _from: '.' }
+31 verbose mapToRegistry name fireplace
+32 verbose mapToRegistry uri https://registry.npmjs.org/fireplace
+33 verbose publish registryBase https://registry.npmjs.org/
+34 verbose request on initialization, where is /fireplace
+35 verbose request after pass 1, where is /fireplace
+36 verbose request url raw /fireplace
+37 verbose request resolving registry [ 'https://registry.npmjs.org/', './fireplace' ]
+38 verbose request after pass 2, where is https://registry.npmjs.org/fireplace
+39 verbose request sending authorization for write operation
+40 info attempt registry request try #1 at 15:16:23
+41 verbose request id 4843f7640c736287
+42 http request PUT https://registry.npmjs.org/fireplace
+43 http 403 https://registry.npmjs.org/fireplace
+44 verbose headers { date: 'Mon, 13 Oct 2014 14:16:25 GMT',
+44 verbose headers   server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+44 verbose headers   'content-type': 'application/json',
+44 verbose headers   'cache-control': 'max-age=60',
+44 verbose headers   'content-length': '5132',
+44 verbose headers   'accept-ranges': 'bytes',
+44 verbose headers   via: '1.1 varnish',
+44 verbose headers   'x-served-by': 'cache-fra1221-FRA',
+44 verbose headers   'x-cache': 'MISS',
+44 verbose headers   'x-cache-hits': '0',
+44 verbose headers   'x-timer': 'S1413209784.745104,VS0,VE840',
+44 verbose headers   'keep-alive': 'timeout=10, max=50',
+44 verbose headers   connection: 'Keep-Alive' }
+45 error publish Failed PUT 403
+46 verbose stack Error: forbidden cannot modify pre-existing version: 0.2.0
+46 verbose stack old={"name":"fireplace","description":"A Firebase model library for Ember.js","version":"0.2.0","directories":{"doc":"doc","test":"tests"},"scripts":{"start":"ember server","build":"ember build","test":"ember test"},"repository":{"type":"git","url":"git://github.com/rlivsey/fireplace.git"},"engines":{"node":">= 0.10.0"},"author":{"name":"Richard Livsey","email":"richard@livsey.org"},"license":"MIT","devDependencies":{"body-parser":"^1.2.0","broccoli-asset-rev":"0.3.0","broccoli-ember-hbs-template-compiler":"^1.6.1","ember-cli":"0.2.0","ember-cli-content-security-policy":"0.2.0","ember-cli-inject-live-reload":"^1.2.2","ember-cli-qunit":"0.1.0","express":"^4.8.5","glob":"^4.0.5"},"keywords":["ember-addon","firebase"],"ember-addon":{"configPath":"tests/dummy/config"},"gitHead":"c8747307f628bd8d18df806bb0513aa8ca83008a","bugs":{"url":"https://github.com/rlivsey/fireplace/issues"},"homepage":"https://github.com/rlivsey/fireplace","_id":"fireplace@0.2.0","_shasum":"c2a6358125bc80a839636e0af5000f6bde4b688e","_from":".","_npmVersion":"2.0.2","_nodeVersion":"0.10.29","_npmUser":{"name":"rlivsey","email":"richard@livsey.org"},"maintainers":[{"name":"rlivsey","email":"richard@livsey.org"}],"dist":{"shasum":"c2a6358125bc80a839636e0af5000f6bde4b688e","tarball":"http://registry.npmjs.org/fireplace/-/fireplace-0.2.0.tgz"}}
+46 verbose stack new={"name":"fireplace","description":"A Firebase model library for Ember.js","version":"0.2.0","directories":{"doc":"doc","test":"tests"},"scripts":{"start":"ember server","build":"ember build","test":"ember test"},"repository":{"type":"git","url":"git://github.com/rlivsey/fireplace.git"},"engines":{"node":">= 0.10.0"},"author":{"name":"Richard Livsey","email":"richard@livsey.org"},"license":"MIT","devDependencies":{"body-parser":"^1.2.0","broccoli-asset-rev":"0.3.0","broccoli-ember-hbs-template-compiler":"^1.6.1","ember-cli":"0.2.0","ember-cli-content-security-policy":"0.2.0","ember-cli-inject-live-reload":"^1.2.2","ember-cli-qunit":"0.1.0","express":"^4.8.5","glob":"^4.0.5"},"keywords":["ember-addon","firebase"],"ember-addon":{"configPath":"tests/dummy/config"},"readme":"# Fireplace\u000a\u000aFireplace is an [Ember.js](http://emberjs.com) addon for [Firebase](http://firebase.com).\u000a\u000a[![Build Status](https://travis-ci.org/rlivsey/fireplace.svg?branch=master)](https://travis-ci.org/rlivsey/fireplace)\u000a\u000a## Installation\u000a\u000aInstall as an Ember CLI addon:\u000a\u000a```\u000anpm install --save-dev fireplace\u000a```\u000a\u000aThen run the generator to install dependencies (Firebase from Bower):\u000a\u000a```\u000aember generate fireplace\u000a```\u000a\u000a## Quick Example\u000a\u000a```javascript\u000a// app/models/person.js\u000aimport {Model, attr, hasOne, hasMany} from 'fireplace';\u000a\u000aexport default Model.extend({\u000a  firstName: attr(),\u000a  lastName: attr(),\u000a  age: attr(\"number\"),\u000a  avatar: hasOne()  \u000a});\u000a```\u000a\u000a```javascript\u000a// app/routes/people.js\u000aimport Ember from 'ember';\u000aexport default Ember.Route.extend({\u000a  model: function() {\u000a    // list all people\u000a    return this.store.fetch(\"person\");\u000a  }\u000a});\u000a```\u000a\u000a```javascript\u000a// app/routes/person.js\u000aimport Ember from 'ember';\u000aexport default Ember.Route.extend({\u000a  model: function(params) {\u000a    return this.store.fetch(\"person\", params.person_id);\u000a  }\u000a});\u000a```\u000a\u000aSee the [documentation](http://livsey.org/fireplace) for more details.\u000a\u000a### Development\u000a\u000a## Installation\u000a\u000a* `git clone` this repository\u000a* `npm install`\u000a* `bower install`\u000a\u000a## Running\u000a\u000a* `ember server`\u000a* Visit your app at http://localhost:4200.\u000a\u000a## Running Tests\u000a\u000a* `ember test`\u000a* `ember test --server`\u000a\u000a## Building\u000a\u000a* `ember build`\u000a\u000aFor more information on using ember-cli, visit [http://www.ember-cli.com/](http://www.ember-cli.com/).\u000a","readmeFilename":"README.md","gitHead":"ceb00db2a6edcbc0a7cbffd4e14a9da13f8c9d45","bugs":{"url":"https://github.com/rlivsey/fireplace/issues"},"homepage":"https://github.com/rlivsey/fireplace","_id":"fireplace@0.2.0","_shasum":"fd7aa4e0a04970cf0607433c49971f950031f2af","_from":".","_npmVersion":"2.0.2","_nodeVersion":"0.10.29","_npmUser":{"name":"rlivsey","email":"richard@livsey.org"},"maintainers":[{"name":"rlivsey","email":"richard@livsey.org"}],"dist":{"shasum":"fd7aa4e0a04970cf0607433c49971f950031f2af","tarball":"http://registry.npmjs.org/fireplace/-/fireplace-0.2.0.tgz"}}: fireplace
+46 verbose stack     at RegClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:260:14)
+46 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:197:65)
+46 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:237:22)
+46 verbose stack     at Request.emit (events.js:98:17)
+46 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1146:14)
+46 verbose stack     at Request.emit (events.js:117:20)
+46 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1097:12)
+46 verbose stack     at IncomingMessage.emit (events.js:117:20)
+46 verbose stack     at _stream_readable.js:929:16
+46 verbose stack     at process._tickCallback (node.js:419:13)
+47 verbose statusCode 403
+48 verbose pkgid fireplace
+49 verbose cwd /Users/rlivsey/Sites/minutebase3/fireplace
+50 error Darwin 13.4.0
+51 error argv "node" "/usr/local/bin/npm" "publish"
+52 error node v0.10.29
+53 error npm  v2.0.2
+54 error code E403
+55 error forbidden cannot modify pre-existing version: 0.2.0
+55 error old={"name":"fireplace","description":"A Firebase model library for Ember.js","version":"0.2.0","directories":{"doc":"doc","test":"tests"},"scripts":{"start":"ember server","build":"ember build","test":"ember test"},"repository":{"type":"git","url":"git://github.com/rlivsey/fireplace.git"},"engines":{"node":">= 0.10.0"},"author":{"name":"Richard Livsey","email":"richard@livsey.org"},"license":"MIT","devDependencies":{"body-parser":"^1.2.0","broccoli-asset-rev":"0.3.0","broccoli-ember-hbs-template-compiler":"^1.6.1","ember-cli":"0.2.0","ember-cli-content-security-policy":"0.2.0","ember-cli-inject-live-reload":"^1.2.2","ember-cli-qunit":"0.1.0","express":"^4.8.5","glob":"^4.0.5"},"keywords":["ember-addon","firebase"],"ember-addon":{"configPath":"tests/dummy/config"},"gitHead":"c8747307f628bd8d18df806bb0513aa8ca83008a","bugs":{"url":"https://github.com/rlivsey/fireplace/issues"},"homepage":"https://github.com/rlivsey/fireplace","_id":"fireplace@0.2.0","_shasum":"c2a6358125bc80a839636e0af5000f6bde4b688e","_from":".","_npmVersion":"2.0.2","_nodeVersion":"0.10.29","_npmUser":{"name":"rlivsey","email":"richard@livsey.org"},"maintainers":[{"name":"rlivsey","email":"richard@livsey.org"}],"dist":{"shasum":"c2a6358125bc80a839636e0af5000f6bde4b688e","tarball":"http://registry.npmjs.org/fireplace/-/fireplace-0.2.0.tgz"}}
+55 error new={"name":"fireplace","description":"A Firebase model library for Ember.js","version":"0.2.0","directories":{"doc":"doc","test":"tests"},"scripts":{"start":"ember server","build":"ember build","test":"ember test"},"repository":{"type":"git","url":"git://github.com/rlivsey/fireplace.git"},"engines":{"node":">= 0.10.0"},"author":{"name":"Richard Livsey","email":"richard@livsey.org"},"license":"MIT","devDependencies":{"body-parser":"^1.2.0","broccoli-asset-rev":"0.3.0","broccoli-ember-hbs-template-compiler":"^1.6.1","ember-cli":"0.2.0","ember-cli-content-security-policy":"0.2.0","ember-cli-inject-live-reload":"^1.2.2","ember-cli-qunit":"0.1.0","express":"^4.8.5","glob":"^4.0.5"},"keywords":["ember-addon","firebase"],"ember-addon":{"configPath":"tests/dummy/config"},"readme":"# Fireplace\u000a\u000aFireplace is an [Ember.js](http://emberjs.com) addon for [Firebase](http://firebase.com).\u000a\u000a[![Build Status](https://travis-ci.org/rlivsey/fireplace.svg?branch=master)](https://travis-ci.org/rlivsey/fireplace)\u000a\u000a## Installation\u000a\u000aInstall as an Ember CLI addon:\u000a\u000a```\u000anpm install --save-dev fireplace\u000a```\u000a\u000aThen run the generator to install dependencies (Firebase from Bower):\u000a\u000a```\u000aember generate fireplace\u000a```\u000a\u000a## Quick Example\u000a\u000a```javascript\u000a// app/models/person.js\u000aimport {Model, attr, hasOne, hasMany} from 'fireplace';\u000a\u000aexport default Model.extend({\u000a  firstName: attr(),\u000a  lastName: attr(),\u000a  age: attr(\"number\"),\u000a  avatar: hasOne()  \u000a});\u000a```\u000a\u000a```javascript\u000a// app/routes/people.js\u000aimport Ember from 'ember';\u000aexport default Ember.Route.extend({\u000a  model: function() {\u000a    // list all people\u000a    return this.store.fetch(\"person\");\u000a  }\u000a});\u000a```\u000a\u000a```javascript\u000a// app/routes/person.js\u000aimport Ember from 'ember';\u000aexport default Ember.Route.extend({\u000a  model: function(params) {\u000a    return this.store.fetch(\"person\", params.person_id);\u000a  }\u000a});\u000a```\u000a\u000aSee the [documentation](http://livsey.org/fireplace) for more details.\u000a\u000a### Development\u000a\u000a## Installation\u000a\u000a* `git clone` this repository\u000a* `npm install`\u000a* `bower install`\u000a\u000a## Running\u000a\u000a* `ember server`\u000a* Visit your app at http://localhost:4200.\u000a\u000a## Running Tests\u000a\u000a* `ember test`\u000a* `ember test --server`\u000a\u000a## Building\u000a\u000a* `ember build`\u000a\u000aFor more information on using ember-cli, visit [http://www.ember-cli.com/](http://www.ember-cli.com/).\u000a","readmeFilename":"README.md","gitHead":"ceb00db2a6edcbc0a7cbffd4e14a9da13f8c9d45","bugs":{"url":"https://github.com/rlivsey/fireplace/issues"},"homepage":"https://github.com/rlivsey/fireplace","_id":"fireplace@0.2.0","_shasum":"fd7aa4e0a04970cf0607433c49971f950031f2af","_from":".","_npmVersion":"2.0.2","_nodeVersion":"0.10.29","_npmUser":{"name":"rlivsey","email":"richard@livsey.org"},"maintainers":[{"name":"rlivsey","email":"richard@livsey.org"}],"dist":{"shasum":"fd7aa4e0a04970cf0607433c49971f950031f2af","tarball":"http://registry.npmjs.org/fireplace/-/fireplace-0.2.0.tgz"}}: fireplace
+56 error If you need help, you may report this error at:
+56 error     <http://github.com/npm/npm/issues>
+57 verbose exit [ 1, true ]
