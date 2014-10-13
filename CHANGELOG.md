@@ -2,6 +2,8 @@
 
 ## Master
 
+## v0.2.1
+
 * Fix race condition when listening to firebase
 
 ## v0.2.0
