@@ -1,0 +1,8 @@
+baseurl: /fireplace
+
+highlighter: pygments
+
+exclude: [node_modules]
+
+collections:
+- sections

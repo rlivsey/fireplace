@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Fireplace</title>
+
+    <link rel="stylesheet" href="/assets/stylesheets/styles.css">
+    <link rel="stylesheet" href="/assets/stylesheets/pygment_trac.css">
+    <script src="/assets/javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Fireplace</h1>
+        <p>Firebase addon for Ember.js</p>
+        <ul>
+          <li><a href="https://github.com/rlivsey/fireplace">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+
+      <nav class="section-nav">
+        <ul class="section-nav__list">
+          
+            <li class="section-nav__item">
+              <a href="#introduction" class="section-nav__link">Introduction</a>
+            </li>
+          
+            <li class="section-nav__item">
+              <a href="#attributes" class="section-nav__link">Models &amp; Attributes</a>
+            </li>
+          
+            <li class="section-nav__item">
+              <a href="#saving" class="section-nav__link">Saving</a>
+            </li>
+          
+            <li class="section-nav__item">
+              <a href="#deleting" class="section-nav__link">Deleting</a>
+            </li>
+          
+            <li class="section-nav__item">
+              <a href="#finding" class="section-nav__link">Finding</a>
+            </li>
+          
+            <li class="section-nav__item">
+              <a href="#relationships" class="section-nav__link">Relationships</a>
+            </li>
+          
+            <li class="section-nav__item">
+              <a href="#priorities" class="section-nav__link">Priorities</a>
+            </li>
+          
+            <li class="section-nav__item">
+              <a href="#custom-paths" class="section-nav__link">Custom Paths</a>
+            </li>
+          
+            <li class="section-nav__item">
+              <a href="#custom-collections" class="section-nav__link">Custom Collections</a>
+            </li>
+          
+            <li class="section-nav__item">
+              <a href="#forking" class="section-nav__link">Forking</a>
+            </li>
+          
+        </ul>
+      </nav>
+
+      
+        <section>
+          <div id="introduction" class="section-content">
+            <h1>Introduction</h1>
+            <p>Fireplace is an <a href="http://emberjs.com">Ember.js</a> addon for <a href="http://firebase.com">Firebase</a>.</p>
+
+<p><a href="https://travis-ci.org/rlivsey/fireplace"><img src="https://travis-ci.org/rlivsey/fireplace.svg?branch=master" alt="Build Status" /></a></p>
+
+<h2 id="installation">Installation</h2>
+
+<p>Install as an Ember CLI addon:</p>
+
+<p><code>npm install --save-dev fireplace</code></p>
+
+<p>Then run the generator to install dependencies (Firebase from Bower):</p>
+
+<p><code>ember generate fireplace</code></p>
+
+<h2 id="getting-started">Getting Started</h2>
+
+<p>Setup your Firebase root path by extending the default Store.</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/stores/main.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Store</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Store</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">firebaseRoot</span><span class="o">:</span> <span class="s2">&quot;https://your-firebase.firebaseio.com&quot;</span>
+<span class="p">});</span></code></pre></div>
+
+
+          </div>
+        </section>
+      
+        <section>
+          <div id="attributes" class="section-content">
+            <h1>Models &amp; Attributes</h1>
+            <p>Define a model by extending from <code>Model</code> and giving it some attributes:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">firstName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">lastName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">()</span>
+<span class="p">});</span></code></pre></div>
+
+<p><code>attr</code> takes a type which tells it how to transform to and from Firebase, and options.</p>
+
+<p>Fireplace supports the following types out of the box:</p>
+
+<ul>
+  <li><code>string</code> (the default if no type is supplied)</li>
+  <li><code>boolean</code></li>
+  <li><code>date</code> (iso8601 formatted date)</li>
+  <li><code>hash</code></li>
+  <li><code>number</code></li>
+  <li><code>timestamp</code> (the epoch returned from date.getTime())</li>
+</ul>
+
+<h2 id="custom-keys">Custom Keys</h2>
+
+<p>You can change the key used to serialize the data to/from Firebase with the <code>key</code> option.
+By default this is the underscored version of the name, so <code>firstName</code> maps to <code>first_name</code>.</p>
+
+<p>For example, lets add a date of birth date attribute and map the lastName attribute to “surname”:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">firstName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">lastName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">({</span><span class="nx">key</span><span class="o">:</span> <span class="s2">&quot;surname&quot;</span><span class="p">}),</span>
+  <span class="nx">dob</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">)</span>
+<span class="p">})</span></code></pre></div>
+
+<h2 id="default-values">Default Values</h2>
+
+<p>Attributes can have default values, specify this with the <code>default</code> option which can be either
+the value itself or a function which returns the default value (good for dates etc…)</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">firstName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">({</span><span class="k">default</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span><span class="p">}),</span>
+  <span class="nx">lastName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">({</span><span class="k">default</span><span class="o">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">}),</span>
+  <span class="nx">createdAt</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="p">{</span><span class="k">default</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span> <span class="p">}})</span>
+<span class="p">})</span></code></pre></div>
+
+
+          </div>
+        </section>
+      
+        <section>
+          <div id="saving" class="section-content">
+            <h1>Saving</h1>
+            <p>Now that we’ve defined a basic model, let’s save it to Firebase.</p>
+
+<p>As with Ember Data, the <code>Store</code> is our access point into Fireplace and it’s injected into all controllers
+and routes.</p>
+
+<p>We create an instance of a model with <code>store.createRecord</code> and then save it with <code>model.save()</code>:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">createRecord</span><span class="p">(</span><span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">firstName</span><span class="o">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="o">:</span> <span class="s2">&quot;Johnson&quot;</span>
+<span class="p">});</span>
+
+<span class="nx">person</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span></code></pre></div>
+
+<p>Now the model is saved, it’s now live and any changes which occur in Firebase are reflected in the local instance.</p>
+
+<p>Saving a model returns a promise, so we can wait for Firebase to confirm that the changes are saved like so:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">person</span><span class="p">.</span><span class="nx">save</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+  <span class="c1">// do something here, like transitioning to a route etc...</span>
+<span class="p">});</span></code></pre></div>
+
+<p><code>Model#save</code> is a shortcut to <code>Store#saveRecord</code> so if you prefer to type more then the above example could
+be re-written as:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">createRecord</span><span class="p">(</span><span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">firstName</span><span class="o">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
+  <span class="nx">lastName</span><span class="o">:</span> <span class="s2">&quot;Johnson&quot;</span>
+<span class="p">});</span>
+
+<span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">saveRecord</span><span class="p">(</span><span class="nx">person</span><span class="p">);</span></code></pre></div>
+
+          </div>
+        </section>
+      
+        <section>
+          <div id="deleting" class="section-content">
+            <h1>Deleting</h1>
+            <p>Simply call <code>delete</code> on a model to delete it.</p>
+
+<p>As with saving, we return a promise so you can wait for Firebase to confirm that the save succeeded.</p>
+
+<p>Likewise with saving, <code>Model#delete</code> is syntactic sugar for <code>Store#deleteRecord</code>.</p>
+
+          </div>
+        </section>
+      
+        <section>
+          <div id="finding" class="section-content">
+            <h1>Finding</h1>
+            <p>We’ve now saved some data to Firebase, lets go get it back out again.</p>
+
+<p>All examples below use <code>store.fetch</code> as that returns a promise which works with Ember’s router.
+You can use <code>store.find</code> instead to immediately return a model / collection.</p>
+
+<h2 id="finding-individual-records">Finding individual records</h2>
+
+<p>Let’s say we’ve got a person saved with an ID of “123”, we can fetch that with:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="s2">&quot;123&quot;</span><span class="p">);</span></code></pre></div>
+
+<p>Once resolved, the record will be live and update itself whenever Firebase updates.</p>
+
+<p>If more data is required to build the Firebase reference (see customising references later) then
+we can provide them as a 3rd argument:</p>
+
+<p>Eg if a list of tasks is at <code>/projects/some-project/tasks/123</code> then we might do something like:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">project</span><span class="o">:</span> <span class="nx">someProject</span><span class="p">});</span></code></pre></div>
+
+<h2 id="finding-lists-of-records">Finding lists of records</h2>
+
+<p>To find every item in a list:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">&quot;person&quot;</span><span class="p">)</span></code></pre></div>
+
+<p>To limit to a number of records, or provide a start/end point then we can supply an options object:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">limit</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span> <span class="nx">startAt</span><span class="o">:</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span> <span class="nx">endAt</span><span class="o">:</span> <span class="s2">&quot;456&quot;</span><span class="p">})</span></code></pre></div>
+
+<p>If we need to provide more data to build the Firebase reference, then we provide them before the limit options:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">project</span><span class="o">:</span> <span class="nx">someProject</span><span class="p">},</span> <span class="p">{</span><span class="nx">limit</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span> <span class="nx">startAt</span><span class="o">:</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span> <span class="nx">endAt</span><span class="o">:</span> <span class="s2">&quot;456&quot;</span><span class="p">})</span></code></pre></div>
+
+
+          </div>
+        </section>
+      
+        <section>
+          <div id="relationships" class="section-content">
+            <h1>Relationships</h1>
+            <h2 id="hasone">hasOne</h2>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">,</span> <span class="nx">hasOne</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">firstName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">lastName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">()</span>
+  <span class="nx">address</span><span class="o">:</span> <span class="nx">hasOne</span><span class="p">()</span>
+<span class="p">});</span>
+
+<span class="c1">// app/models/address.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">street</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">city</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">postcode</span><span class="o">:</span> <span class="nx">attr</span><span class="p">()</span>
+<span class="p">});</span></code></pre></div>
+
+<p>This maps to the Firebase JSON of:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="nx">first_name</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
+  <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Watson&quot;</span><span class="p">,</span>
+  <span class="nx">address</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">street</span><span class="o">:</span> <span class="s2">&quot;221B Baker Street&quot;</span><span class="p">,</span>
+    <span class="nx">city</span><span class="o">:</span> <span class="s2">&quot;London&quot;</span><span class="p">,</span>
+    <span class="nx">postcode</span><span class="o">:</span> <span class="s2">&quot;NW1 6XE&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>By default <code>hasOne</code> guesses the name of the associated type based on the name of the property,
+in this case <code>address</code>.</p>
+
+<p>If you want to call the property something different to the model type, pass its name as the first argument:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">hasOne</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">residence</span><span class="o">:</span> <span class="nx">hasOne</span><span class="p">(</span><span class="s2">&quot;address&quot;</span><span class="p">)</span>
+<span class="p">});</span></code></pre></div>
+
+<p>Firebase stores data in a tree structure, so Fireplace by default treats all relationships
+as embedded. We can set the <code>embedded: false</code> option to change this:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">,</span> <span class="nx">hasOne</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">firstName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">lastName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">address</span><span class="o">:</span> <span class="nx">hasOne</span><span class="p">({</span><span class="nx">embedded</span><span class="o">:</span> <span class="kc">false</span><span class="p">})</span>
+<span class="p">});</span></code></pre></div>
+
+<p>and now the JSON is:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="nx">first_name</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
+  <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Watson&quot;</span><span class="p">,</span>
+  <span class="nx">address</span><span class="o">:</span> <span class="mi">123</span>
+<span class="p">}</span></code></pre></div>
+
+<p>This assumes that the address is stored at <code>/addresses/123</code> where <code>123</code> is the ID of the address.</p>
+
+<p>We’ll cover configuring the path of the item in Firebase later.</p>
+
+<h2 id="hasmany">hasMany</h2>
+
+<p>Lets say our person lives in many different places, we can model this like so:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">,</span> <span class="nx">hasMany</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">firstName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">lastName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">addresses</span><span class="o">:</span> <span class="nx">hasMany</span><span class="p">()</span>
+<span class="p">});</span>
+
+<span class="c1">// app/models/address.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">street</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">city</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">postcode</span><span class="o">:</span> <span class="nx">attr</span><span class="p">()</span>
+<span class="p">});</span></code></pre></div>
+
+<p>The JSON for this is now:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="nx">first_name</span><span class="o">:</span> <span class="s2">&quot;The&quot;</span><span class="p">,</span>
+  <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Queen&quot;</span><span class="p">,</span>
+  <span class="nx">addresses</span><span class="o">:</span> <span class="p">{</span>
+    <span class="mi">123</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">street</span><span class="o">:</span> <span class="s2">&quot;Buckingham Palace&quot;</span><span class="p">,</span>
+      <span class="nx">city</span><span class="o">:</span> <span class="s2">&quot;London&quot;</span><span class="p">,</span>
+      <span class="nx">postcode</span><span class="o">:</span> <span class="s2">&quot;SW1A 1AA&quot;</span>
+    <span class="p">},</span>
+    <span class="mi">456</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">street</span><span class="o">:</span> <span class="s2">&quot;Windsor Castle&quot;</span><span class="p">,</span>
+      <span class="nx">city</span><span class="o">:</span> <span class="s2">&quot;London&quot;</span><span class="p">,</span>
+      <span class="nx">postcode</span><span class="o">:</span> <span class="s2">&quot;SL4 1NJ&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>Like hasOne, <code>hasMany</code> guesses the name of the associated type based on the singular name of the property,
+in this case <code>addresses</code> -&gt; <code>address</code>.</p>
+
+<p>If you want to call the property something different to the model type, pass its name as the first argument:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">hasOne</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">residences</span><span class="o">:</span> <span class="nx">hasOne</span><span class="p">(</span><span class="s2">&quot;address&quot;</span><span class="p">)</span>
+<span class="p">});</span></code></pre></div>
+
+<p>Again, we can change this to non-embedded by setting <code>{embedded: false}</code> to produce:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="nx">first_name</span><span class="o">:</span> <span class="s2">&quot;The&quot;</span><span class="p">,</span>
+  <span class="nx">last_name</span><span class="o">:</span> <span class="s2">&quot;Queen&quot;</span><span class="p">,</span>
+  <span class="nx">addresses</span><span class="o">:</span> <span class="p">{</span>
+    <span class="mi">123</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="mi">456</span><span class="o">:</span> <span class="kc">true</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<h3 id="storing-additional-data-with-a-non-embedded-relationship">Storing additional data with a non-embedded relationship</h3>
+
+<p>By default the relationships are stored as <code>{id: true}</code>, but we can store information there too.</p>
+
+<p>Lets say we have projects which have people as members and each member has an access level.</p>
+
+<p>Because it’s a <code>hasMany</code> relationship, we can’t store the meta information for the relationship
+on the model itself because that person object can belong to many different projects.</p>
+
+<p>Instead we use a <code>MetaModel</code> which lets us store the information for this particular member.</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/project.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">,</span> <span class="nx">hasMany</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">title</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">members</span><span class="o">:</span> <span class="nx">hasMany</span><span class="p">(</span><span class="s2">&quot;people&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">embedded</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">as</span><span class="o">:</span> <span class="s2">&quot;member&quot;</span><span class="p">})</span>
+<span class="p">});</span>
+
+<span class="c1">// app/models/member.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">MetaModel</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">MetaModel</span><span class="p">.</span><span class="nx">extend</span><span class="p">();</span></code></pre></div>
+
+<p>The JSON for this would now be something like:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;A project&quot;</span><span class="p">,</span>
+  <span class="nx">members</span><span class="o">:</span> <span class="p">{</span>
+    <span class="mi">123</span><span class="o">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">,</span>
+    <span class="mi">234</span><span class="o">:</span> <span class="s2">&quot;member&quot;</span><span class="p">,</span>
+    <span class="mi">345</span><span class="o">:</span> <span class="s2">&quot;admin&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>The meta value is available on the meta model as <code>meta</code>:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">member</span> <span class="o">=</span> <span class="nx">project</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;firstObject&quot;</span><span class="p">);</span>
+<span class="nx">member</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">);</span> <span class="o">=&gt;</span> <span class="s2">&quot;admin&quot;</span></code></pre></div>
+
+<p>To change this to something more descriptive, you can use <code>Ember.computed.alias</code>:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/member.js</span>
+<span class="kr">import</span> <span class="nx">Ember</span> <span class="nx">from</span> <span class="s1">&#39;ember&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">MetaModel</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">MetaModel</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">accessLevel</span><span class="o">:</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">computed</span><span class="p">.</span><span class="nx">alias</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">)</span>
+<span class="p">});</span></code></pre></div>
+
+<p>If you want to store more complex data on a relationship, you can give the <code>MetaModel</code> attributes
+and relationships just like a normal model. All the same rules apply:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/member.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">MetaModel</span><span class="p">,</span> <span class="nx">attr</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">MetaModel</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">accessLevel</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">joinedAt</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">)</span>
+<span class="p">});</span></code></pre></div>
+
+<p>This would produce JSON like so:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;A project&quot;</span><span class="p">,</span>
+  <span class="nx">members</span><span class="o">:</span> <span class="p">{</span>
+    <span class="mi">123</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">access_level</span><span class="o">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">,</span>
+      <span class="nx">joined_at</span><span class="o">:</span> <span class="s2">&quot;2012-11-24T15:00:00&quot;</span>
+    <span class="p">},</span>
+    <span class="mi">234</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">access_level</span><span class="o">:</span> <span class="s2">&quot;member&quot;</span><span class="p">,</span>
+      <span class="nx">joined_at</span><span class="o">:</span> <span class="s2">&quot;2012-12-11T14:30:00&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>Keep in mind that, when using <code>MetaModel</code>s, you have to set the actual model as the <code>content</code> property on the <code>MetaModel</code> and then add the <code>MetaModel</code> to the parent’s collection like in this sample:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// project and person (of class People) are loaded already</span>
+<span class="kd">var</span> <span class="nx">member</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">createRecord</span><span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">accessLevel</span><span class="o">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">,</span>
+  <span class="nx">joinedAt</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(),</span>
+  <span class="nx">content</span><span class="o">:</span> <span class="nx">person</span> <span class="c1">// the actual &quot;content&quot; of this relationship</span>
+<span class="p">});</span>
+
+<span class="nx">project</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;members&#39;</span><span class="p">).</span><span class="nx">addObject</span><span class="p">(</span><span class="nx">member</span><span class="p">);</span>
+<span class="nx">project</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span></code></pre></div>
+
+<p>When loading projects and getting members, the <code>MetaModel</code>’s properties are available on the <em>real</em> member (instance of <code>People</code>) as if they were a part of it.</p>
+
+<h2 id="detached-relationships">Detached relationships</h2>
+
+<p>All the above examples assume that the associated object itself or its ID is stored with the parent,
+but what if you want to store something completely separately? Here we can use detached relationships.</p>
+
+<p>For example, lets say we stored people with their avatars completely separately in the tree because
+we’re storing the image data and we don’t want to include that by default when we fetch a list of people.
+We don’t store the avatar ID with the person because maybe every person has an avatar, so the JSON’s something like:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="nx">people</span><span class="o">:</span> <span class="p">{</span>
+    <span class="mi">123</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;John Smith&quot;</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nx">avatars</span><span class="o">:</span> <span class="p">{</span>
+    <span class="mi">123</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">filename</span><span class="o">:</span> <span class="s2">&quot;an-image.png&quot;</span><span class="p">,</span>
+      <span class="nx">data</span><span class="o">:</span> <span class="s2">&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>We can model this like so:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">,</span> <span class="nx">hasOne</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">avatar</span><span class="o">:</span> <span class="nx">hasOne</span><span class="p">({</span><span class="nx">detached</span><span class="o">:</span> <span class="kc">true</span><span class="p">})</span>
+<span class="p">});</span></code></pre></div>
+
+<p>By default this then looks for the avatar at <code>/avatars/</code>, we’ll look at how to change that later
+should you want to store things in a different place.</p>
+
+<p>Detached hasMany relationships are specified in a similar way, say a task can be assigned to multiple
+people, but we want to be able to list them for a specific person. We could set this up in Firebase like so:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+  <span class="nx">people</span><span class="o">:</span> <span class="p">{</span>
+    <span class="mi">123</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Tom Ford&quot;</span>
+    <span class="p">},</span>
+    <span class="mi">234</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Paul Smith&quot;</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+  <span class="nx">tasks_by_person</span><span class="o">:</span> <span class="p">{</span>
+    <span class="mi">123</span><span class="o">:</span> <span class="p">{</span>
+      <span class="mi">345</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="mi">456</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">},</span>
+    <span class="mi">234</span><span class="o">:</span> <span class="p">{</span>
+      <span class="mi">345</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nx">tasks</span><span class="o">:</span> <span class="p">{</span>
+    <span class="mi">345</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;A task assigned to both people&quot;</span><span class="p">,</span>
+      <span class="nx">assignees</span><span class="o">:</span> <span class="p">{</span>
+        <span class="mi">123</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="mi">234</span><span class="o">:</span> <span class="kc">true</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="mi">456</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;A task assigned to one person&quot;</span><span class="p">,</span>
+      <span class="nx">assignees</span><span class="o">:</span> <span class="p">{</span>
+        <span class="mi">123</span><span class="o">:</span> <span class="kc">true</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>Here we’ve got a list of people, a list of tasks and an index which maps each person to their tasks.</p>
+
+<p>We can model this like so:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/task.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">,</span> <span class="nx">hasMany</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">title</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">assignees</span><span class="o">:</span> <span class="nx">hasMany</span><span class="p">(</span><span class="s2">&quot;people&quot;</span><span class="p">)</span>
+<span class="p">});</span>
+
+<span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">,</span> <span class="nx">hasMany</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">tasks</span><span class="o">:</span> <span class="nx">hasMany</span><span class="p">({</span><span class="nx">detached</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;tasks_by_person/&quot;</span><span class="p">})</span>
+<span class="p">});</span></code></pre></div>
+
+<p>If the given <code>path</code> is a string, as it is here, it’s expanded and appended to the root Firebase path.</p>
+
+<p>For complete control over the path you can provide a function and return either a string or a Firebase
+reference:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">hasMany</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">tasks</span><span class="o">:</span> <span class="nx">hasMany</span><span class="p">({</span>
+    <span class="nx">detached</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;project&quot;</span><span class="p">).</span><span class="nx">buildFirebaseReference</span><span class="p">().</span>
+        <span class="nx">child</span><span class="p">(</span><span class="s2">&quot;tasks/by-person&quot;</span><span class="p">).</span>
+        <span class="nx">child</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">));</span>
+    <span class="p">}</span>
+  <span class="p">})</span>
+<span class="p">});</span></code></pre></div>
+
+<p>A detached hasMany is assumed to be an indexed collection, as opposed to a collection of the items itself.</p>
+
+          </div>
+        </section>
+      
+        <section>
+          <div id="priorities" class="section-content">
+            <h1>Priorities</h1>
+            <p>If a model has a <code>priority</code> property, then that’s used when saving to Firebase.</p>
+
+<p>For example, lets say we want to order all people by their full name, last name first:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">firstName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">lastName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">priority</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;firstName&quot;</span><span class="p">),</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;lastName&quot;</span><span class="p">)].</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">).</span><span class="nx">toLowerCase</span><span class="p">();</span>
+  <span class="p">}.</span><span class="nx">property</span><span class="p">(</span><span class="s2">&quot;firstName&quot;</span><span class="p">,</span> <span class="s2">&quot;lastName&quot;</span><span class="p">)</span>
+<span class="p">})</span></code></pre></div>
+
+<p>Note that the priority here is a normal Ember property and not an <code>attr</code>. That’s because we’re not
+storing it as an attribute in the JSON.</p>
+
+<p>The same applies to a <code>MetaModel</code> so you can order items in an indexed list.</p>
+
+<p>For example, lets order a list of members by the date they were added to a project:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">firstName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">lastName</span><span class="o">:</span> <span class="nx">attr</span><span class="p">()</span>
+<span class="p">})</span>
+
+<span class="c1">// app/models/project.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">,</span> <span class="nx">attr</span><span class="p">,</span> <span class="nx">hasMany</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">title</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(),</span>
+  <span class="nx">members</span><span class="o">:</span> <span class="nx">hasMany</span><span class="p">(</span><span class="s2">&quot;people&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">as</span><span class="o">:</span> <span class="s2">&quot;member&quot;</span><span class="p">})</span>
+<span class="p">})</span>
+
+<span class="c1">// app/models/member.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">MetaModel</span><span class="p">,</span> <span class="nx">attr</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">MetaModel</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">createdAt</span><span class="o">:</span> <span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">),</span>
+
+  <span class="nx">priority</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;createdAt&quot;</span><span class="p">).</span><span class="nx">toISOString</span><span class="p">();</span>
+  <span class="p">}.</span><span class="nx">property</span><span class="p">(</span><span class="s2">&quot;createdAt&quot;</span><span class="p">)</span>
+<span class="p">})</span></code></pre></div>
+
+
+          </div>
+        </section>
+      
+        <section>
+          <div id="custom-paths" class="section-content">
+            <h1>Custom Paths</h1>
+            <p>By default Fireplace assumes that non-embedded records will be stored at the root of your store’s Firebase reference
+with each model type stored under its pluralized underscored name.</p>
+
+<p>Embedded records are stored relative to their parent records.</p>
+
+<p>For example, each <code>App.Person</code> is stored at <code>/people/id</code>.</p>
+
+<p>To customise this you can override the <code>firebasePath</code> property on the model’s class.</p>
+
+<p>Let’s change <code>App.Person</code> to store its data at <code>/member/profiles</code> instead of <code>/people</code>:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">Person</span> <span class="o">=</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">();</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Person</span><span class="p">;</span>
+
+<span class="nx">Person</span><span class="p">.</span><span class="nx">reopenClass</span><span class="p">({</span>
+  <span class="nx">firebasePath</span><span class="o">:</span> <span class="s2">&quot;member/profiles&quot;</span>
+<span class="p">});</span></code></pre></div>
+
+<p>Any handlebars style parameters will be expanded, so lets say we store each person under the project
+they are a member of, eg <code>/projects/123/people/456</code>, then we can provide a path like so:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">Person</span><span class="p">.</span><span class="nx">reopenClass</span><span class="p">({</span>
+  <span class="nx">firebasePath</span><span class="o">:</span> <span class="s2">&quot;projects//people&quot;</span>
+<span class="p">});</span></code></pre></div>
+
+<p>In this case, whenever we look for a person we’ll need to provide the project and the model should have
+a project property so that it knows where it is to be saved to.</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">project</span><span class="o">:</span> <span class="nx">someProject</span><span class="p">});</span></code></pre></div>
+
+<p>Finally, for complete control you can specify a function, the equivalent to the template string above would be:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">Person</span><span class="p">.</span><span class="nx">reopenClass</span><span class="p">({</span>
+  <span class="nx">firebasePath</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">projectID</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;project.id&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="s2">&quot;projects/&quot;</span><span class="o">+</span><span class="nx">projectID</span><span class="o">+</span><span class="s2">&quot;/people&quot;</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+          </div>
+        </section>
+      
+        <section>
+          <div id="custom-collections" class="section-content">
+            <h1>Custom Collections</h1>
+            <p>There are two types of collection built in:</p>
+
+<ul>
+  <li><code>ObjectCollection</code> - returned from finders and hasMany embedded relationships</li>
+  <li><code>IndexedCollection</code> - returned from hasMany non-embedded / detached relationships</li>
+</ul>
+
+<p>You can create a custom collection by extending either of these as a starting point.</p>
+
+<p>For example, lets make a collection of objects which sets a random priority when items are added:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/collections/random.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">ObjectCollection</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">ObjectCollection</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+
+  <span class="nx">replaceContent</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nx">numRemoved</span><span class="p">,</span> <span class="nx">objectsAdded</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">priority</span><span class="p">;</span>
+    <span class="nx">objectsAdded</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">obj</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;priority&quot;</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">priority</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">();</span>
+        <span class="nx">obj</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;priority&quot;</span><span class="p">,</span> <span class="nx">priority</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_super</span><span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nx">numRemoved</span><span class="p">,</span> <span class="nx">objectsAdded</span><span class="p">);</span>
+  <span class="p">}</span>
+
+<span class="p">});</span></code></pre></div>
+
+<p>We can now use this in queries:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">collection</span><span class="o">:</span> <span class="s2">&quot;random&quot;</span><span class="p">})</span></code></pre></div>
+
+<p>and in relationships:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// app/models/person.js</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Model</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fireplace&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">tasks</span><span class="o">:</span> <span class="nx">hasMany</span><span class="p">({</span><span class="nx">collection</span><span class="o">:</span> <span class="s2">&quot;random&quot;</span><span class="p">})</span>
+<span class="p">});</span></code></pre></div>
+
+          </div>
+        </section>
+      
+        <section>
+          <div id="forking" class="section-content">
+            <h1>Forking</h1>
+            <p>You can fork the store to make changes which don’t affect any existing data until you save.</p>
+
+<p>For example, if you have an editing interface and you don’t want changes to affect parts of the
+page which are being displayed with that record’s details then you can fork the store and
+get a new copy of the record which is totally isolated:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">newStore</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">fork</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">personClone</span> <span class="o">=</span> <span class="nx">newStore</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span></code></pre></div>
+
+<p>When you save <code>personClone</code> then <code>person</code> will also update, but not until then.</p>
+
+<p>We fork the store instead of just copying the record because this makes sure we have a completely fresh
+cache &amp; that all embedded records are also isolated.</p>
+
+          </div>
+        </section>
+      
+
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/rlivsey">rlivsey</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+  </body>
+</html>
