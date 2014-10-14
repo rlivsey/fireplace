@@ -2,6 +2,8 @@
 
 ## Master
 
+## v0.2.2
+
 * pass Model#firebasePath function result through path expansion
 * add Model#firebasePathOptions to more easily change options passed to firebasePath
 
