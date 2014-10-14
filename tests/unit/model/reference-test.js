@@ -107,6 +107,21 @@ test("expands the result of firebasePath function", function() {
   equal(ref.toString(), rootRef + "/foo/bar", "path should have been expanded");
 });
 
+test("overriding firebasePathOptions", function() {
+  var refOptions = {id: "bar"};
+
+  Person.reopenClass({
+    firebasePath: "people/{{type}}/{{id}}",
+    firebasePathOptions: function(opts) {
+      opts.type = "foo";
+      return opts;
+    }
+  });
+
+  var ref = Person.buildFirebaseReference(store, refOptions);
+  equal(ref.toString(), rootRef + "/people/foo/bar", "path should have been expanded");
+});
+
 test("firebasePath can return a reference", function() {
   Person.reopenClass({
     firebasePath: function(opts) {

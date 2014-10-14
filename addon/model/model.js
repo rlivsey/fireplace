@@ -66,8 +66,14 @@ Model.reopenClass(ModelClassMixin, {
     return store.buildFirebaseRootReference();
   },
 
-  buildFirebaseReference: function(store, opts){
-    opts = opts || {};
+  // override if you want to do something different based on the options
+  // can be handy for polymorphism
+  firebasePathOptions: function(opts) {
+    return opts;
+  },
+
+  buildFirebaseReference: function(store, opts) {
+    opts = this.firebasePathOptions(opts || {});
 
     var path = this.firebasePath;
     if (typeof path === "function") {
