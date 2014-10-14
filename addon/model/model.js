@@ -49,7 +49,7 @@ var Model = Ember.Object.extend(ModelMixin, {
 export default Model;
 
 Model.reopenClass(ModelClassMixin, {
-  firebasePath: function(){
+  firebasePath: function(/* opts */) {
     // typeKey is set in the store when looking up the factory
     Ember.assert("No typeKey set, you must use the store to create/find records", this.typeKey);
     return pluralize(underscore(this.typeKey));
@@ -71,12 +71,14 @@ Model.reopenClass(ModelClassMixin, {
 
     var path = this.firebasePath;
     if (typeof path === "function") {
-      // so firebase path  can do opts.get("...") regardless of being passed hash or model instance
+      // so firebase path can do opts.get("...") regardless of being passed hash or model instance
       if (!(opts instanceof Ember.Object)) {
         opts = Ember.Object.create(opts);
       }
       path = path.call(this, opts);
-    } else if (typeof path === "string") {
+    }
+
+    if (typeof path === "string") {
       path = expandPath(path, opts);
     }
 

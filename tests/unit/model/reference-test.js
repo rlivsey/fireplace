@@ -94,6 +94,19 @@ test("uses firebasePath as a function", function(){
   equal(ref.toString(), rootRef + "/foo/bar", "reference should point to the right place");
 });
 
+test("expands the result of firebasePath function", function() {
+  var refOptions = {id: "bar"};
+
+  Person.reopenClass({
+    firebasePath: function() {
+      return "foo/{{id}}";
+    }
+  });
+
+  var ref = Person.buildFirebaseReference(store, refOptions);
+  equal(ref.toString(), rootRef + "/foo/bar", "path should have been expanded");
+});
+
 test("firebasePath can return a reference", function() {
   Person.reopenClass({
     firebasePath: function(opts) {

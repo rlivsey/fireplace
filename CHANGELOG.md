@@ -2,6 +2,8 @@
 
 ## Master
 
+* pass Model#firebasePath function result through path expansion
+
 ## v0.2.1
 
 * Fix race condition when listening to firebase
