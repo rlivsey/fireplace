@@ -192,7 +192,9 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
         json          = {},
         key, value;
 
-    attributes.forEach(function(name, meta){
+    attributes.forEach(function(meta, name) {
+      if (LEGACY_MAP) { var tmp = name; name = meta; meta = tmp; }
+
       value = get(this, name);
       // Firebase doesn't like null values, so remove them
       if (isNone(value)) { return; }

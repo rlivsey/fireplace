@@ -2,6 +2,8 @@
 
 ## Master
 
+* Fix Model#toFirebaseJSON for Ember 1.8.0
+
 ## v0.2.2
 
 * pass Model#firebasePath function result through path expansion
