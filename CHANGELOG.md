@@ -2,6 +2,8 @@
 
 ## Master
 
+## v0.2.3
+
 * Fix Model#toFirebaseJSON for Ember 1.8.0
 
 ## v0.2.2
