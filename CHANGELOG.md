@@ -2,6 +2,8 @@
 
 ## Master
 
+## v0.2.4
+
 * Collection#fetch returns a promise proxy
 
 ## v0.2.3
