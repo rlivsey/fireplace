@@ -2,6 +2,8 @@
 
 ## Master
 
+* Collection#fetch promise proxy should be an array proxy
+
 ## v0.2.4
 
 * Collection#fetch returns a promise proxy
