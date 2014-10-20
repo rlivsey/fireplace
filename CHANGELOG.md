@@ -2,6 +2,8 @@
 
 ## Master
 
+* Collection#fetch returns a promise proxy
+
 ## v0.2.3
 
 * Fix Model#toFirebaseJSON for Ember 1.8.0

@@ -112,17 +112,20 @@ module("ObjectCollection - fetching", {
   setup: setupEnv
 });
 
-test("fetch returns a promise which resolves when the collection has a value", function() {
-  expect(2);
+test("fetch returns a promise proxy which resolves when the collection has a value", function() {
+  expect(4);
 
   var people = People.create();
+  var promise = people.fetch();
 
-  people.fetch().then(function(c) {
+  promise.then(function(c) {
     equal(c, people, "resolves with itself");
     equal(people.get("length"), 3, "has the items");
   });
 
+  ok(promise.get("isPending"));
   firebase.flush();
+  ok(!promise.get("isPending"));
 });
 
 test("resolves immediately if already listening to firebase", function() {

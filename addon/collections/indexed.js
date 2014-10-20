@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import Collection from './base';
 import MetaModel from '../model/meta-model';
+import PromiseProxy from './promise';
 
 var get = Ember.get;
 var set = Ember.set;
@@ -77,9 +78,11 @@ export default Collection.extend({
   },
 
   fetch: function() {
-    return this.listenToFirebase().
+    var promise = this.listenToFirebase().
       then(this._fetchAll.bind(this)).
       then(Ember.K.bind(this));
+
+    return PromiseProxy.create({promise: promise});
   },
 
   _fetchAll: function() {

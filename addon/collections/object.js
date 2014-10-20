@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import Collection from './base';
+import PromiseProxy from './promise';
 
 var get = Ember.get;
 var set = Ember.set;
@@ -48,9 +49,8 @@ export default Collection.extend({
   // then we know we have all our content because it all comes in
   // the same result
   fetch: function() {
-    return this.listenToFirebase().then(function() {
-      return this;
-    }.bind(this));
+    var promise = this.listenToFirebase().then(Ember.K.bind(this));
+    return PromiseProxy.create({promise: promise});
   },
 
   contentChanged: function() {
