@@ -2,7 +2,10 @@
 
 ## Master
 
+## v0.2.6
+
 * timestamp transform serializes Firebase.ServerValue.TIMESTAMP
+* timestamp transform exports `now` helper, also re-exported from index
 
 ## v0.2.5
 
