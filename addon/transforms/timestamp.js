@@ -2,6 +2,10 @@
 
 import Transform from './base';
 
+export function now() {
+  return Firebase.ServerValue.TIMESTAMP;
+}
+
 export default Transform.extend({
   deserialize: function(value) {
     if (!value) {

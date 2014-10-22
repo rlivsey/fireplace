@@ -1,6 +1,8 @@
 /* global Firebase */
 
 import Timestamp from 'fireplace/transforms/timestamp';
+import { now } from 'fireplace/transforms/timestamp';
+
 import {
   transforms,
   serializes,
@@ -12,6 +14,10 @@ module('Transforms - timestamp');
 // MockFirebase doesn't have ServerValue
 Firebase.ServerValue = Firebase.ServerValue || {};
 Firebase.ServerValue.TIMESTAMP = Firebase.ServerValue.TIMESTAMP || {".sv": "timestamp"};
+
+test('export now as Firebase.ServerValue.TIMESTAMP', function() {
+  equal(now(), Firebase.ServerValue.TIMESTAMP);
+});
 
 test('transforms timestamps', function() {
   var transform = Timestamp.create();

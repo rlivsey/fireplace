@@ -16,6 +16,8 @@ import NumberTransform    from './transforms/number';
 import StringTransform    from './transforms/string';
 import TimestampTransform from './transforms/timestamp';
 
+import { now } from './transforms/timestamp';
+
 export {
   Model,
 
@@ -35,7 +37,8 @@ export {
   HashTransform,
   NumberTransform,
   StringTransform,
-  TimestampTransform
+  TimestampTransform,
+  now
 };
 
 export default Model;
