@@ -2,6 +2,8 @@
 
 ## Master
 
+* timestamp transform serializes Firebase.ServerValue.TIMESTAMP
+
 ## v0.2.5
 
 * Collection#fetch promise proxy should be an array proxy
