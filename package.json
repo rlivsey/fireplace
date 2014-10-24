@@ -1,7 +1,7 @@
 {
   "name": "fireplace",
   "description": "A Firebase model library for Ember.js",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "directories": {
     "doc": "doc",
     "test": "tests"

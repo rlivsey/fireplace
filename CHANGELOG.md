@@ -2,6 +2,8 @@
 
 ## Master
 
+## v0.2.7
+
 * export MetaModel from index
 
 ## v0.2.6

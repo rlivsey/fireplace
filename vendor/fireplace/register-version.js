@@ -1,1 +1,1 @@
-Ember.libraries.register('Fireplace', '0.2.6');
+Ember.libraries.register('Fireplace', '0.2.7');
