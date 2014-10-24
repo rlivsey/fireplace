@@ -2,6 +2,8 @@
 
 ## Master
 
+* export MetaModel from index
+
 ## v0.2.6
 
 * timestamp transform serializes Firebase.ServerValue.TIMESTAMP

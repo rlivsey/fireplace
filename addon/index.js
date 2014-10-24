@@ -1,8 +1,9 @@
-import Model   from './model/model';
-import attr    from './model/attr';
-import hasOne  from './relationships/has-one';
-import hasMany from './relationships/has-many';
-import Store   from './store';
+import Model     from './model/model';
+import MetaModel from './model/meta-model';
+import attr      from './model/attr';
+import hasOne    from './relationships/has-one';
+import hasMany   from './relationships/has-many';
+import Store     from './store';
 
 import Collection         from './collections/base';
 import ObjectCollection   from './collections/object';
@@ -20,6 +21,7 @@ import { now } from './transforms/timestamp';
 
 export {
   Model,
+  MetaModel,
 
   attr,
   hasOne,
