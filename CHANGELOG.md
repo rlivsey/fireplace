@@ -2,6 +2,8 @@
 
 ## Master
 
+## v0.2.8
+
 * added Store#saveCollection
 
 ## v0.2.7
