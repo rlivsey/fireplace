@@ -4,6 +4,7 @@ import Model from 'fireplace/model/model';
 import Store from 'fireplace/store';
 import attr from 'fireplace/model/attr';
 import ObjectCollection from 'fireplace/collections/object';
+import IndexedCollection from 'fireplace/collections/indexed';
 
 var get = Ember.get;
 var set = Ember.set;
@@ -415,4 +416,62 @@ test("fetchQuery with options", function() {
     equal(collection.objectAt(1).get("id"), "c");
   });
   firebase.flush();
+});
+
+test("saveCollection when successful", function() {
+  expect(2);
+
+  var ref = firebase.child("people-index");
+
+  var index = IndexedCollection.create({
+    firebaseReference: ref,
+    store: store
+  });
+
+  var person = store.createRecord(Person, {id: "123", name: "Bob"});
+  index.pushObject(person);
+
+  store.saveCollection(index).then(function(collection) {
+    equal(collection, index, "resolves with the collection");
+  });
+
+  firebase.flush();
+
+  ref.once("value", function(snap) {
+    deepEqual(snap.val(), { 123: true }, "saves the expected information");
+  });
+
+  firebase.flush();
+});
+
+test("saveCollection when fails", function() {
+  expect(1);
+
+  var ref = firebase.child("people-index");
+
+  var index = IndexedCollection.create({
+    firebaseReference: ref,
+    store: store
+  });
+
+  var person = store.createRecord(Person, {id: "123", name: "Bob"});
+  index.pushObject(person);
+
+  ref.failNext("set", "an error");
+
+  store.saveCollection(index).catch(function() {
+    ok("rejects the promise");
+  });
+
+  firebase.flush();
+});
+
+test("saveCollection with a query collection", function() {
+  expect(1);
+
+  var index = IndexedCollection.create({ limit: 10 });
+
+  throws(function() {
+    store.saveCollection(index);
+  }, "you can't save a collection which is query");
 });

@@ -54,6 +54,33 @@ export default Ember.Object.extend({
     return record;
   },
 
+  saveCollection: function(collection) {
+    var json  = collection.toFirebaseJSON();
+    var ref   = collection.buildFirebaseReference();
+    var _this = this;
+
+    var limit = collection.get("limit");
+    var start = collection.get("startAt");
+    var end   = collection.get("endAt");
+
+    // if the collection is built from a query as you'll nuke any data not matched
+    Ember.assert("Saving a collection which is the result of a query could lose data", !limit && !start && !end);
+
+    return new Ember.RSVP.Promise(function(resolve, reject){
+      var callback = function(error) {
+        _this.enqueueEvent(function(){
+          if (error) {
+            reject(error);
+          } else {
+            collection.listenToFirebase();
+            resolve(collection);
+          }
+        });
+      };
+      ref.set(json, callback);
+    }, "FP: Save Collection "+ref.toString());
+  },
+
   saveRecord: function(record, attr) {
     var ref      = record.buildFirebaseReference();
     var priority = get(record, 'priority');

@@ -86,6 +86,10 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
     return reference;
   },
 
+  save: function() {
+    return this.store.saveCollection(this);
+  },
+
   modelClassFromSnapshot: function(snap) {
     var modelName = get(this, 'model');
     var baseClass = this.store.modelFor(modelName);

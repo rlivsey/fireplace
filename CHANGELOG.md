@@ -2,6 +2,8 @@
 
 ## Master
 
+* added Store#saveCollection
+
 ## v0.2.7
 
 * export MetaModel from index
