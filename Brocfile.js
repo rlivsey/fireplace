@@ -18,6 +18,5 @@ var app = new EmberAddon();
 // along with the exports of each module as its value.
 
 app.import("bower_components/mockfirebase/browser/mockfirebase.js");
-app.import("bower_components/sinon/index.js");
 
 module.exports = app.toTree();

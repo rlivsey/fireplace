@@ -14,7 +14,6 @@
     "ember-qunit-notifications": "0.0.4",
     "qunit": "~1.15.0",
     "firebase": "~1.1.0",
-    "mockfirebase": "~0.3.2",
-    "sinon": "http://sinonjs.org/releases/sinon-1.9.0.js"
+    "mockfirebase": "~0.4.0"
   }
 }
