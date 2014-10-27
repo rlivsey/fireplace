@@ -20,7 +20,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
     var attributes    = get(this.constructor, 'attributes'),
         relationships = get(this.constructor, 'relationships');
 
-    if (attributes.length || relationships.length) {
+    if (attributes.size || relationships.size) {
       return null;
     }
 
@@ -44,7 +44,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
     var attributes    = get(this.constructor, 'attributes'),
         relationships = get(this.constructor, 'relationships');
 
-    if (attributes.length || relationships.length) {
+    if (attributes.size || relationships.size) {
       var attrJSON = this._super(includePriority);
 
       // if attributes are null, then we'll get an empty object back

@@ -2,6 +2,8 @@
 
 ## Master
 
+* Ember.Map#length is deprecated, use #size instead
+
 ## v0.2.8
 
 * added Store#saveCollection
