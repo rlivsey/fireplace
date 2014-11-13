@@ -3,6 +3,7 @@
 ## Master
 
 * Ember.Map#length is deprecated, use #size instead
+* Ember.assert in canary now calls functions, so coerce tests to booleans
 
 ## v0.2.8
 

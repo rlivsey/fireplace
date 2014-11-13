@@ -40,7 +40,7 @@ export default Ember.Object.extend({
 
   buildFirebaseRootReference: function(){
     var url = get(this, 'firebaseRoot');
-    Ember.assert("Your store needs a firebaseRoot", url);
+    Ember.assert("Your store needs a firebaseRoot", !!url);
     if (url instanceof Firebase) {
       return url;
     }
@@ -111,7 +111,7 @@ export default Ember.Object.extend({
         if (attr !== 'priority') {
           var key = record.attributeKeyFromName(attr) || record.relationshipKeyFromName(attr);
 
-          Ember.assert(Ember.inspect(record) +" has no attribute "+ attr, key);
+          Ember.assert(Ember.inspect(record) +" has no attribute "+ attr, !!key);
 
           var value = json[key];
           if (value) {
@@ -297,7 +297,7 @@ export default Ember.Object.extend({
 
     if (typeof type === 'string') {
       factory = get(this, 'container').lookupFactory('model:' + type);
-      Ember.assert("No model was found for '" + type + "'", factory);
+      Ember.assert("No model was found for '" + type + "'", !!factory);
       factory.typeKey = factory.typeKey || this._normalizeTypeKey(type);
     } else {
       factory = type;

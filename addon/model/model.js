@@ -51,7 +51,7 @@ export default Model;
 Model.reopenClass(ModelClassMixin, {
   firebasePath: function(/* opts */) {
     // typeKey is set in the store when looking up the factory
-    Ember.assert("No typeKey set, you must use the store to create/find records", this.typeKey);
+    Ember.assert("No typeKey set, you must use the store to create/find records", !!this.typeKey);
     return pluralize(underscore(this.typeKey));
   },
 

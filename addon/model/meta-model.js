@@ -35,7 +35,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
     var id        = get(this, 'id'),
         parent    = get(this, 'parent');
 
-    Ember.assert("meta models must belong to a parent in order to generate a Firebase reference", parent);
+    Ember.assert("meta models must belong to a parent in order to generate a Firebase reference", !!parent);
 
     return parent.buildFirebaseReference().child(id);
   },
