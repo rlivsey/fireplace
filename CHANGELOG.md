@@ -2,6 +2,10 @@
 
 ## Master
 
+## v0.2.10
+
+* Update ember-cli to 0.1.5
+
 ## v0.2.9
 
 * Ember.Map#length is deprecated, use #size instead
