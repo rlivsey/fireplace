@@ -2,6 +2,8 @@
 
 ## Master
 
+## v0.2.11
+
 * Check arguments.length > 1 instead of === 2 for detecting set vs get of computed properties
 
 ## v0.2.10
