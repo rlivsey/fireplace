@@ -43,7 +43,7 @@ export default Ember.ObjectProxy.extend(Ember.PromiseProxyMixin, {
 
   // re-implemented from Ember so we can call our own observePromise
   promise: Ember.computed(function(key, promise) {
-    if (arguments.length === 2) {
+    if (arguments.length > 1) {
       promise = resolve(promise);
       observePromise(this, promise);
       return promise.then(); // fork the promise.

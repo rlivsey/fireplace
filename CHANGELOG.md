@@ -2,6 +2,8 @@
 
 ## Master
 
+* Check arguments.length > 1 instead of === 2 for detecting set vs get of computed properties
+
 ## v0.2.10
 
 * Update ember-cli to 0.1.5
