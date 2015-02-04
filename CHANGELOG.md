@@ -2,6 +2,8 @@
 
 ## Master
 
+## v0.3.0
+
 * Update to Firebase 2.1.x
 * Stop calling deprecated Snapshot#name, use Snapshot#key instead
 
