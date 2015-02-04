@@ -17,7 +17,7 @@ var Model = Ember.Object.extend(ModelMixin, {
     if (value) { return value; }
 
     var store = get(this, 'store');
-    return this.constructor.buildFirebaseRootReference(store).push().name();
+    return this.constructor.buildFirebaseRootReference(store).push().key();
   }.property(),
 
   debugReference: function(){

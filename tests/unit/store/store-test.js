@@ -86,10 +86,10 @@ test("saveRecord when fails", function() {
 
   var person = store.createRecord("person", {name: "Bob"});
 
-  person.buildFirebaseReference().failNext("set", "an error");
+  person.buildFirebaseReference().failNext("set", new Error("an error"));
 
   store.saveRecord(person).catch(function(e){
-    equal("an error", e, "fails with the error");
+    equal("an error", e.message, "fails with the error");
   });
 
   firebase.flush();
@@ -457,7 +457,7 @@ test("saveCollection when fails", function() {
   var person = store.createRecord(Person, {id: "123", name: "Bob"});
   index.pushObject(person);
 
-  ref.failNext("set", "an error");
+  ref.failNext("set", new Error("an error"));
 
   store.saveCollection(index).catch(function() {
     ok("rejects the promise");

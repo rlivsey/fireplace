@@ -12,7 +12,7 @@
     "ember-qunit": "0.1.8",
     "ember-qunit-notifications": "0.0.4",
     "qunit": "~1.15.0",
-    "firebase": "~1.1.0",
-    "mockfirebase": "~0.4.0"
+    "firebase": "~2.1.2",
+    "mockfirebase": "~0.9.4"
   }
 }

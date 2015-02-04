@@ -81,7 +81,7 @@ export default Collection.extend({
   // on replaceContent we can build an ID map and then check that
 
   onFirebaseChildAdded: function(snapshot, prevItemName) {
-    var id = snapshot.name();
+    var id = snapshot.key();
 
     if (this.findBy('id', id)) { return; }
 
@@ -96,14 +96,14 @@ export default Collection.extend({
   // TODO - should we destroy the item when removed?
   // TODO - should the item be removed from the store's cache?
   onFirebaseChildRemoved: function(snapshot) {
-    var item = this.findBy('id', snapshot.name());
+    var item = this.findBy('id', snapshot.key());
     if (!item) { return; }
     this.removeObject(item);
     item.stopListeningToFirebase();
   },
 
   onFirebaseChildMoved: function(snapshot, prevItemName) {
-    var item = this.findBy('id', snapshot.name());
+    var item = this.findBy('id', snapshot.key());
     if (!item) { return; }
 
     this.removeObject(item);

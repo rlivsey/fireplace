@@ -93,7 +93,7 @@ export default Collection.extend({
 
   itemFromSnapshot: function(snapshot) {
     return {
-      id:       snapshot.name(),
+      id:       snapshot.key(),
       snapshot: snapshot,
       record:   null
     };
@@ -221,7 +221,7 @@ export default Collection.extend({
   },
 
   onFirebaseChildAdded: function(snapshot, prevItemName) {
-    var id      = snapshot.name(),
+    var id      = snapshot.key(),
         content = get(this, "content");
 
     if (content.findBy('id', id)) { return; }
@@ -232,7 +232,7 @@ export default Collection.extend({
 
   onFirebaseChildRemoved: function(snapshot) {
     var content = get(this, "content"),
-        item    = content.findBy('id', snapshot.name());
+        item    = content.findBy('id', snapshot.key());
 
     if (!item) { return; }
 
@@ -241,7 +241,7 @@ export default Collection.extend({
 
   onFirebaseChildMoved: function(snapshot, prevItemName) {
     var content = get(this, "content"),
-        item    = content.findBy('id', snapshot.name());
+        item    = content.findBy('id', snapshot.key());
 
     if (!item) { return; }
 
@@ -266,7 +266,7 @@ export default Collection.extend({
   // TODO - add polymorphic: true/key as an option where key defaults to 'type'
   onFirebaseChildChanged: function(snapshot) {
     var content = get(this, "content"),
-        item    = content.findBy('id', snapshot.name());
+        item    = content.findBy('id', snapshot.key());
 
     if (!item) { return; }
 

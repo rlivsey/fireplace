@@ -5,6 +5,12 @@ var MutableSnapshot = function(snapshot) {
 
 export default MutableSnapshot;
 
+MutableSnapshot.prototype.key = function() {
+  if (!this.snapshot) { return null; }
+  return this.snapshot.key();
+};
+
+// deprecated but keep it around until it's removed in Firebase
 MutableSnapshot.prototype.name = function() {
   if (!this.snapshot) { return null; }
   return this.snapshot.name();

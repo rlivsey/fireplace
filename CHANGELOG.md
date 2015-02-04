@@ -2,6 +2,9 @@
 
 ## Master
 
+* Update to Firebase 2.1.x
+* Stop calling deprecated Snapshot#name, use Snapshot#key instead
+
 ## v0.2.11
 
 * Check arguments.length > 1 instead of === 2 for detecting set vs get of computed properties

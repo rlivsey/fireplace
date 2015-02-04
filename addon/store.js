@@ -381,7 +381,7 @@ export default Ember.Object.extend({
     if (record) {
       return record;
     } else {
-      attributes.id = reference.name();
+      attributes.id = reference.key();
       return this.createRecord(type, attributes);
     }
   },

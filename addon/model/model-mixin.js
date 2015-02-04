@@ -97,7 +97,7 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
   },
 
   setAttributeFromSnapshot: function(snapshot, valueRemoved) {
-    var key       = snapshot.name();
+    var key       = snapshot.key();
     var attribute = this.attributeNameFromKey(key);
     if (!attribute) { return; }
 
@@ -127,7 +127,7 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
   },
 
   notifyRelationshipOfChange: function(snapshot, valueRemoved) {
-    var key       = snapshot.name();
+    var key       = snapshot.key();
     var attribute = this.relationshipNameFromKey(key);
 
     if (!attribute) { return; }

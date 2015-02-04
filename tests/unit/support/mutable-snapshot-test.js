@@ -12,7 +12,7 @@ module('MutableSnapshot - with no snapshot', {
 });
 
 test("has defaults values", function() {
-  equal(snapshot.name(),        null);
+  equal(snapshot.key(),        null);
   equal(snapshot.getPriority(), null);
   equal(snapshot.val(),         null);
   equal(snapshot.ref(),         null);
@@ -43,7 +43,7 @@ module('MutableSnapshot - wrapping a snapshot', {
 
 // this is testing mockSnapshot more than anything...
 test("has values", function() {
-  equal(snapshot.name(),        "snap",         "has a name");
+  equal(snapshot.key(),        "snap",         "has a name");
   equal(snapshot.getPriority(), 123,            "has a priority");
   deepEqual(snapshot.val(),     {title: "Bob"}, "has a value");
 });
