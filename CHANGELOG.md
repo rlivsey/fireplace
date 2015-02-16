@@ -2,6 +2,8 @@
 
 ## Master
 
+## v0.3.1
+
 * Optionally include `id` in embedded object attributes
 
 ## v0.3.0
