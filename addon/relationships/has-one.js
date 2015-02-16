@@ -4,7 +4,9 @@ import Ember from 'ember';
 // embedded: (true)|false
 // detached: (false)|true
 // query: any additional data for non-embedded fetching
-// id: for detached queries, defaults to the object ID
+// id:
+//     for detached queries, defaults to the object ID
+//     for embedded - include the ID in Firebase
 // key: (type)
 
 var get    = Ember.get;
@@ -57,11 +59,17 @@ export default function(type, options) {
       }
 
       if (options.embedded) {
-        value = store.createRecord(meta.type, {
+        var attributes = {
           snapshot:  childSnap,
           parent:    this,
           parentKey: name
-        });
+        };
+
+        if (options.id) {
+          attributes.id = childSnap.child("id").val();
+        }
+
+        value = store.createRecord(meta.type, attributes);
 
         if (get(this, "isListeningToFirebase")) {
           value.listenToFirebase();

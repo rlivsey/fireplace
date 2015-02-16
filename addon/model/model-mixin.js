@@ -190,7 +190,7 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
         container     = get(this, "container"),
         snapshot      = get(this, "_snapshot"),
         json          = {},
-        key, value;
+        key, value, item;
 
     attributes.forEach(function(meta, name) {
       if (LEGACY_MAP) { var tmp = name; name = meta; meta = tmp; }
@@ -212,20 +212,27 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
 
       // if we haven't loaded the relationship yet, get the data from the snapshot
       // no point materializing something we already know the data of
-      value = cacheFor(this, name);
+      item = cacheFor(this, name);
 
-      if (value === undefined && snapshot) {
+      if (item === undefined && snapshot) {
         value = snapshot.child(key).exportVal();
-      } else if (isNone(value)) {
+      } else if (isNone(item)) {
         // Firebase doesn't like null values, so remove them
         return;
       } else {
         // TODO - ideally we shouldn't have to know about these details here
         // can we farm this off to a function on the relationship?
-        if (meta.kind === "hasOne" && meta.options.embedded === false) {
-          value = get(value, "id");
+        if (meta.kind === "hasOne") {
+          if (meta.options.embedded === false) {
+            value = get(item, "id");
+          } else if (meta.options.id) {
+            value = item.toFirebaseJSON(true);
+            value.id = get(item, "id");
+          } else {
+            value = item.toFirebaseJSON(true);
+          }
         } else {
-          value = value.toFirebaseJSON(true);
+          value = item.toFirebaseJSON(true);
         }
       }
 

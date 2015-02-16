@@ -2,6 +2,8 @@
 
 ## Master
 
+* Optionally include `id` in embedded object attributes
+
 ## v0.3.0
 
 * Update to Firebase 2.1.x

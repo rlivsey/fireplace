@@ -181,6 +181,34 @@ test("serializes hasOne embedded relationships", function() {
   });
 });
 
+test("serializes hasOne embedded relationships (with ID)", function() {
+  var Avatar = Model.extend({
+    image: attr()
+  });
+
+  var Person = Model.extend({
+    name: attr(),
+    avatar: one(Avatar, { id: true })
+  });
+
+  var person = Person.create({
+    id: 123,
+    name: "Ted Thompson",
+    avatar: Avatar.create({
+      id:    "an-avatar",
+      image: "my-face.png"
+    })
+  });
+
+  serializesTo(person, {
+    name: "Ted Thompson",
+    avatar: {
+      id:    "an-avatar",
+      image: "my-face.png"
+    }
+  });
+});
+
 test("serializes hasOne non-embedded relationships", function() {
   var Avatar = Model.extend({
     image: attr()
