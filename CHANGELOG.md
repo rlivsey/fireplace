@@ -2,6 +2,11 @@
 
 ## Master
 
+## v0.3.2
+
+* Update ember-cli to v0.2.0
+* Use bower version of ember-inflector
+
 ## v0.3.1
 
 * Optionally include `id` in embedded object attributes
