@@ -1,7 +1,6 @@
 /* global Firebase */
 
 import Ember from 'ember';
-import { pluralize } from 'ember-inflector';
 
 import expandPath from '../utils/expand-path';
 import {
@@ -11,6 +10,7 @@ import {
 
 var get        = Ember.get;
 var underscore = Ember.String.underscore;
+var pluralize  = Ember.String.pluralize;
 
 var Model = Ember.Object.extend(ModelMixin, {
   id: function(key, value) {

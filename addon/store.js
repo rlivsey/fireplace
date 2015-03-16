@@ -6,7 +6,7 @@ import EventQueue   from './support/event-queue';
 import PromiseModel from './model/promise-model';
 import MetaModel    from './model/meta-model';
 
-import { singularize } from 'ember-inflector';
+var singularize = Ember.String.singularize;
 
 var get     = Ember.get;
 var guidFor = Ember.guidFor;

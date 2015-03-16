@@ -1,8 +1,8 @@
 import Ember from 'ember';
-import { singularize } from 'ember-inflector';
 
-var get        = Ember.get;
-var underscore = Ember.String.underscore;
+var get         = Ember.get;
+var underscore  = Ember.String.underscore;
+var singularize = Ember.String.singularize;
 
 export var RelationshipsClassMixin = Ember.Mixin.create({
   relationships: Ember.computed(function() {

@@ -5,6 +5,15 @@ module.exports = {
     // to us
   },
   afterInstall: function() {
-    return this.addBowerPackageToProject('firebase', '~2.1.0');
+    return this.addBowerPackagesToProject([
+      {
+        name: 'firebase',
+        target: '^2.1.0'
+      },
+      {
+        name: 'ember-inflector',
+        target: '^1.3.1'
+      }
+    ]);
   }
 };
