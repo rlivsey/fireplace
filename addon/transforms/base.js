@@ -1,8 +1,8 @@
 import Ember from 'ember';
 
 export default Ember.Object.extend({
-  serialize:   Ember.required(),
-  deserialize: Ember.required()
+  serialize:   null,
+  deserialize: null
 });
 
 export function deserialize(obj, value, meta, container) {
