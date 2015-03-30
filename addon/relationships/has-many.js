@@ -34,18 +34,18 @@ export default function(type, options) {
   };
 
   return Ember.computed({
-    get: function() {
-      var collection = buildCollection(this, type, false, options);
+    get: function(key) {
+      var collection = buildCollection(this, key, meta.type, false, options);
       if (get(this, "isListeningToFirebase")) {
         collection.listenToFirebase();
       }
       return collection;
     },
-    set: function(name, value) {
+    set: function(key, value) {
       if (isNone(value)) {
         return null;
       }
-      return buildCollection(this, type, true, options, {
+      return buildCollection(this, key, meta.type, true, options, {
         content: value
       });
     }
@@ -55,7 +55,7 @@ export default function(type, options) {
 // regardless of getting or setting, we create a new collection
 // TODO - update the old one if there is one hanging around
 // TODO - use store.findQuery for this
-function buildCollection(model, type, isSetter, options, attrs) {
+function buildCollection(model, name, type, isSetter, options, attrs) {
   var store          = get(model, "store");
   var container      = get(model, "container");
   var collectionName = options.collection || (options.embedded ? "object" : "indexed");
