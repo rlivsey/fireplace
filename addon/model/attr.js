@@ -18,28 +18,29 @@ export default function(type, options) {
     options:     options
   };
 
-  return Ember.computed(function(name, value) {
-    var container = get(this, 'container');
-    if (arguments.length > 1) {
+  return Ember.computed({
+    get: function(name) {
+      var container = get(this, 'container');
+      var dataKey   = this.attributeKeyFromName(name);
+      var snapshot  = get(this, 'snapshot');
+      var value     = snapshot.child(dataKey).val();
+
+      if (isNone(value)) {
+        value = getDefaultValue(this, options);
+      } else {
+        value = deserialize(this, value, meta, container);
+      }
+
+      return value;
+    },
+
+    set: function(name, value) {
       if (isNone(value)) {
         value = getDefaultValue(this, options);
       }
       return value;
     }
-
-    var dataKey  = this.attributeKeyFromName(name),
-        snapshot = get(this, 'snapshot');
-
-    value = snapshot.child(dataKey).val();
-
-    if (isNone(value)) {
-      value = getDefaultValue(this, options);
-    } else {
-      value = deserialize(this, value, meta, container);
-    }
-
-    return value;
-  }).property().meta(meta);
+  }).meta(meta);
 }
 
 function getDefaultValue(obj, options) {

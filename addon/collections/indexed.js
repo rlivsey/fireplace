@@ -40,7 +40,7 @@ export default Collection.extend({
     set(this, "content", content);
   }),
 
-  contentChanged: function() {
+  contentChanged: Ember.on("init", Ember.observer("content", function() {
     if (this._updatingContent) { return; }
 
     var content = get(this, "content");
@@ -60,7 +60,7 @@ export default Collection.extend({
       set(this, "content", transformed);
       this._updatingContent = false;
     }
-  }.observes("content").on("init"),
+  })),
 
   // if we're listening, then our meta model items should be too
   listenToFirebase: function() {
@@ -88,7 +88,7 @@ export default Collection.extend({
   _fetchAll: function() {
     return Ember.RSVP.all(get(this, "content").map(function(item, index) {
       return this.objectAtContentAsPromise(index);
-    }.bind(this)));
+    }, this));
   },
 
   itemFromSnapshot: function(snapshot) {

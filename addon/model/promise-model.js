@@ -23,7 +23,7 @@ function observePromise(proxy, promise) {
 export default Ember.ObjectProxy.extend(Ember.PromiseProxyMixin, {
 
   // forward on all content's functions where it makes sense to do so
-  _setupContentForwarding: function() {
+  _setupContentForwarding: Ember.on("init", Ember.observer('content', function() {
     var obj = get(this, "content");
     if (!obj) { return; }
 
@@ -32,7 +32,7 @@ export default Ember.ObjectProxy.extend(Ember.PromiseProxyMixin, {
         this._forwardToContent(prop);
       }
     }
-  }.observes("content").on("init"),
+  })),
 
   _forwardToContent: function(prop) {
     this[prop] = function() {
@@ -42,13 +42,14 @@ export default Ember.ObjectProxy.extend(Ember.PromiseProxyMixin, {
   },
 
   // re-implemented from Ember so we can call our own observePromise
-  promise: Ember.computed(function(key, promise) {
-    if (arguments.length > 1) {
+  promise: Ember.computed({
+    get: function() {
+      throw new Ember.Error("PromiseProxy's promise must be set");
+    },
+    set: function(key, promise) {
       promise = resolve(promise);
       observePromise(this, promise);
       return promise.then(); // fork the promise.
-    } else {
-      throw new Ember.Error("PromiseProxy's promise must be set");
     }
   })
 

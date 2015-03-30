@@ -25,15 +25,15 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
   onFirebaseChildMoved:   Ember.required,
   toFirebaseJSON:         Ember.required,
 
-  isNew: Ember.computed(function(){
+  isNew: Ember.computed("snapshot", function(){
     return !get(this, "snapshot");
-  }).property("snapshot"),
+  }),
 
   firebaseReference: null,
 
-  debugReference: function(){
+  debugReference: Ember.computed(function(){
     return this.buildFirebaseReference().toString();
-  }.property(),
+  }),
 
   buildFirebaseReference: function() {
     // do we have an explicit reference?

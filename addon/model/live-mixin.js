@@ -19,9 +19,9 @@ export default Ember.Mixin.create(Ember.Evented, {
     return this.buildFirebaseReference();
   },
 
-  changeCameFromFirebase: function() {
+  changeCameFromFirebase: Ember.computed(function() {
     return !!this._settingFromFirebase;
-  }.property().volatile(),
+  }).volatile(),
 
   settingFromFirebase: function(fn) {
     this._settingFromFirebase = true;

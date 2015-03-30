@@ -16,20 +16,28 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
 
   // meta is the simple value of the snapshot
   // if attributes are defined then you can't also have a meta value
-  meta: Ember.computed(function(key, value){
-    var attributes    = get(this.constructor, 'attributes'),
-        relationships = get(this.constructor, 'relationships');
+  meta: Ember.computed("snapshot", {
+    get: function() {
+      var attributes    = get(this.constructor, 'attributes');
+      var relationships = get(this.constructor, 'relationships');
 
-    if (attributes.size || relationships.size) {
-      return null;
-    }
+      if (attributes.size || relationships.size) {
+        return null;
+      }
 
-    if (arguments.length > 1) {
-      return value;
-    } else {
       return get(this, "snapshot").val();
+    },
+    set: function(key, value) {
+      var attributes    = get(this.constructor, 'attributes');
+      var relationships = get(this.constructor, 'relationships');
+
+      if (attributes.size || relationships.size) {
+        return null;
+      }
+
+      return value;
     }
-  }).property("snapshot"),
+  }),
 
   buildFirebaseReference: function(){
     var id        = get(this, 'id'),
@@ -70,7 +78,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
     return this.get("content").save();
   },
 
-  changeCameFromFirebase: function() {
+  changeCameFromFirebase: Ember.computed(function() {
     if (!!this._settingFromFirebase) {
       return true;
     } else if (get(this, "content.changeCameFromFirebase")) {
@@ -78,7 +86,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
     } else {
       return false;
     }
-  }.property().volatile()
+  }).volatile()
 
 });
 

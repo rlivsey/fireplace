@@ -13,16 +13,19 @@ var underscore = Ember.String.underscore;
 var pluralize  = Ember.String.pluralize;
 
 var Model = Ember.Object.extend(ModelMixin, {
-  id: function(key, value) {
-    if (value) { return value; }
+  id: Ember.computed({
+    get: function() {
+      var store = get(this, 'store');
+      return this.constructor.buildFirebaseRootReference(store).push().key();
+    },
+    set: function(key, value) {
+      return value;
+    }
+  }),
 
-    var store = get(this, 'store');
-    return this.constructor.buildFirebaseRootReference(store).push().key();
-  }.property(),
-
-  debugReference: function(){
+  debugReference: Ember.computed(function(){
     return this.buildFirebaseReference().toString();
-  }.property(),
+  }),
 
   buildFirebaseReference: function(){
     var id        = get(this, 'id'),

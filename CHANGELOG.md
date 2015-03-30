@@ -2,6 +2,8 @@
 
 ## Master
 
+* use new-style computed property getters & setters (removes deprecation warnings in canary)
+
 ## v0.3.2
 
 * Update ember-cli to v0.2.0

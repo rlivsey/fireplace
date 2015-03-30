@@ -28,27 +28,27 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
 
   store: null,
 
-  isNew: Ember.computed(function(){
+  isNew: Ember.computed("_snapshot", function(){
     return !get(this, "_snapshot");
-  }).property("_snapshot"),
+  }),
 
   // the actual Firebase::Snapshot, can be null if new record
   _snapshot: null,
 
   // wrapped MutableSnapshot, will never be null
-  snapshot: Ember.computed(function(key, value) {
-    var snapshot;
-    if (arguments.length > 1) {
+  snapshot: Ember.computed("_snapshot", {
+    get: function() {
+      var snapshot = get(this, "_snapshot");
+      return new MutableSnapshot(snapshot);
+    },
+    set: function(key, value) {
       if (value instanceof MutableSnapshot) {
         value = value.snapshot;
       }
       set(this, "_snapshot", value);
-      snapshot = value;
-    } else {
-      snapshot = get(this, "_snapshot");
+      return new MutableSnapshot(value);
     }
-    return new MutableSnapshot(snapshot);
-  }).property("_snapshot"),
+  }),
 
   willDestroy: function() {
     var store = get(this, "store");

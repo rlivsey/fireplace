@@ -53,9 +53,9 @@ export default Collection.extend({
     return PromiseProxy.create({promise: promise});
   },
 
-  contentChanged: function() {
+  contentChanged: Ember.on("init", Ember.observer("content", function() {
     this.setupParentage(this);
-  }.observes("content").on("init"),
+  })),
 
   setupParentage: function(items) {
     items.forEach(function(item) {

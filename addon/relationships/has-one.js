@@ -33,24 +33,11 @@ export default function(type, options) {
     options:        options
   };
 
-  return Ember.computed(function(name, value) {
-    if (arguments.length > 1) {
-      if (isNone(value)) {
-        return null;
-      }
-
-      if (options.embedded) {
-        value.setProperties({
-          parent:    this,
-          parentKey: name
-        });
-      }
-
-      return value;
-    } else {
-      var store    = get(this, "store"),
-          snapshot = get(this, "snapshot"),
-          childSnap;
+  return Ember.computed({
+    get: function(name) {
+      var store    = get(this, "store");
+      var snapshot = get(this, "snapshot");
+      var childSnap;
 
       if (!options.detached) {
         var dataKey = this.relationshipKeyFromName(name);
@@ -69,7 +56,7 @@ export default function(type, options) {
           attributes.id = childSnap.child("id").val();
         }
 
-        value = store.createRecord(meta.type, attributes);
+        var value = store.createRecord(meta.type, attributes);
 
         if (get(this, "isListeningToFirebase")) {
           value.listenToFirebase();
@@ -95,6 +82,20 @@ export default function(type, options) {
         }
         return store.findOne(meta.type, itemID, query);
       }
+    },
+    set: function(name, value) {
+      if (isNone(value)) {
+        return null;
+      }
+
+      if (options.embedded) {
+        value.setProperties({
+          parent:    this,
+          parentKey: name
+        });
+      }
+
+      return value;
     }
-  }).property().meta(meta);
+  }).meta(meta);
 }
