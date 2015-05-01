@@ -257,23 +257,26 @@ export default Collection.extend({
     this.insertAfter(prevItemName, item, content);
   },
 
-  // if the child changed then its meta information has changed
-  // if we're polymorphic this means we'll need to fetch a new content item
-  // otherwise the meta model will take care of it
-  // currently this replaces the item each time, but we should only need to do this
-  // when polymorphic and the polymorph key has changed - but we don't currently
-  // know what that is
-  // TODO - add polymorphic: true/key as an option where key defaults to 'type'
   onFirebaseChildChanged: function(snapshot) {
     var content = get(this, "content"),
         item    = content.findBy('id', snapshot.key());
 
     if (!item) { return; }
 
-    // item.snapshot = snapshot;
+    // if the type has changed, we need to fetch a new item
+    // otherwise we can just ignore this and assume the model itself is listening
+    var klass = this.modelClassFromSnapshot(snapshot);
+    var record = item.record;
 
-    // TODO - only do this if polymorphic and the polymorph key has changed
-    // otherwise just update the snapshot
+    if (record && this.get("as")) {
+      record = record.get("content");
+    }
+
+    if (record && record.constructor.typeKey === klass.typeKey) {
+      return;
+    }
+
+    // it's a polymorph whose type has changed, fetch a new item
     var index   = content.indexOf(item),
         newItem = this.itemFromSnapshot(snapshot);
 
