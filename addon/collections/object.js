@@ -5,6 +5,8 @@ import PromiseProxy from './promise';
 var get = Ember.get;
 var set = Ember.set;
 
+// TODO - there's no need for this to be an ArrayProxy, make Collection a mixin instead
+
 export default Collection.extend({
 
   toFirebaseJSON: function() {
@@ -26,17 +28,21 @@ export default Collection.extend({
     snapshot.forEach(function(child) {
       content.push(_this.modelFromSnapshot(child));
     });
+
+    // The observer happens too late for the initial content
+    // so force it to setup right away
+    this.setupParentage(content);
     set(this, "content", content);
   }),
 
   // if we're listening, then our existing children should be too
   listenToFirebase: function() {
-    this.invoke("listenToFirebase");
+    this.get("content").invoke("listenToFirebase");
     return this._super();
   },
 
   stopListeningToFirebase: function() {
-    this.invoke("stopListeningToFirebase");
+    this.get("content").invoke("stopListeningToFirebase");
     return this._super();
   },
 
@@ -54,7 +60,9 @@ export default Collection.extend({
   },
 
   contentChanged: Ember.on("init", Ember.observer("content", function() {
-    this.setupParentage(this);
+    if (this.get("content")) {
+      this.setupParentage(this.get("content"));
+    }
   })),
 
   setupParentage: function(items) {
