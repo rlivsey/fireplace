@@ -8,7 +8,7 @@ module.exports = {
     return this.addBowerPackagesToProject([
       {
         name: 'firebase',
-        target: '^2.1.0'
+        target: '^2.2.4'
       },
       {
         name: 'ember-inflector',
