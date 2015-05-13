@@ -114,7 +114,6 @@ test("fetch returns a promise proxy which resolves when the collection has a val
   promise.then(function(c) {
     assert.equal(c, people, "resolves with itself");
     assert.equal(people.get("length"), 3, "has the items");
-    console.log("resolved");
   }).finally(done);
 });
 
