@@ -2,12 +2,9 @@ import Ember from 'ember';
 
 import Model from '../model/model';
 
-var get        = Ember.get;
-var capitalize = Ember.String.capitalize;
-var underscore = Ember.String.underscore;
-
-// Map#forEach argument order changed - https://github.com/emberjs/data/issues/2323
-var LEGACY_MAP = Ember.Map.prototype.forEach.length === 2;
+const get        = Ember.get;
+const capitalize = Ember.String.capitalize;
+const underscore = Ember.String.underscore;
 
 export default Ember.DataAdapter.extend({
   getFilters() {
@@ -22,11 +19,12 @@ export default Ember.DataAdapter.extend({
   },
 
   columnsForType(type) {
-    var columns = [{ name: 'id', desc: 'Id' }], count = 0, self = this;
-    get(type, 'attributes').forEach(function(meta, name) {
-        if (LEGACY_MAP) { var tmp = name; name = meta; meta = tmp; }
-        if (count++ > self.attributeLimit) { return false; }
-        var desc = capitalize(underscore(name).replace('_', ' '));
+    const columns = [{ name: 'id', desc: 'Id' }];
+    let count = 0;
+
+    get(type, 'attributes').forEach((meta, name) => {
+        if (count++ > this.attributeLimit) { return false; }
+        const desc = capitalize(underscore(name).replace('_', ' '));
         columns.push({ name: name, desc: desc });
     });
     columns.push({name: 'fbPath', desc: 'Firebase Path'});
@@ -38,39 +36,38 @@ export default Ember.DataAdapter.extend({
   },
 
   recordReferenceToString(record) {
-    var ref  = record.buildFirebaseReference(),
-        root = ref.root().toString();
+    const ref  = record.buildFirebaseReference();
+    const root = ref.root().toString();
 
     return ref.toString().slice(root.length);
   },
 
   getRecordColumnValues(record) {
-    var self  = this,
-        count = 0;
+    let count = 0;
 
-    var columnValues = {
+    const columnValues = {
       id: get(record, 'id'),
       fbPath: this.recordReferenceToString(record)
     };
 
-    record.eachAttribute(function(key) {
-      if (count++ > self.attributeLimit) {
+    record.eachAttribute(key => {
+      if (count++ > this.attributeLimit) {
         return false;
       }
-      var value = get(record, key);
+      const value = get(record, key);
       columnValues[key] = value;
     });
+
     return columnValues;
   },
 
   getRecordKeywords(record) {
-    var keywords = Ember.A(), keys = Ember.A(['id']);
-    record.eachAttribute(function(key) {
-      keys.push(key);
-    });
-    keys.forEach(function(key) {
-      keywords.push(get(record, key));
-    });
+    const keywords = Ember.A();
+    const keys = Ember.A(['id']);
+
+    record.eachAttribute(key => keys.push(key) );
+    keys.forEach(key => keywords.push(get(record, key)) );
+
     return keywords;
   },
 
@@ -82,7 +79,7 @@ export default Ember.DataAdapter.extend({
   },
 
   getRecordColor(record) {
-    var color = 'black';
+    let color = 'black';
     if (record.get('isListeningToFirebase')) {
       color = 'green';
     } else if (record.get('isNew')) {
@@ -92,28 +89,24 @@ export default Ember.DataAdapter.extend({
   },
 
   observeRecord(record, recordUpdated) {
-    var releaseMethods = Ember.A(), self = this,
-        keysToObserve = Ember.A(['id', 'isListeningToFirebase', 'isNew']);
+    const releaseMethods = Ember.A();
+    const keysToObserve  = Ember.A(['id', 'isListeningToFirebase', 'isNew']);
 
-    record.eachAttribute(function(key) {
-      keysToObserve.push(key);
-    });
+    record.eachAttribute(key => keysToObserve.push(key) );
 
-    keysToObserve.forEach(function(key) {
-      var handler = function() {
-        recordUpdated(self.wrapRecord(record));
+    keysToObserve.forEach(key => {
+      const handler = function() {
+        recordUpdated(this.wrapRecord(record));
       };
+
       Ember.addObserver(record, key, handler);
-      releaseMethods.push(function() {
+
+      releaseMethods.push(() => {
         Ember.removeObserver(record, key, handler);
       });
     });
 
-    var release = function() {
-      releaseMethods.forEach(function(fn) { fn(); } );
-    };
-
-    return release;
+    return () => releaseMethods.forEach(fn => fn());
   }
 
 });

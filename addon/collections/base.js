@@ -2,9 +2,9 @@ import Ember from 'ember';
 
 import LiveMixin from '../model/live-mixin';
 
-var get           = Ember.get;
-var set           = Ember.set;
-var getProperties = Ember.getProperties;
+const get           = Ember.get;
+const set           = Ember.set;
+const getProperties = Ember.getProperties;
 
 export default Ember.ArrayProxy.extend(LiveMixin, {
   firebaseEvents: ['child_added', 'child_removed', 'child_moved'],
@@ -20,10 +20,10 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
   endAt:   null,
   limit:   null,
 
-  onFirebaseChildAdded:   Ember.required,
-  onFirebaseChildRemoved: Ember.required,
-  onFirebaseChildMoved:   Ember.required,
-  toFirebaseJSON:         Ember.required,
+  onFirebaseChildAdded:   null,
+  onFirebaseChildRemoved: null,
+  onFirebaseChildMoved:   null,
+  toFirebaseJSON:         null,
 
   isNew: Ember.computed("snapshot", function(){
     return !get(this, "snapshot");
@@ -37,39 +37,39 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
 
   buildFirebaseReference() {
     // do we have an explicit reference?
-    var ref = get(this, 'firebaseReference');
+    const ref = get(this, 'firebaseReference');
     if (ref) {
       return ref;
     }
 
     // do we have an explicit path to build from?
-    var path  = get(this, 'firebasePath'),
-        store = get(this, 'store');
+    const path  = get(this, 'firebasePath');
+    const store = get(this, 'store');
 
     if (path) {
-      var rootRef = store.buildFirebaseRootReference();
+      const rootRef = store.buildFirebaseRootReference();
       return rootRef.child(path);
     }
 
     // are we an embedded collection in a relationship?
-    var parent    = get(this, 'parent'),
-        parentKey = get(this, 'parentKey');
+    const parent    = get(this, 'parent');
+    const parentKey = get(this, 'parentKey');
 
     if (parent && parentKey) {
-      var childKey = parent.relationshipKeyFromName(parentKey);
+      const childKey = parent.relationshipKeyFromName(parentKey);
       return parent.buildFirebaseReference().child(childKey);
     }
 
     // otherwise we're a root collection, use the model reference
-    var modelName  = get(this, 'model'),
-        modelClass = store.modelFor(modelName);
+    const modelName  = get(this, 'model');
+    const modelClass = store.modelFor(modelName);
 
     return modelClass.buildFirebaseReference(store);
   },
 
   buildFirebaseQuery() {
-    var reference = this.buildFirebaseReference(),
-        options = getProperties(this, 'startAt', 'endAt', 'limit');
+    let reference = this.buildFirebaseReference();
+    const options = getProperties(this, 'startAt', 'endAt', 'limit');
 
     if (options.startAt) {
       reference = reference.startAt(options.startAt);
@@ -91,8 +91,8 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
   },
 
   modelClassFromSnapshot(snap) {
-    var modelName = get(this, 'model');
-    var baseClass = this.store.modelFor(modelName);
+    const modelName = get(this, 'model');
+    const baseClass = this.store.modelFor(modelName);
     return baseClass.typeFromSnapshot(snap);
   },
 
@@ -109,7 +109,9 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
   insertAfter(prevItemName, item, collection) {
     collection = collection || this;
 
-    var previous, previousIndex;
+    let previous;
+    let previousIndex;
+
     if (prevItemName) {
       previous = collection.findProperty('id', prevItemName);
       if (previous) {

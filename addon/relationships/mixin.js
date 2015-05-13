@@ -1,14 +1,14 @@
 import Ember from 'ember';
 
-var get         = Ember.get;
-var underscore  = Ember.String.underscore;
-var singularize = Ember.String.singularize;
+const get         = Ember.get;
+const underscore  = Ember.String.underscore;
+const singularize = Ember.String.singularize;
 
-export var RelationshipsClassMixin = Ember.Mixin.create({
+export const RelationshipsClassMixin = Ember.Mixin.create({
   relationships: Ember.computed(function() {
-    var map = Ember.Map.create();
+    const map = Ember.Map.create();
 
-    this.eachComputedProperty(function(name, meta) {
+    this.eachComputedProperty((name, meta) => {
       if (meta.isRelationship) {
         meta.name = name;
         meta.key  = keyForRelationship(name, meta);
@@ -21,14 +21,14 @@ export var RelationshipsClassMixin = Ember.Mixin.create({
   }),
 
   relationshipsByKey: Ember.computed(function() {
-    var map = Ember.Map.create(), key;
+    const map = Ember.Map.create();
 
-    this.eachComputedProperty(function(name, meta) {
+    this.eachComputedProperty((name, meta) => {
       if (meta.isRelationship) {
         meta.name = name;
-        meta.key  = key = keyForRelationship(name, meta);
+        meta.key  = keyForRelationship(name, meta);
         meta.type = typeForRelationship(name, meta);
-        map.set(key, meta);
+        map.set(meta.key, meta);
       }
     });
 
@@ -36,17 +36,17 @@ export var RelationshipsClassMixin = Ember.Mixin.create({
   }),
 
   relationshipNameFromKey(key) {
-    var meta = get(this, 'relationshipsByKey').get(key);
+    const meta = get(this, 'relationshipsByKey').get(key);
     return meta && meta.name;
   },
 
   relationshipKeyFromName(name) {
-    var meta = get(this, 'relationships').get(name);
+    const meta = get(this, 'relationships').get(name);
     return meta && meta.key;
   }
 });
 
-export var RelationshipsMixin = Ember.Mixin.create({
+export const RelationshipsMixin = Ember.Mixin.create({
   relationshipNameFromKey(key) {
     return this.constructor.relationshipNameFromKey(key);
   },
@@ -65,7 +65,7 @@ function keyForRelationship(name, meta) {
 }
 
 function typeForRelationship(name, meta) {
-  var type = meta.type;
+  let type = meta.type;
 
   if (!type && meta.kind === 'hasMany') {
     type = singularize(name);

@@ -1,19 +1,19 @@
 import Ember from 'ember';
 
-var set     = Ember.set;
-var get     = Ember.get;
-var resolve = Ember.RSVP.resolve;
+const set     = Ember.set;
+const get     = Ember.get;
+const resolve = Ember.RSVP.resolve;
 
 // reimplemented private method from Ember, but with setting
 // _settingFromFirebase so we can avoid extra saves down the line
 
 function observePromise(proxy, promise) {
-  promise.then(function(value) {
+  promise.then(value => {
     set(proxy, 'isFulfilled', true);
     value._settingFromFirebase = true;
     set(proxy, 'content', value);
     value._settingFromFirebase = false;
-  }, function(reason) {
+  }, reason => {
     set(proxy, 'isRejected', true);
     set(proxy, 'reason', reason);
     // don't re-throw, as we are merely observing
@@ -24,10 +24,10 @@ export default Ember.ObjectProxy.extend(Ember.PromiseProxyMixin, {
 
   // forward on all content's functions where it makes sense to do so
   _setupContentForwarding: Ember.on("init", Ember.observer('content', function() {
-    var obj = get(this, "content");
+    const obj = get(this, "content");
     if (!obj) { return; }
 
-    for (var prop in obj) {
+    for (let prop in obj) {
       if (!this[prop] && typeof obj[prop] === "function") {
         this._forwardToContent(prop);
       }
@@ -35,8 +35,8 @@ export default Ember.ObjectProxy.extend(Ember.PromiseProxyMixin, {
   })),
 
   _forwardToContent(prop) {
-    this[prop] = function() {
-      var content = this.get("content");
+    this[prop] = () => {
+      const content = this.get("content");
       return content[prop].apply(content, arguments);
     };
   },

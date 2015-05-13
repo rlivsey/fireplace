@@ -9,8 +9,8 @@ import Ember from 'ember';
 //     for embedded - include the ID in Firebase
 // key: (type)
 
-var get    = Ember.get;
-var isNone = Ember.isNone;
+const get    = Ember.get;
+const isNone = Ember.isNone;
 
 export default function(type, options) {
   if (arguments.length === 1 && typeof type === "object") {
@@ -26,7 +26,7 @@ export default function(type, options) {
 
   Ember.assert("can't be both detached and embedded", !options.detached || !options.embedded);
 
-  var meta = {
+  const meta = {
     type:           type,
     isRelationship: true,
     kind:           'hasOne',
@@ -35,18 +35,19 @@ export default function(type, options) {
 
   return Ember.computed({
     get(name) {
-      var store    = get(this, "store");
-      var snapshot = get(this, "snapshot");
-      var childSnap;
+      const store    = get(this, "store");
+      const snapshot = get(this, "snapshot");
+
+      let childSnap;
 
       if (!options.detached) {
-        var dataKey = this.relationshipKeyFromName(name);
+        const dataKey = this.relationshipKeyFromName(name);
         childSnap = snapshot.child(dataKey);
         if (!childSnap.val()) { return null; }
       }
 
       if (options.embedded) {
-        var attributes = {
+        const attributes = {
           snapshot:  childSnap,
           parent:    this,
           parentKey: name
@@ -56,7 +57,7 @@ export default function(type, options) {
           attributes.id = childSnap.child("id").val();
         }
 
-        var value = store.createRecord(meta.type, attributes);
+        const value = store.createRecord(meta.type, attributes);
 
         if (get(this, "isListeningToFirebase")) {
           value.listenToFirebase();
@@ -64,8 +65,7 @@ export default function(type, options) {
 
         return value;
       } else {
-        var itemID;
-
+        let itemID;
         if (options.detached) {
           itemID = options.id || get(this, "id");
           if (typeof itemID === "function") {
@@ -76,7 +76,7 @@ export default function(type, options) {
           if (!itemID) { return null; }
         }
 
-        var query = options.query;
+        let query = options.query;
         if (typeof query === "function") {
           query = query.call(this);
         }

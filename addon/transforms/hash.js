@@ -19,11 +19,10 @@ function transformHash(direction, hash, options, container) {
     return hash;
   }
 
-  var transform = container.lookup('transform:'+options.of);
+  const transform = container.lookup('transform:'+options.of);
 
-  var transformed = {};
-  var key;
-  for (key in hash) {
+  const transformed = {};
+  for (let key in hash) {
     transformed[key] = transform[direction](hash[key], options, container);
   }
   return transformed;

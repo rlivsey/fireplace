@@ -2,15 +2,15 @@ import Ember from 'ember';
 import Collection from './base';
 import PromiseProxy from './promise';
 
-var get = Ember.get;
-var set = Ember.set;
+const get = Ember.get;
+const set = Ember.set;
 
 // TODO - there's no need for this to be an ArrayProxy, make Collection a mixin instead
 
 export default Collection.extend({
 
   toFirebaseJSON() {
-    return this.reduce(function(json, item) {
+    return this.reduce((json, item) => {
       json[get(item, 'id')] = item.toFirebaseJSON(true);
       return json;
     }, {});
@@ -21,18 +21,19 @@ export default Collection.extend({
   // but we don't know if we're going to be live or not in the near future
   // so inflate if we have a snapshot
   inflateFromSnapshot: Ember.on("init", function() {
-    var snapshot = get(this, "snapshot");
+    const snapshot = get(this, "snapshot");
     if (!snapshot) { return; }
 
-    var content = Ember.A(), _this = this;
-    snapshot.forEach(function(child) {
-      content.push(_this.modelFromSnapshot(child));
-    });
+    // snapshot doesn't implement map
+
+    const content = [];
+    snapshot.forEach(child => content.push(this.modelFromSnapshot(child) ));
 
     // The observer happens too late for the initial content
     // so force it to setup right away
     this.setupParentage(content);
-    set(this, "content", content);
+
+    set(this, "content", Ember.A(content));
   }),
 
   // if we're listening, then our existing children should be too
@@ -55,7 +56,7 @@ export default Collection.extend({
   // then we know we have all our content because it all comes in
   // the same result
   fetch() {
-    var promise = this.listenToFirebase().then(Ember.K.bind(this));
+    const promise = this.listenToFirebase().then(Ember.K.bind(this));
     return PromiseProxy.create({promise: promise});
   },
 
@@ -66,18 +67,18 @@ export default Collection.extend({
   })),
 
   setupParentage(items) {
-    items.forEach(function(item) {
+    items.forEach((item) => {
       item.setProperties({
         parent:    this,
         parentKey: null
       });
-    }, this);
+    });
   },
 
   modelFromSnapshot(snapshot) {
-    var modelName = this.modelClassFromSnapshot(snapshot);
-    var store     = get(this, 'store');
-    var query     = get(this, 'query') || {};
+    const modelName = this.modelClassFromSnapshot(snapshot);
+    const store     = get(this, 'store');
+    const query     = get(this, 'query') || {};
 
     return store.findInCacheOrCreateRecord(modelName, snapshot.ref(), Ember.merge({
       snapshot: snapshot,
@@ -89,11 +90,11 @@ export default Collection.extend({
   // on replaceContent we can build an ID map and then check that
 
   onFirebaseChildAdded(snapshot, prevItemName) {
-    var id = snapshot.key();
+    const id = snapshot.key();
 
     if (this.findBy('id', id)) { return; }
 
-    var obj = this.modelFromSnapshot(snapshot);
+    const obj = this.modelFromSnapshot(snapshot);
     this.insertAfter(prevItemName, obj);
 
     // this needs to happen after insert, otherwise the parent isn't associated yet
@@ -104,14 +105,14 @@ export default Collection.extend({
   // TODO - should we destroy the item when removed?
   // TODO - should the item be removed from the store's cache?
   onFirebaseChildRemoved(snapshot) {
-    var item = this.findBy('id', snapshot.key());
+    const item = this.findBy('id', snapshot.key());
     if (!item) { return; }
     this.removeObject(item);
     item.stopListeningToFirebase();
   },
 
   onFirebaseChildMoved(snapshot, prevItemName) {
-    var item = this.findBy('id', snapshot.key());
+    const item = this.findBy('id', snapshot.key());
     if (!item) { return; }
 
     this.removeObject(item);

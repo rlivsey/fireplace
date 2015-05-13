@@ -1,5 +1,3 @@
-/* global Firebase */
-
 import Ember from 'ember';
 
 import expandPath from '../utils/expand-path';
@@ -8,14 +6,14 @@ import {
   ModelClassMixin
 } from './model-mixin';
 
-var get        = Ember.get;
-var underscore = Ember.String.underscore;
-var pluralize  = Ember.String.pluralize;
+const get        = Ember.get;
+const underscore = Ember.String.underscore;
+const pluralize  = Ember.String.pluralize;
 
-var Model = Ember.Object.extend(ModelMixin, {
+const Model = Ember.Object.extend(ModelMixin, {
   id: Ember.computed({
     get() {
-      var store = get(this, 'store');
+      const store = get(this, 'store');
       return this.constructor.buildFirebaseRootReference(store).push().key();
     },
     set(key, value) {
@@ -28,20 +26,21 @@ var Model = Ember.Object.extend(ModelMixin, {
   }),
 
   buildFirebaseReference(){
-    var id        = get(this, 'id'),
-        parent    = get(this, 'parent'),
-        parentKey = get(this, 'parentKey'),
-        ref;
+    const id        = get(this, 'id');
+    const parent    = get(this, 'parent');
+    const parentKey = get(this, 'parentKey');
 
     if (parent && parentKey) {
-      var childKey = parent.relationshipKeyFromName(parentKey);
+      const childKey = parent.relationshipKeyFromName(parentKey);
       return parent.buildFirebaseReference().child(childKey);
     }
+
+    let ref;
 
     if (parent) {
       ref = parent.buildFirebaseReference();
     } else {
-      var store = get(this, 'store');
+      const store = get(this, 'store');
       ref = this.constructor.buildFirebaseReference(store, this);
     }
 
@@ -78,7 +77,7 @@ Model.reopenClass(ModelClassMixin, {
   buildFirebaseReference(store, opts) {
     opts = this.firebasePathOptions(opts || {});
 
-    var path = this.firebasePath;
+    let path = this.firebasePath;
     if (typeof path === "function") {
       // so firebase path can do opts.get("...") regardless of being passed hash or model instance
       if (!(opts instanceof Ember.Object)) {
@@ -91,11 +90,11 @@ Model.reopenClass(ModelClassMixin, {
       path = expandPath(path, opts);
     }
 
-    if (path instanceof Firebase) {
+    if (path instanceof window.Firebase) {
       return path;
     }
 
-    var root = this.buildFirebaseRootReference(store);
+    const root = this.buildFirebaseRootReference(store);
     return root.child(path);
   }
 });

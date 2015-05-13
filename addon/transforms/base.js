@@ -14,8 +14,8 @@ export function serialize(obj, value, meta, container) {
 }
 
 export function transform(kind, obj, value, meta, container) {
-  var type    = meta.type;
-  var options = meta.options;
+  const type    = meta.type;
+  const options = meta.options;
 
   if (options[kind]) {
     return options[kind].call(obj, value);
@@ -25,7 +25,7 @@ export function transform(kind, obj, value, meta, container) {
     return value;
   }
 
-  var transformer = container.lookup('transform:'+type);
+  const transformer = container.lookup('transform:'+type);
   if (!transformer) {
     return value;
   }

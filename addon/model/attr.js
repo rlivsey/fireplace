@@ -1,8 +1,8 @@
 import Ember from 'ember';
 import {deserialize} from '../transforms/base';
 
-var get         = Ember.get;
-var isNone      = Ember.isNone;
+const get         = Ember.get;
+const isNone      = Ember.isNone;
 
 export default function(type, options) {
   if (arguments.length === 1 && typeof type === "object") {
@@ -12,7 +12,7 @@ export default function(type, options) {
 
   options = options || {};
 
-  var meta = {
+  const meta = {
     type:        type,
     isAttribute: true,
     options:     options
@@ -20,10 +20,11 @@ export default function(type, options) {
 
   return Ember.computed({
     get(name) {
-      var container = get(this, 'container');
-      var dataKey   = this.attributeKeyFromName(name);
-      var snapshot  = get(this, 'snapshot');
-      var value     = snapshot.child(dataKey).val();
+      const container = get(this, 'container');
+      const dataKey   = this.attributeKeyFromName(name);
+      const snapshot  = get(this, 'snapshot');
+
+      let value = snapshot.child(dataKey).val();
 
       if (isNone(value)) {
         value = getDefaultValue(this, options);

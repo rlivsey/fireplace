@@ -3,8 +3,8 @@ import Collection from './base';
 import MetaModel from '../model/meta-model';
 import PromiseProxy from './promise';
 
-var get = Ember.get;
-var set = Ember.set;
+const get = Ember.get;
+const set = Ember.set;
 
 export default Collection.extend({
 
@@ -13,8 +13,8 @@ export default Collection.extend({
   as: null, // the meta model wrapper to use
 
   toFirebaseJSON() {
-    var value;
-    return this.reduce(function(json, item) {
+    return this.reduce((json, item) => {
+      let value;
       if (item instanceof MetaModel) {
         value = item.toFirebaseJSON(true);
       } else {
@@ -30,30 +30,31 @@ export default Collection.extend({
   // but we don't know if we're going to be live or not in the near future
   // so inflate if we have a snapshot
   inflateFromSnapshot: Ember.on("init", function() {
-    var snapshot = get(this, "snapshot");
+    const snapshot = get(this, "snapshot");
     if (!snapshot) { return; }
 
-    var content = Ember.A(), _this = this;
-    snapshot.forEach(function(child) {
-      content.push(_this.itemFromSnapshot(child));
-    });
-    set(this, "content", content);
+    const content = [];
+
+    // snapshot doesn't implement map
+    snapshot.forEach(child => content.push(this.itemFromSnapshot(child)));
+
+    set(this, "content", Ember.A(content));
   }),
 
   contentChanged: Ember.on("init", Ember.observer("content", function() {
     if (this._updatingContent) { return; }
 
-    var content = get(this, "content");
+    const content = get(this, "content");
     if (!content) { return; }
 
-    var anyTransformed = false;
-    var transformed = content.map(function(item){
+    let anyTransformed = false;
+    const transformed = content.map(item => {
       if (item instanceof Ember.Object) {
         item = this.itemFromRecord(item);
         anyTransformed = true;
       }
       return item;
-    }, this);
+    });
 
     if (anyTransformed) {
       this._updatingContent = true;
@@ -78,7 +79,7 @@ export default Collection.extend({
   },
 
   fetch() {
-    var promise = this.listenToFirebase().
+    const promise = this.listenToFirebase().
       then(this._fetchAll.bind(this)).
       then(Ember.K.bind(this));
 
@@ -86,9 +87,7 @@ export default Collection.extend({
   },
 
   _fetchAll() {
-    return Ember.RSVP.all(get(this, "content").map(function(item, index) {
-      return this.objectAtContentAsPromise(index);
-    }, this));
+    return Ember.RSVP.all(get(this, "content").map((_, index) => this.objectAtContentAsPromise(index) ));
   },
 
   itemFromSnapshot(snapshot) {
@@ -108,7 +107,7 @@ export default Collection.extend({
   },
 
   replaceContent(start, numRemoved, objectsAdded) {
-    objectsAdded = objectsAdded.map(function(object) {
+    objectsAdded = objectsAdded.map(object => {
       if (object instanceof MetaModel) {
         object.set("parent", this);
         return this.itemFromRecord(object);
@@ -117,17 +116,17 @@ export default Collection.extend({
       } else {
         return object;
       }
-    }, this);
+    });
     return this._super(start, numRemoved, objectsAdded);
   },
 
   objectAtContent(idx) {
-    var content = get(this, "content");
+    const content = get(this, "content");
     if (!content || !content.length) {
       return;
     }
 
-    var item = content.objectAt(idx);
+    const item = content.objectAt(idx);
     if (!item) {
       return;
     }
@@ -139,7 +138,7 @@ export default Collection.extend({
 
     item.record = this.findFetchRecordFromItem(item, false);
 
-    item.record.get("promise").then(function(obj) {
+    item.record.get("promise").then(obj => {
       if (item.record instanceof MetaModel) {
         item.record.set("content", obj);
       } else {
@@ -151,12 +150,12 @@ export default Collection.extend({
   },
 
   objectAtContentAsPromise(idx) {
-    var content = get(this, "content");
+    const content = get(this, "content");
     if (!content || !content.length) {
       return Ember.RSVP.reject();
     }
 
-    var item = content.objectAt(idx);
+    const item = content.objectAt(idx);
     if (!item) {
       return Ember.RSVP.reject();
     }
@@ -165,33 +164,30 @@ export default Collection.extend({
     if (item.record) {
       // is the item.record a promise proxy, if so return that
       // so we end up with the actual object
-      var promise = item.record.get("promise");
+      const promise = item.record.get("promise");
       if (promise) {
         return promise;
       }
       return Ember.RSVP.resolve(item.record);
     }
 
-    var recordPromise = this.findFetchRecordFromItem(item, true);
-    return recordPromise.then(function(record) {
+    const recordPromise = this.findFetchRecordFromItem(item, true);
+    return recordPromise.then(record => {
       item.record = record;
-      return item.record;
+      return record;
     });
   },
 
   // TODO - handle findOne failing (permissions / 404)
   findFetchRecordFromItem(item, returnPromise) {
-    var store  = get(this, "store"),
-        query  = get(this, "query"),
-        type   = this.modelClassFromSnapshot(item.snapshot),
-        _this  = this,
-        record;
+    const store  = get(this, "store");
+    const query  = get(this, "query");
+    const type   = this.modelClassFromSnapshot(item.snapshot);
 
+    let record;
     if (returnPromise) {
       record = store.fetchOne(type, item.id, query);
-      return record.then(function(resolved) {
-        return _this.wrapRecordInMetaObjectIfNeccessary(resolved, item.snapshot);
-      });
+      return record.then(resolved => this.wrapRecordInMetaObjectIfNeccessary(resolved, item.snapshot) );
     } else {
       record = store.findOne(type, item.id, query);
       return this.wrapRecordInMetaObjectIfNeccessary(record, item.snapshot);
@@ -199,15 +195,15 @@ export default Collection.extend({
   },
 
   wrapRecordInMetaObjectIfNeccessary(record, snapshot) {
-    var as = get(this, "as");
+    const as = get(this, "as");
     if (!as || record instanceof MetaModel) {
       return record;
     }
 
-    var store    = get(this, "store"),
-        priority = snapshot ? snapshot.getPriority() : null;
+    const store    = get(this, "store");
+    const priority = snapshot ? snapshot.getPriority() : null;
 
-    var meta = store.buildRecord(as, null, {
+    const meta = store.buildRecord(as, null, {
       content:  record,
       priority: priority,
       snapshot: snapshot,
@@ -221,18 +217,18 @@ export default Collection.extend({
   },
 
   onFirebaseChildAdded(snapshot, prevItemName) {
-    var id      = snapshot.key(),
-        content = get(this, "content");
+    const id      = snapshot.key();
+    const content = get(this, "content");
 
     if (content.findBy('id', id)) { return; }
 
-    var item = this.itemFromSnapshot(snapshot);
+    const item = this.itemFromSnapshot(snapshot);
     this.insertAfter(prevItemName, item, content);
   },
 
   onFirebaseChildRemoved(snapshot) {
-    var content = get(this, "content"),
-        item    = content.findBy('id', snapshot.key());
+    const content = get(this, "content");
+    const item    = content.findBy('id', snapshot.key());
 
     if (!item) { return; }
 
@@ -240,8 +236,8 @@ export default Collection.extend({
   },
 
   onFirebaseChildMoved(snapshot, prevItemName) {
-    var content = get(this, "content"),
-        item    = content.findBy('id', snapshot.key());
+    const content = get(this, "content");
+    const item    = content.findBy('id', snapshot.key());
 
     if (!item) { return; }
 
@@ -258,16 +254,16 @@ export default Collection.extend({
   },
 
   onFirebaseChildChanged(snapshot) {
-    var content = get(this, "content"),
-        item    = content.findBy('id', snapshot.key());
+    const content = get(this, "content");
+    const item    = content.findBy('id', snapshot.key());
 
     if (!item) { return; }
 
     // if the type has changed, we need to fetch a new item
     // otherwise we can just ignore this and assume the model itself is listening
-    var klass = this.modelClassFromSnapshot(snapshot);
-    var record = item.record;
+    const klass = this.modelClassFromSnapshot(snapshot);
 
+    let record = item.record;
     if (record && this.get("as")) {
       record = record.get("content");
     }
@@ -277,8 +273,8 @@ export default Collection.extend({
     }
 
     // it's a polymorph whose type has changed, fetch a new item
-    var index   = content.indexOf(item),
-        newItem = this.itemFromSnapshot(snapshot);
+    const index   = content.indexOf(item);
+    const newItem = this.itemFromSnapshot(snapshot);
 
     content.replace(index, 1, [newItem]);
   }

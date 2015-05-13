@@ -1,8 +1,8 @@
 import Ember from 'ember';
 
-var get      = Ember.get;
-var set      = Ember.set;
-var classify = Ember.String.classify;
+const get      = Ember.get;
+const set      = Ember.set;
+const classify = Ember.String.classify;
 
 export default Ember.Mixin.create(Ember.Evented, {
   isListeningToFirebase:  false,
@@ -55,51 +55,44 @@ export default Ember.Mixin.create(Ember.Evented, {
     // ensure value is listened to last, this doesn't matter for Firebase
     // as child_added is called before value, but in MockFirebase it appears
     // that the events are triggered in the order they are setup
-    var events = get(this, 'firebaseEvents').slice().reverse();
+    const events = get(this, 'firebaseEvents').slice().reverse();
 
-    var ref    = this.buildFirebaseQuery();
-    var _this  = this;
+    const ref = this.buildFirebaseQuery();
 
-    var handler;
-    var errHandler;
-
-    var promise = this._listenPromise = new Ember.RSVP.Promise(function(resolve, reject) {
-      _this.one("firebaseValue",      resolve);
-      _this.one("firebaseValueError", reject);
-    }, "FP: Value "+ref.toString()).catch(function(e) {
-      set(_this, 'isListeningToFirebase', false);
+    const promise = this._listenPromise = new Ember.RSVP.Promise((resolve, reject) => {
+      this.one("firebaseValue",      resolve);
+      this.one("firebaseValueError", reject);
+    }, "FP: Value "+ref.toString()).catch(e => {
+      set(this, 'isListeningToFirebase', false);
       return Ember.RSVP.reject(e);
-    }).finally(function() {
-      _this._listenPromise = null;
+    }).finally(() => {
+      this._listenPromise = null;
     });
 
-    events.forEach(function(eventName) {
-      handler    = this.buildHandler(eventName);
-      errHandler = this.buildErrorHandler(eventName);
+    events.forEach(eventName => {
+      const handler    = this.buildHandler(eventName);
+      const errHandler = this.buildErrorHandler(eventName);
 
       this._fbEventHandlers[eventName] = handler;
       ref.on(eventName, handler, errHandler, this);
-    }, this);
+    });
 
     return promise;
   },
 
   buildErrorHandler(eventName) {
-    var triggerName = 'firebase' + classify(eventName) + "Error";
-    return function(e) {
-      this.trigger(triggerName, e);
-    };
+    const triggerName = 'firebase' + classify(eventName) + "Error";
+    return e => this.trigger(triggerName, e);
   },
 
   buildHandler(eventName) {
-    var classyName  = classify(eventName);
-    var handlerName = 'onFirebase' + classyName;
-    var triggerName = 'firebase'   + classyName;
-    var store       = this.store;
+    const classyName  = classify(eventName);
+    const handlerName = 'onFirebase' + classyName;
+    const triggerName = 'firebase'   + classyName;
+    const store       = this.store;
 
-    return function() {
-      var args = arguments;
-      store.enqueueEvent(function(){
+    return (...args) => {
+      store.enqueueEvent(() => {
 
         // if the we have been destroyed since the event came in, then
         // don't bother trying to update - destroying stops listening to firebase
@@ -107,9 +100,10 @@ export default Ember.Mixin.create(Ember.Evented, {
         if (this.isDestroying || this.isDestroyed) {
           return;
         }
+
         this.trigger(triggerName, args);
         this[handlerName].apply(this, args);
-      }, this);
+      });
     };
   },
 
@@ -122,11 +116,10 @@ export default Ember.Mixin.create(Ember.Evented, {
 
     set(this, 'isListeningToFirebase', false);
 
-    var ref = this.buildFirebaseQuery();
+    const ref = this.buildFirebaseQuery();
 
-    var eventName, handler;
-    for (eventName in this._fbEventHandlers) {
-      handler = this._fbEventHandlers[eventName];
+    for (let eventName in this._fbEventHandlers) {
+      const handler = this._fbEventHandlers[eventName];
       ref.off(eventName, handler, this);
     }
 

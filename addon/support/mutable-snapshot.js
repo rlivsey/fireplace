@@ -1,4 +1,4 @@
-var MutableSnapshot = function(snapshot) {
+const MutableSnapshot = function(snapshot) {
   this.snapshot = snapshot;
   this.children = {};
 };
@@ -41,7 +41,7 @@ MutableSnapshot.prototype.setChild = function(key, snapshot) {
 };
 
 MutableSnapshot.prototype.child = function(key) {
-  var childSnapshot;
+  let childSnapshot;
   if (this.children.hasOwnProperty(key)) {
     childSnapshot = this.children[key];
   } else if (this.snapshot) {

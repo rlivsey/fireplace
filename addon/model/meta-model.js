@@ -4,11 +4,11 @@ import {
   ModelClassMixin
 } from './model-mixin';
 
-var get    = Ember.get;
-var isNone = Ember.isNone;
+const get    = Ember.get;
+const isNone = Ember.isNone;
 
 
-var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
+const MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
   id:        Ember.computed.alias('content.id'),
   priority:  null,
   parent:    null,
@@ -18,8 +18,8 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
   // if attributes are defined then you can't also have a meta value
   meta: Ember.computed("snapshot", {
     get() {
-      var attributes    = get(this.constructor, 'attributes');
-      var relationships = get(this.constructor, 'relationships');
+      const attributes    = get(this.constructor, 'attributes');
+      const relationships = get(this.constructor, 'relationships');
 
       if (attributes.size || relationships.size) {
         return null;
@@ -28,8 +28,8 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
       return get(this, "snapshot").val();
     },
     set(key, value) {
-      var attributes    = get(this.constructor, 'attributes');
-      var relationships = get(this.constructor, 'relationships');
+      const attributes    = get(this.constructor, 'attributes');
+      const relationships = get(this.constructor, 'relationships');
 
       if (attributes.size || relationships.size) {
         return null;
@@ -40,8 +40,8 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
   }),
 
   buildFirebaseReference(){
-    var id        = get(this, 'id'),
-        parent    = get(this, 'parent');
+    const id        = get(this, 'id');
+    const parent    = get(this, 'parent');
 
     Ember.assert("meta models must belong to a parent in order to generate a Firebase reference", !!parent);
 
@@ -49,11 +49,11 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
   },
 
   toFirebaseJSON(includePriority) {
-    var attributes    = get(this.constructor, 'attributes'),
-        relationships = get(this.constructor, 'relationships');
+    const attributes    = get(this.constructor, 'attributes');
+    const relationships = get(this.constructor, 'relationships');
 
     if (attributes.size || relationships.size) {
-      var attrJSON = this._super(includePriority);
+      const attrJSON = this._super(includePriority);
 
       // if attributes are null, then we'll get an empty object back
       // we don't want to save this as that'll be treated as deleting the meta model!
@@ -62,7 +62,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
       }
     }
 
-    var meta = get(this, "meta");
+    let meta = get(this, "meta");
     if (isNone(meta)) {
       meta = true;
     }
@@ -79,13 +79,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
   },
 
   changeCameFromFirebase: Ember.computed(function() {
-    if (!!this._settingFromFirebase) {
-      return true;
-    } else if (get(this, "content.changeCameFromFirebase")) {
-      return true;
-    } else {
-      return false;
-    }
+    return !!this._settingFromFirebase || get(this, "content.changeCameFromFirebase");
   }).volatile()
 
 });

@@ -263,6 +263,8 @@ module("IndexedCollection - finding items", {
 });
 
 test("fetches associated item by the ID", function(assert) {
+  var done = assert.async();
+
   firebase.child("people").set({
     tom:   {name: "Tom"},
     dick:  {name: "Dick"},
@@ -278,9 +280,10 @@ test("fetches associated item by the ID", function(assert) {
     ])
   });
 
-  var person = people.objectAt(0);
-
-  assert.equal(person.get("name"), "Tom");
+  // will be a promise model, wait to resolve
+  people.objectAt(0).then(person => {
+    assert.equal(person.get("name"), "Tom");
+  }).finally(done);
 });
 
 

@@ -1,17 +1,13 @@
-/* global Firebase */
-
 import Ember from 'ember';
 
 import EventQueue   from './support/event-queue';
 import PromiseModel from './model/promise-model';
 import MetaModel    from './model/meta-model';
 
-var singularize = Ember.String.singularize;
-
-var get     = Ember.get;
-var guidFor = Ember.guidFor;
-
-var camelize = Ember.String.camelize;
+const get         = Ember.get;
+const guidFor     = Ember.guidFor;
+const camelize    = Ember.String.camelize;
+const singularize = Ember.String.singularize;
 
 export default Ember.Object.extend({
 
@@ -39,36 +35,35 @@ export default Ember.Object.extend({
   },
 
   buildFirebaseRootReference(){
-    var url = get(this, 'firebaseRoot');
+    const url = get(this, 'firebaseRoot');
     Ember.assert("Your store needs a firebaseRoot", !!url);
-    if (url instanceof Firebase) {
+    if (url instanceof window.Firebase) {
       return url;
     }
-    return new Firebase(url);
+    return new window.Firebase(url);
   },
 
   createRecord(type, attributes) {
     attributes = attributes || {};
-    var record = this.buildRecord(type, attributes.id, attributes);
+    const record = this.buildRecord(type, attributes.id, attributes);
     this.storeInCache(type, record);
     return record;
   },
 
   saveCollection(collection) {
-    var json  = collection.toFirebaseJSON();
-    var ref   = collection.buildFirebaseReference();
-    var _this = this;
+    const json  = collection.toFirebaseJSON();
+    const ref   = collection.buildFirebaseReference();
 
-    var limit = collection.get("limit");
-    var start = collection.get("startAt");
-    var end   = collection.get("endAt");
+    const limit = collection.get("limit");
+    const start = collection.get("startAt");
+    const end   = collection.get("endAt");
 
     // if the collection is built from a query as you'll nuke any data not matched
     Ember.assert("Saving a collection which is the result of a query could lose data", !limit && !start && !end);
 
-    return new Ember.RSVP.Promise(function(resolve, reject){
-      var callback = function(error) {
-        _this.enqueueEvent(function(){
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      const callback = error => {
+        this.enqueueEvent(() => {
           if (error) {
             reject(error);
           } else {
@@ -82,23 +77,22 @@ export default Ember.Object.extend({
   },
 
   saveRecord(record, attr) {
-    var ref      = record.buildFirebaseReference();
-    var priority = get(record, 'priority');
-    var json     = record.toFirebaseJSON();
-    var _this    = this;
+    const ref      = record.buildFirebaseReference();
+    const priority = get(record, 'priority');
+    const json     = record.toFirebaseJSON();
 
     record.trigger("save");
 
-    return new Ember.RSVP.Promise(function(resolve, reject){
-      var callback = function(error) {
-        _this.enqueueEvent(function(){
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      const callback = (error) => {
+        this.enqueueEvent(() => {
           if (error) {
             reject(error);
           } else if (get(record, "isDeleted") || get(record, "isDeleting")) { // it was deleted in the time it took to save
             reject("the record has since been deleted");
           } else {
             if (!attr) {
-              _this.storeInCache(record.constructor, record);
+              this.storeInCache(record.constructor, record);
             }
             record.listenToFirebase();
             resolve(record);
@@ -109,11 +103,11 @@ export default Ember.Object.extend({
 
       if (attr) {
         if (attr !== 'priority') {
-          var key = record.attributeKeyFromName(attr) || record.relationshipKeyFromName(attr);
+          const key = record.attributeKeyFromName(attr) || record.relationshipKeyFromName(attr);
 
           Ember.assert(Ember.inspect(record) +" has no attribute "+ attr, !!key);
 
-          var value = json[key];
+          const value = json[key];
           if (value) {
             ref.child(key).set(value, callback);
           } else {
@@ -133,9 +127,8 @@ export default Ember.Object.extend({
   },
 
   deleteRecord(record) {
-    var ref         = record.buildFirebaseReference(),
-        _this       = this,
-        isListening = get(record, "isListeningToFirebase");
+    const ref         = record.buildFirebaseReference();
+    const isListening = get(record, "isListeningToFirebase");
 
     record.trigger("delete");
 
@@ -143,9 +136,9 @@ export default Ember.Object.extend({
       record.stopListeningToFirebase();
     }
 
-    return new Ember.RSVP.Promise(function(resolve, reject){
-      ref.remove(function(error) {
-        _this.enqueueEvent(function(){
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      ref.remove(error => {
+        this.enqueueEvent(() => {
           if (error) {
             if (isListening) { // the delete failed, start listening to changes again
               record.listenToFirebase();
@@ -205,8 +198,8 @@ export default Ember.Object.extend({
   },
 
   findFetchQuery(type, query, options, returnPromise) {
+    query   = query || {};
     options = options || {};
-    query   = query   || {};
 
     // switch order if query is the options
     if (query.startAt || query.endAt || query.limit || query.path || query.collection) {
@@ -214,9 +207,9 @@ export default Ember.Object.extend({
       query   = {};
     }
 
-    var model = this.modelFor(type),
-        reference;
+    const model = this.modelFor(type);
 
+    let reference;
     if (options.path) {
       reference = model.buildFirebaseRootReference(this).child(options.path);
     } else {
@@ -229,31 +222,27 @@ export default Ember.Object.extend({
   findFetchOne(type, id, query, returnPromise) {
     query = query || {};
 
-    var record   = this.buildRecord(type, id, query),
-        ref      = record.buildFirebaseReference(),
-        existing = this.findInCacheByReference(type, ref),
-        promise;
+    const placeholder = this.buildRecord(type, id, query);
+    const ref         = placeholder.buildFirebaseReference();
+    const existing    = this.findInCacheByReference(type, ref);
+
+    let promise;
 
     if (existing) {
       existing.listenToFirebase();
       promise = Ember.RSVP.resolve(existing);
-      return returnPromise ? promise : PromiseModel.create({content: existing, promise: promise});
+      return returnPromise ? promise : PromiseModel.create({ promise, content: existing });
     }
 
-    var _this = this;
-
-    promise = new Ember.RSVP.Promise(function(resolve, reject){
-      ref.once('value', function(snapshot){
-        _this.enqueueEvent(function(){
-          var value = snapshot.val();
+    promise = new Ember.RSVP.Promise((resolve, reject) => {
+      ref.once('value', (snapshot) => {
+        this.enqueueEvent(() => {
+          const value = snapshot.val();
           if (value) {
 
             // for polymorhism
-            var modelType = _this.modelFor(type).typeFromSnapshot(snapshot);
-            record = _this.createRecord(modelType, Ember.merge(query, {
-              id: id,
-              snapshot: snapshot
-            }));
+            const modelType = this.modelFor(type).typeFromSnapshot(snapshot);
+            const record = this.createRecord(modelType, Ember.merge(query, { id, snapshot }));
 
             record.listenToFirebase();
             resolve(record);
@@ -261,20 +250,20 @@ export default Ember.Object.extend({
             reject('not found');
           }
         });
-      }, function(){
+      }, () => {
         reject('permission denied');
       });
     }, "FP: Find one "+ref.toString());
 
-    return returnPromise ? promise : PromiseModel.create({promise: promise, content: record});
+    return returnPromise ? promise : PromiseModel.create({ promise, content: placeholder });
   },
 
   findFetchCollectionByReference(model, ref, query, options, returnPromise) {
-    var container = get(this, 'container');
-    var type      = options.collection || "object";
-    var factory   = container.lookupFactory("collection:"+type);
+    const container = get(this, 'container');
+    const type      = options.collection || "object";
+    const factory   = container.lookupFactory("collection:"+type);
 
-    var collection = factory.create({
+    const collection = factory.create({
       store: this,
       model: model,
       query: query,
@@ -293,7 +282,7 @@ export default Ember.Object.extend({
   },
 
   modelFor(type) {
-    var factory;
+    let factory;
 
     if (typeof type === 'string') {
       factory = get(this, 'container').lookupFactory('model:' + type);
@@ -309,11 +298,10 @@ export default Ember.Object.extend({
   },
 
   buildRecord(type, id, attributes) {
-    var container = get(this, "container"),
-        factory   = this.modelFor(type),
-        record;
+    const container = get(this, "container");
+    const factory   = this.modelFor(type);
 
-    record = factory.create({
+    const record = factory.create({
       store:     this,
       container: container
     });
@@ -334,16 +322,16 @@ export default Ember.Object.extend({
   },
 
   cacheForType(type) {
-    var model = this.modelFor(type),
-        guid  = guidFor(model),
-        cache = this.cache[guid];
+    const model    = this.modelFor(type);
+    const guid     = guidFor(model);
+    const existing = this.cache[guid];
 
-    if (cache) {
-      return cache;
+    if (existing) {
+      return existing;
     }
 
-    cache = {
-      records:  {}
+    const cache = {
+      records: {}
     };
 
     this.cache[guid] = cache;
@@ -357,27 +345,27 @@ export default Ember.Object.extend({
       return;
     }
 
-    var cache = this.cacheForType(type),
-        ref   = record.buildFirebaseReference().toString();
+    const cache = this.cacheForType(type);
+    const ref   = record.buildFirebaseReference().toString();
 
     cache.records[ref] = record;
   },
 
   // when record is destroyed, remove it from the cache etc...
   teardownRecord(record) {
-    var cache = this.cacheForType(record.constructor),
-        ref   = record.buildFirebaseReference().toString();
+    const cache = this.cacheForType(record.constructor);
+    const ref   = record.buildFirebaseReference().toString();
 
     delete cache.records[ref];
   },
 
   findInCacheByReference(type, reference) {
-    var cache = this.cacheForType(type);
+    const cache = this.cacheForType(type);
     return cache.records[reference.toString()];
   },
 
   findInCacheOrCreateRecord(type, reference, attributes) {
-    var record = this.findInCacheByReference(type, reference);
+    const record = this.findInCacheByReference(type, reference);
     if (record) {
       return record;
     } else {
@@ -387,12 +375,11 @@ export default Ember.Object.extend({
   },
 
   all(type) {
-    var cache   = this.cacheForType(type),
-        records = cache.records,
-        all     = Ember.A(),
-        reference;
+    const cache   = this.cacheForType(type);
+    const records = cache.records;
+    const all     = Ember.A();
 
-    for (reference in records) {
+    for (let reference in records) {
       all.push(records[reference]);
     }
 

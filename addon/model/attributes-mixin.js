@@ -1,16 +1,13 @@
 import Ember from 'ember';
 
-var get        = Ember.get;
-var underscore = Ember.String.underscore;
+const get        = Ember.get;
+const underscore = Ember.String.underscore;
 
-// Map#forEach argument order changed - https://github.com/emberjs/data/issues/2323
-var LEGACY_MAP = Ember.Map.prototype.forEach.length === 2;
-
-export var AttributesClassMixin = Ember.Mixin.create({
+export const AttributesClassMixin = Ember.Mixin.create({
   attributes: Ember.computed(function() {
-    var map = Ember.Map.create();
+    const map = Ember.Map.create();
 
-    this.eachComputedProperty(function(name, meta) {
+    this.eachComputedProperty((name, meta) => {
       if (meta.isAttribute) {
         meta.name = name;
         meta.key  = keyForAttribute(name, meta);
@@ -22,13 +19,13 @@ export var AttributesClassMixin = Ember.Mixin.create({
   }),
 
   attributesByKey: Ember.computed(function(){
-    var map = Ember.Map.create(), key;
+    const map = Ember.Map.create();
 
-    this.eachComputedProperty(function(name, meta) {
+    this.eachComputedProperty((name, meta) => {
       if (meta.isAttribute) {
         meta.name = name;
-        meta.key  = key = keyForAttribute(name, meta);
-        map.set(key, meta);
+        meta.key  = keyForAttribute(name, meta);
+        map.set(meta.key, meta);
       }
     });
 
@@ -36,24 +33,23 @@ export var AttributesClassMixin = Ember.Mixin.create({
   }),
 
   eachAttribute(callback, binding) {
-    get(this, 'attributes').forEach(function(meta, name) {
-      if (LEGACY_MAP) { var tmp = name; name = meta; meta = tmp; }
+    get(this, 'attributes').forEach((meta, name) => {
       callback.call(binding, name, meta);
-    }, binding);
+    });
   },
 
   attributeNameFromKey(key) {
-    var meta = get(this, 'attributesByKey').get(key);
+    const meta = get(this, 'attributesByKey').get(key);
     return meta && meta.name;
   },
 
   attributeKeyFromName(name) {
-    var meta = get(this, 'attributes').get(name);
+    const meta = get(this, 'attributes').get(name);
     return meta && meta.key;
   }
 });
 
-export var AttributesMixin = Ember.Mixin.create({
+export const AttributesMixin = Ember.Mixin.create({
   eachAttribute(callback, binding) {
     this.constructor.eachAttribute(callback, binding);
   },

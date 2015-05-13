@@ -13,24 +13,19 @@ import {
   RelationshipsMixin
 } from '../relationships/mixin';
 
-// Map#forEach argument order changed - https://github.com/emberjs/data/issues/2323
-var LEGACY_MAP = Ember.Map.prototype.forEach.length === 2;
+const get       = Ember.get;
+const set       = Ember.set;
+const cacheFor  = Ember.cacheFor;
+const isNone    = Ember.isNone;
 
-var get       = Ember.get;
-var set       = Ember.set;
-var cacheFor  = Ember.cacheFor;
-var isNone    = Ember.isNone;
+export const ModelClassMixin = Ember.Mixin.create(AttributesClassMixin, RelationshipsClassMixin);
 
-export var ModelClassMixin = Ember.Mixin.create(AttributesClassMixin, RelationshipsClassMixin);
-
-export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, RelationshipsMixin, Ember.Evented, {
+export const ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, RelationshipsMixin, Ember.Evented, {
   firebaseEvents: ['child_added', 'child_removed', 'child_changed'],
 
   store: null,
 
-  isNew: Ember.computed("_snapshot", function(){
-    return !get(this, "_snapshot");
-  }),
+  isNew: Ember.computed.not("_snapshot"),
 
   // the actual Firebase::Snapshot, can be null if new record
   _snapshot: null,
@@ -38,7 +33,7 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
   // wrapped MutableSnapshot, will never be null
   snapshot: Ember.computed("_snapshot", {
     get() {
-      var snapshot = get(this, "_snapshot");
+      const snapshot = get(this, "_snapshot");
       return new MutableSnapshot(snapshot);
     },
     set(key, value) {
@@ -51,11 +46,11 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
   }),
 
   willDestroy() {
-    var store = get(this, "store");
+    const store = get(this, "store");
     store.teardownRecord(this);
 
-    var parent = get(this, "parent"),
-        parentKey = get(this, "parentKey");
+    const parent = get(this, "parent");
+    const parentKey = get(this, "parentKey");
 
     // TODO - remove this knowledge from here
     // Ember data does this with registered collections etc...
@@ -71,39 +66,35 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
   },
 
   eachActiveRelation(cb) {
-    var item;
-    get(this.constructor, 'relationships').forEach(function(name/*, meta */) {
-      item = cacheFor(this, name);
+    get(this.constructor, 'relationships').forEach(name => {
+      const item = cacheFor(this, name);
       if (item) { cb(item); }
-    }, this);
+    });
   },
 
   listenToFirebase() {
     if (!get(this, 'isListeningToFirebase')) {
-      this.eachActiveRelation(function(item) {
-        item.listenToFirebase();
-      });
+      this.eachActiveRelation(item => item.listenToFirebase() );
     }
     return this._super();
   },
 
   stopListeningToFirebase() {
     if (get(this, 'isListeningToFirebase')) {
-      this.eachActiveRelation(function(item) {
-        item.stopListeningToFirebase();
-      });
+      this.eachActiveRelation(item => item.stopListeningToFirebase() );
     }
     return this._super();
   },
 
   setAttributeFromSnapshot(snapshot, valueRemoved) {
-    var key       = snapshot.key();
-    var attribute = this.attributeNameFromKey(key);
+    const key       = snapshot.key();
+    const attribute = this.attributeNameFromKey(key);
     if (!attribute) { return; }
 
-    var current     = get(this, "snapshot"),
-        currentData = current.child(key).val(),
-        newVal;
+    const current     = get(this, "snapshot");
+    const currentData = current.child(key).val();
+
+    let newVal;
 
     // child_removed sends the old value back in the snapshot
     if (valueRemoved) {
@@ -121,14 +112,12 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
 
     current.setChild(key, snapshot);
 
-    this.settingFromFirebase(function(){
-      this.notifyPropertyChange(attribute);
-    });
+    this.settingFromFirebase(() => this.notifyPropertyChange(attribute) );
   },
 
   notifyRelationshipOfChange(snapshot, valueRemoved) {
-    var key       = snapshot.key();
-    var attribute = this.relationshipNameFromKey(key);
+    const key       = snapshot.key();
+    const attribute = this.relationshipNameFromKey(key);
 
     if (!attribute) { return; }
 
@@ -139,11 +128,9 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
 
     get(this, "snapshot").setChild(key, snapshot);
 
-    var meta = this.constructor.metaForProperty(attribute);
+    const meta = this.constructor.metaForProperty(attribute);
     if (meta.kind === "hasOne") {
-      this.settingFromFirebase(function(){
-        this.notifyPropertyChange(attribute);
-      });
+      this.settingFromFirebase(() => this.notifyPropertyChange(attribute) );
     }
   },
 
@@ -185,34 +172,31 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
   },
 
   toFirebaseJSON(includePriority) {
-    var attributes    = get(this.constructor, 'attributes'),
-        relationships = get(this.constructor, 'relationships'),
-        container     = get(this, "container"),
-        snapshot      = get(this, "_snapshot"),
-        json          = {},
-        key, value, item;
+    const attributes    = get(this.constructor, 'attributes');
+    const relationships = get(this.constructor, 'relationships');
+    const container     = get(this, "container");
+    const snapshot      = get(this, "_snapshot");
+    const json          = {};
 
-    attributes.forEach(function(meta, name) {
-      if (LEGACY_MAP) { var tmp = name; name = meta; meta = tmp; }
-
-      value = get(this, name);
+    attributes.forEach((meta, name) => {
+      const value = get(this, name);
       // Firebase doesn't like null values, so remove them
       if (isNone(value)) { return; }
 
       json[this.attributeKeyFromName(name)] = serialize(this, value, meta, container);
-    }, this);
+    });
 
-    relationships.forEach(function(meta, name) {
-      if (LEGACY_MAP) { var tmp = name; name = meta; meta = tmp; }
-
+    relationships.forEach((meta, name) => {
       // we don't serialize detached relationships
       if (meta.options.detached) { return; }
 
-      key = this.relationshipKeyFromName(name);
+      const key = this.relationshipKeyFromName(name);
 
       // if we haven't loaded the relationship yet, get the data from the snapshot
       // no point materializing something we already know the data of
-      item = cacheFor(this, name);
+      const item = cacheFor(this, name);
+
+      let value;
 
       if (item === undefined && snapshot) {
         value = snapshot.child(key).exportVal();
@@ -237,13 +221,13 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
       }
 
       json[key] = value;
-    }, this);
+    });
 
     return includePriority ? this.wrapValueAndPriority(json) : json;
   },
 
   wrapValueAndPriority(json) {
-    var priority = get(this, 'priority');
+    const priority = get(this, 'priority');
     if (isNone(priority)) {
       return json;
     }

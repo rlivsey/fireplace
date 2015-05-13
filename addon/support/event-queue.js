@@ -2,7 +2,7 @@
 
 import Ember from 'ember';
 
-var EventQueue = function() {
+const EventQueue = function() {
   this.pending = [];
 };
 
@@ -16,19 +16,16 @@ EventQueue.prototype = {
       this.running = true;
       // TODO - running in the next runloop breaks the tests
       // how to solve this without this hack?
-      console.log("testing", Ember.testing);
-      var run = Ember.testing ? Ember.run : Ember.run.next;
+      const run = Ember.testing ? Ember.run : Ember.run.next;
       run(this, this.flush);
     }
   },
 
   flush() {
-    var batch;
-
     // if a batch queues items itself we want to make sure we run those too
     // otherwise they'll be ignored
     while (this.pending.length) {
-      batch = this.pending;
+      let batch = this.pending;
       this.pending = [];
       this.runBatch(batch);
     }
@@ -37,12 +34,9 @@ EventQueue.prototype = {
   },
 
   runBatch(batch) {
-    var context;
-    var fn;
-
-    batch.forEach(function(item){
-      fn      = item[0];
-      context = item[1];
+    batch.forEach(item => {
+      const fn      = item[0];
+      const context = item[1];
       fn.call(context);
     });
   }

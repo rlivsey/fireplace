@@ -11,8 +11,8 @@ import expandPath from '../utils/expand-path';
 // startAt/endAt/limit for filtering
 // key: (type)
 
-var get    = Ember.get;
-var isNone = Ember.isNone;
+const get    = Ember.get;
+const isNone = Ember.isNone;
 
 export default function(type, options) {
   if (arguments.length === 1 && typeof type === "object") {
@@ -26,7 +26,7 @@ export default function(type, options) {
     options.embedded = true;
   }
 
-  var meta = {
+  const meta = {
     type:           type,
     isRelationship: true,
     kind:           'hasMany',
@@ -35,7 +35,7 @@ export default function(type, options) {
 
   return Ember.computed({
     get(key) {
-      var collection = buildCollection(this, key, meta.type, false, options);
+      const collection = buildCollection(this, key, meta.type, false, options);
       if (get(this, "isListeningToFirebase")) {
         collection.listenToFirebase();
       }
@@ -56,11 +56,12 @@ export default function(type, options) {
 // TODO - update the old one if there is one hanging around
 // TODO - use store.findQuery for this
 function buildCollection(model, name, type, isSetter, options, attrs) {
-  var store          = get(model, "store");
-  var container      = get(model, "container");
-  var collectionName = options.collection || (options.embedded ? "object" : "indexed");
-  var collectionType = container.lookupFactory("collection:"+collectionName);
-  var query          = options.query;
+  const store          = get(model, "store");
+  const container      = get(model, "container");
+  const collectionName = options.collection || (options.embedded ? "object" : "indexed");
+  const collectionType = container.lookupFactory("collection:"+collectionName);
+
+  let query = options.query;
 
   Ember.assert("Collection type must exist: "+collectionName, !!collectionType);
 
@@ -68,7 +69,7 @@ function buildCollection(model, name, type, isSetter, options, attrs) {
     query = query.call(model);
   }
 
-  var collectionOpts = Ember.$.extend({}, attrs || {}, {
+  const collectionOpts = Ember.$.extend({}, attrs || {}, {
     store:     store,
     model:     type,
     query:     query,
@@ -85,19 +86,20 @@ function buildCollection(model, name, type, isSetter, options, attrs) {
     collectionOpts.parentKey = name;
 
     if (!isSetter) {
-      var dataKey   = model.relationshipKeyFromName(name);
-      var snapshot  = get(model, "snapshot");
+      const dataKey   = model.relationshipKeyFromName(name);
+      const snapshot  = get(model, "snapshot");
 
       // collections use an actual snapshot, not a MutableSnapshot
       // TODO - should be able to pass the mutable one?
       collectionOpts.snapshot = snapshot.child(dataKey).snapshot;
     }
   } else {
-    var modelClass = store.modelFor(type),
-        reference;
+    const modelClass = store.modelFor(type);
+
+    let reference;
 
     if (options.path) {
-      var path = options.path;
+      let path = options.path;
       if (typeof path === "function") {
         path = path.call(model);
       } else {
@@ -107,6 +109,7 @@ function buildCollection(model, name, type, isSetter, options, attrs) {
     } else {
       reference = modelClass.buildFirebaseReference(store, query);
     }
+
     collectionOpts.firebaseReference = reference;
   }
 
