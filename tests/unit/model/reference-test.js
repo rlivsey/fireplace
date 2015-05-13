@@ -1,34 +1,38 @@
 import Ember from 'ember';
 
+import {module, test} from 'qunit';
+
 import Store from 'fireplace/store';
 import Model from 'fireplace/model/model';
 
 var get = Ember.get;
 
+var Firebase = window.Firebase;
+
 var store;
 module("Store - buildFirebaseReference");
 
-test("firebaseRoot can be a String", function() {
+test("firebaseRoot can be a String", function(assert) {
   store = Store.create({firebaseRoot: "https://foobar.firebaseio.com"});
 
   var ref = store.buildFirebaseRootReference();
-  ok(ref instanceof Firebase, "reference should be instance of Firebase");
-  equal(ref.toString(), "https://foobar.firebaseio.com", "reference should point to the right place");
+  assert.ok(ref instanceof Firebase, "reference should be instance of Firebase");
+  assert.equal(ref.toString(), "https://foobar.firebaseio.com", "reference should point to the right place");
 });
 
-test("firebaseRoot can be a Firebase object", function() {
+test("firebaseRoot can be a Firebase object", function(assert) {
   store = Store.create({firebaseRoot: new Firebase("https://foobar.firebaseio.com/some/path")});
 
   var ref = store.buildFirebaseRootReference();
-  ok(ref instanceof Firebase, "reference should be instance of Firebase");
-  equal(ref.toString(), "https://foobar.firebaseio.com/some/path", "reference should point to the right place");
+  assert.ok(ref instanceof Firebase, "reference should be instance of Firebase");
+  assert.equal(ref.toString(), "https://foobar.firebaseio.com/some/path", "reference should point to the right place");
 });
 
 var rootRef = "https://foobar.firebaseio.com";
 var Person;
 
 module("Model - class buildFirebaseReference", {
-  setup: function() {
+  beforeEach: function() {
     store = Store.create({
       firebaseRoot: rootRef
     });
@@ -38,11 +42,11 @@ module("Model - class buildFirebaseReference", {
   }
 });
 
-test("defaults to lowercase, underscored & pluralized class name", function(){
+test("defaults to lowercase, underscored & pluralized class name", function(assert) {
   var ref = Person.buildFirebaseReference(store);
 
-  ok(ref instanceof Firebase, "reference should be instance of Firebase");
-  equal(ref.toString(), rootRef + "/people", "reference should be lowercased, underscored and pluralized");
+  assert.ok(ref instanceof Firebase, "reference should be instance of Firebase");
+  assert.equal(ref.toString(), rootRef + "/people", "reference should be lowercased, underscored and pluralized");
 
   // people only tests lowercase & plural, lets test underscored
 
@@ -50,20 +54,20 @@ test("defaults to lowercase, underscored & pluralized class name", function(){
   SomeThing.typeKey = "SomeThing";
 
   ref = SomeThing.buildFirebaseReference(store);
-  equal(ref.toString(), rootRef + "/some_things", "reference should be lowercased, underscored and pluralized");
+  assert.equal(ref.toString(), rootRef + "/some_things", "reference should be lowercased, underscored and pluralized");
 });
 
-test("uses firebasePath as a string", function(){
+test("uses firebasePath as a string", function(assert) {
   Person.reopenClass({
     firebasePath: "persons"
   });
 
   var ref = Person.buildFirebaseReference(store);
-  ok(ref instanceof Firebase, "reference should be instance of Firebase");
-  equal(ref.toString(), rootRef + "/persons", "reference should point to the right place");
+  assert.ok(ref instanceof Firebase, "reference should be instance of Firebase");
+  assert.equal(ref.toString(), rootRef + "/persons", "reference should point to the right place");
 });
 
-test("expands firebasePath string if it contains {{paths}}", function(){
+test("expands firebasePath string if it contains {{paths}}", function(assert) {
   Person.reopenClass({
     firebasePath: "accounts/{{account.name}}/projects/{{project.id}}/members"
   });
@@ -72,29 +76,29 @@ test("expands firebasePath string if it contains {{paths}}", function(){
       project = {id: "bar"},
       ref = Person.buildFirebaseReference(store, {account: account, project: project});
 
-  ok(ref instanceof Firebase, "reference should be instance of Firebase");
-  equal(ref.toString(), rootRef + "/accounts/foo/projects/bar/members", "reference should have been expanded");
+  assert.ok(ref instanceof Firebase, "reference should be instance of Firebase");
+  assert.equal(ref.toString(), rootRef + "/accounts/foo/projects/bar/members", "reference should have been expanded");
 });
 
-test("uses firebasePath as a function", function(){
-  expect(4);
+test("uses firebasePath as a function", function(assert) {
+  assert.expect(4);
 
   var refOptions = {name: "bar"};
 
   Person.reopenClass({
     firebasePath: function(opts) {
-      equal(get(opts, "name"), "bar", "passes the options from buildFirebaseReference through to firebasePath");
-      ok(opts instanceof Ember.Object, "turns plain options hash to Ember.Object so we can use opts.get etc...");
+      assert.equal(get(opts, "name"), "bar", "passes the options from buildFirebaseReference through to firebasePath");
+      assert.ok(opts instanceof Ember.Object, "turns plain options hash to Ember.Object so we can use opts.get etc...");
       return "foo/"+opts.get("name");
     }
   });
 
   var ref = Person.buildFirebaseReference(store, refOptions);
-  ok(ref instanceof Firebase, "reference should be instance of Firebase");
-  equal(ref.toString(), rootRef + "/foo/bar", "reference should point to the right place");
+  assert.ok(ref instanceof Firebase, "reference should be instance of Firebase");
+  assert.equal(ref.toString(), rootRef + "/foo/bar", "reference should point to the right place");
 });
 
-test("expands the result of firebasePath function", function() {
+test("expands the result of firebasePath function", function(assert) {
   var refOptions = {id: "bar"};
 
   Person.reopenClass({
@@ -104,10 +108,10 @@ test("expands the result of firebasePath function", function() {
   });
 
   var ref = Person.buildFirebaseReference(store, refOptions);
-  equal(ref.toString(), rootRef + "/foo/bar", "path should have been expanded");
+  assert.equal(ref.toString(), rootRef + "/foo/bar", "path should have been expanded");
 });
 
-test("overriding firebasePathOptions", function() {
+test("overriding firebasePathOptions", function(assert) {
   var refOptions = {id: "bar"};
 
   Person.reopenClass({
@@ -119,10 +123,10 @@ test("overriding firebasePathOptions", function() {
   });
 
   var ref = Person.buildFirebaseReference(store, refOptions);
-  equal(ref.toString(), rootRef + "/people/foo/bar", "path should have been expanded");
+  assert.equal(ref.toString(), rootRef + "/people/foo/bar", "path should have been expanded");
 });
 
-test("firebasePath can return a reference", function() {
+test("firebasePath can return a reference", function(assert) {
   Person.reopenClass({
     firebasePath: function(opts) {
       // normally so you can do opts.get("something").buildFirebaseReference().parent().child("/foo")
@@ -132,12 +136,12 @@ test("firebasePath can return a reference", function() {
   });
 
   var ref = Person.buildFirebaseReference(store);
-  ok(ref instanceof Firebase, "reference should be instance of Firebase");
-  equal(ref.toString(), "https://somewhere.firebaseio.com/foo/bar/baz", "reference should point to the right place");
+  assert.ok(ref instanceof Firebase, "reference should be instance of Firebase");
+  assert.equal(ref.toString(), "https://somewhere.firebaseio.com/foo/bar/baz", "reference should point to the right place");
 });
 
 module("Model - instance buildFirebaseReference", {
-  setup: function() {
+  beforeEach: function() {
     store = Store.create({
       firebaseRoot: rootRef
     });
@@ -147,15 +151,15 @@ module("Model - instance buildFirebaseReference", {
   }
 });
 
-test("defaults to pluralized class name with ID", function(){
+test("defaults to pluralized class name with ID", function(assert) {
   var person = Person.create({id: "123"}),
       ref    = person.buildFirebaseReference();
 
-  ok(ref instanceof Firebase, "reference should be instance of Firebase");
-  equal(ref.toString(), rootRef + "/people/123", "reference should point to the right place");
+  assert.ok(ref instanceof Firebase, "reference should be instance of Firebase");
+  assert.equal(ref.toString(), rootRef + "/people/123", "reference should point to the right place");
 });
 
-test("uses class reference with ID appended", function() {
+test("uses class reference with ID appended", function(assert) {
   Person.reopenClass({
     firebasePath: "persons"
   });
@@ -163,11 +167,11 @@ test("uses class reference with ID appended", function() {
   var person = Person.create({id: "123"}),
       ref = person.buildFirebaseReference();
 
-  ok(ref instanceof Firebase, "reference should be instance of Firebase");
-  equal(ref.toString(), rootRef + "/persons/123", "reference should point to the right place");
+  assert.ok(ref instanceof Firebase, "reference should be instance of Firebase");
+  assert.equal(ref.toString(), rootRef + "/persons/123", "reference should point to the right place");
 });
 
-test("passes itself to class.buildFirebaseReference", function(){
+test("passes itself to class.buildFirebaseReference", function(assert) {
   Person.reopenClass({
     firebasePath: function(opts) {
       return "persons/"+opts.get("foo");
@@ -177,6 +181,6 @@ test("passes itself to class.buildFirebaseReference", function(){
   var person = Person.create({id: "123", foo: "bar"}),
       ref = person.buildFirebaseReference();
 
-  ok(ref instanceof Firebase, "reference should be instance of Firebase");
-  equal(ref.toString(), rootRef + "/persons/bar/123", "reference should point to the right place");
+  assert.ok(ref instanceof Firebase, "reference should be instance of Firebase");
+  assert.equal(ref.toString(), rootRef + "/persons/bar/123", "reference should point to the right place");
 });

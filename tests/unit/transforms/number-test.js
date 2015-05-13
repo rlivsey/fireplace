@@ -1,18 +1,19 @@
 import NumberTransform from 'fireplace/transforms/number';
-import { transforms } from '../../helpers/transforms';
+import {module, test} from 'qunit';
+import '../../helpers/transforms';
 
 module('Transforms - number');
 
-test('transforms numbers', function() {
+test('transforms numbers', function(assert) {
   var transform = NumberTransform.create();
 
-  transforms(transform, "1",       1);
-  transforms(transform, "0",       0);
-  transforms(transform, 1,         1);
-  transforms(transform, 0,         0);
-  transforms(transform, "",        null);
-  transforms(transform, null,      null);
-  transforms(transform, undefined, null);
-  transforms(transform, true,      1);
-  transforms(transform, false,     0);
+  assert.transforms(transform, "1",       1);
+  assert.transforms(transform, "0",       0);
+  assert.transforms(transform, 1,         1);
+  assert.transforms(transform, 0,         0);
+  assert.transforms(transform, "",        null);
+  assert.transforms(transform, null,      null);
+  assert.transforms(transform, undefined, null);
+  assert.transforms(transform, true,      1);
+  assert.transforms(transform, false,     0);
 });

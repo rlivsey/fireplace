@@ -389,7 +389,7 @@ export default Ember.Object.extend({
   all: function(type) {
     var cache   = this.cacheForType(type),
         records = cache.records,
-        all     = [],
+        all     = Ember.A(),
         reference;
 
     for (reference in records) {

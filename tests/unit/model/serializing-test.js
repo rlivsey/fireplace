@@ -1,5 +1,7 @@
 import Ember from 'ember';
 
+import {module, test} from 'qunit';
+
 import attr  from 'fireplace/model/attr';
 import one   from 'fireplace/relationships/has-one';
 import many  from 'fireplace/relationships/has-many';
@@ -13,22 +15,22 @@ import Transform         from 'fireplace/transforms/base';
 var container, store;
 
 module("Model#toFirebaseJSON", {
-  setup: function() {
+  beforeEach: function() {
     container = new Ember.Container();
     store = Store.create();
   }
 });
 
-function serializesTo(obj, json, message) {
-  deepEqual(obj.toFirebaseJSON(), json, message || "should serialize to the expected JSON");
-}
+window.QUnit.assert.serializesTo = function(obj, json, message) {
+  this.deepEqual(obj.toFirebaseJSON(), json, message || "should serialize to the expected JSON");
+};
 
-function serializesWithPriorityTo(obj, json, message) {
-  deepEqual(obj.toFirebaseJSON(true), json, message || "should serialize to the expected JSON");
-}
+window.QUnit.assert.serializesWithPriorityTo = function(obj, json, message) {
+  this.deepEqual(obj.toFirebaseJSON(true), json, message || "should serialize to the expected JSON");
+};
 
 
-test("serializes attributes", function() {
+test("serializes attributes", function(assert) {
   var Person = Model.extend({
     firstName: attr(),
     lastName:  attr()
@@ -39,13 +41,13 @@ test("serializes attributes", function() {
     lastName: "Johnson"
   });
 
-  serializesTo(person, {
+  assert.serializesTo(person, {
     first_name: "Bob",
     last_name: "Johnson"
   });
 });
 
-test("allows overriding key names", function() {
+test("allows overriding key names", function(assert) {
   var Person = Model.extend({
     firstName: attr(),
     lastName:  attr({key: "surname"})
@@ -56,14 +58,14 @@ test("allows overriding key names", function() {
     lastName: "Johnson"
   });
 
-  serializesTo(person, {
+  assert.serializesTo(person, {
     first_name: "Bob",
     surname: "Johnson"
   });
 });
 
-test("transforms attribute values with named serializer", function() {
-  expect(2);
+test("transforms attribute values with named serializer", function(assert) {
+  assert.expect(2);
 
   var Person = Model.extend({
     name: attr("capitals")
@@ -72,7 +74,7 @@ test("transforms attribute values with named serializer", function() {
   container.register("transform:capitals", Transform.extend({
     deserialize: function(value) { return value; },
     serialize: function(value) {
-      ok(true, "serialize called");
+      assert.ok(true, "serialize called");
       return value.toUpperCase();
     },
   }));
@@ -82,17 +84,17 @@ test("transforms attribute values with named serializer", function() {
     name: "Bob Johnson"
   });
 
-  serializesTo(person, {
+  assert.serializesTo(person, {
     name: "BOB JOHNSON"
   });
 });
 
-test("transforms attribute values with inline serializer", function() {
-  expect(2);
+test("transforms attribute values with inline serializer", function(assert) {
+  assert.expect(2);
 
   var Person = Model.extend({
     name: attr({serialize: function(value) {
-      ok(true, "serialize called");
+      assert.ok(true, "serialize called");
       return value.toUpperCase();
     }})
   });
@@ -102,13 +104,13 @@ test("transforms attribute values with inline serializer", function() {
     name: "Bob Johnson"
   });
 
-  serializesTo(person, {
+  assert.serializesTo(person, {
     name: "BOB JOHNSON"
   });
 });
 
 
-test("excludes null values", function() {
+test("excludes null values", function(assert) {
   var Person = Model.extend({
     firstName: attr(),
     lastName:  attr()
@@ -118,12 +120,12 @@ test("excludes null values", function() {
     firstName: "Bob"
   });
 
-  serializesTo(person, {
+  assert.serializesTo(person, {
     first_name: "Bob"
   });
 });
 
-test("uses priority/value export format if specified", function() {
+test("uses priority/value export format if specified", function(assert) {
   var Person = Model.extend({
     name: attr()
   });
@@ -133,7 +135,7 @@ test("uses priority/value export format if specified", function() {
     name: "Bob"
   });
 
-  serializesWithPriorityTo(person, {
+  assert.serializesWithPriorityTo(person, {
     ".priority": 123,
     ".value": {
       name: "Bob"
@@ -141,7 +143,7 @@ test("uses priority/value export format if specified", function() {
   });
 });
 
-test("doesn't use priority/value export format if specified but no priority is set", function() {
+test("doesn't use priority/value export format if specified but no priority is set", function(assert) {
   var Person = Model.extend({
     name: attr()
   });
@@ -150,12 +152,12 @@ test("doesn't use priority/value export format if specified but no priority is s
     name: "Bob"
   });
 
-  serializesWithPriorityTo(person, {
+  assert.serializesWithPriorityTo(person, {
     name: "Bob"
   });
 });
 
-test("serializes hasOne embedded relationships", function() {
+test("serializes hasOne embedded relationships", function(assert) {
   var Avatar = Model.extend({
     image: attr()
   });
@@ -173,7 +175,7 @@ test("serializes hasOne embedded relationships", function() {
     })
   });
 
-  serializesTo(person, {
+  assert.serializesTo(person, {
     name: "Ted Thompson",
     avatar: {
       image: "my-face.png"
@@ -181,7 +183,7 @@ test("serializes hasOne embedded relationships", function() {
   });
 });
 
-test("serializes hasOne embedded relationships (with ID)", function() {
+test("serializes hasOne embedded relationships (with ID)", function(assert) {
   var Avatar = Model.extend({
     image: attr()
   });
@@ -200,7 +202,7 @@ test("serializes hasOne embedded relationships (with ID)", function() {
     })
   });
 
-  serializesTo(person, {
+  assert.serializesTo(person, {
     name: "Ted Thompson",
     avatar: {
       id:    "an-avatar",
@@ -209,7 +211,7 @@ test("serializes hasOne embedded relationships (with ID)", function() {
   });
 });
 
-test("serializes hasOne non-embedded relationships", function() {
+test("serializes hasOne non-embedded relationships", function(assert) {
   var Avatar = Model.extend({
     image: attr()
   });
@@ -228,13 +230,13 @@ test("serializes hasOne non-embedded relationships", function() {
     })
   });
 
-  serializesTo(person, {
+  assert.serializesTo(person, {
     name: "Ted Thompson",
     avatar: 234
   });
 });
 
-test("serializes hasMany embedded relationships", function() {
+test("serializes hasMany embedded relationships", function(assert) {
   container.register("collection:object", ObjectCollection);
 
   var Address = Model.extend({
@@ -250,12 +252,12 @@ test("serializes hasMany embedded relationships", function() {
     container: container,
     store: store,
     name: "Eric Wimp",
-    addresses: [
+    addresses: Ember.A([
       Address.create({street: "29 Acacia Road", id: "home"})
-    ]
+    ])
   });
 
-  serializesTo(person, {
+  assert.serializesTo(person, {
     name: "Eric Wimp",
     addresses: {
       home: {
@@ -265,7 +267,7 @@ test("serializes hasMany embedded relationships", function() {
   });
 });
 
-test("serializes hasMany non-embedded relationships", function() {
+test("serializes hasMany non-embedded relationships", function(assert) {
   container.register("collection:indexed", IndexedCollection);
 
   var Address = Model.extend({
@@ -281,12 +283,12 @@ test("serializes hasMany non-embedded relationships", function() {
     container: container,
     store: store,
     name: "Eric Wimp",
-    addresses: [
+    addresses: Ember.A([
       Address.create({id: 234, street: "29 Acacia Road"})
-    ]
+    ])
   });
 
-  serializesTo(person, {
+  assert.serializesTo(person, {
     name: "Eric Wimp",
     addresses: {
       234: true

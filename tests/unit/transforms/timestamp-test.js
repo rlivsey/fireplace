@@ -1,13 +1,9 @@
 /* global Firebase */
 
 import Timestamp from 'fireplace/transforms/timestamp';
+import {module, test} from 'qunit';
 import { now } from 'fireplace/transforms/timestamp';
-
-import {
-  transforms,
-  serializes,
-  deserializes
-} from '../../helpers/transforms';
+import '../../helpers/transforms';
 
 module('Transforms - timestamp');
 
@@ -15,19 +11,19 @@ module('Transforms - timestamp');
 Firebase.ServerValue = Firebase.ServerValue || {};
 Firebase.ServerValue.TIMESTAMP = Firebase.ServerValue.TIMESTAMP || {".sv": "timestamp"};
 
-test('export now as Firebase.ServerValue.TIMESTAMP', function() {
-  equal(now(), Firebase.ServerValue.TIMESTAMP);
+test('export now as Firebase.ServerValue.TIMESTAMP', function(assert) {
+  assert.equal(now(), Firebase.ServerValue.TIMESTAMP);
 });
 
-test('transforms timestamps', function() {
+test('transforms timestamps', function(assert) {
   var transform = Timestamp.create();
 
-  transforms(transform, null,      null);
-  transforms(transform, undefined, null);
+  assert.transforms(transform, null,      null);
+  assert.transforms(transform, undefined, null);
 
-  serializes(transform, Firebase.ServerValue.TIMESTAMP, Firebase.ServerValue.TIMESTAMP);
+  assert.serializes(transform, Firebase.ServerValue.TIMESTAMP, Firebase.ServerValue.TIMESTAMP);
 
   var time = new Date(Date.UTC(1981, 7, 21, 12, 30));
-  serializes(transform, time, 367245000000);
-  deserializes(transform, 367245000000, time);
+  assert.serializes(transform, time, 367245000000);
+  assert.deserializes(transform, 367245000000, time);
 });

@@ -16,6 +16,7 @@ EventQueue.prototype = {
       this.running = true;
       // TODO - running in the next runloop breaks the tests
       // how to solve this without this hack?
+      console.log("testing", Ember.testing);
       var run = Ember.testing ? Ember.run : Ember.run.next;
       run(this, this.flush);
     }

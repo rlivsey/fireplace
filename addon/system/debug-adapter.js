@@ -64,7 +64,7 @@ export default Ember.DataAdapter.extend({
   },
 
   getRecordKeywords: function(record) {
-    var keywords = [], keys = Ember.A(['id']);
+    var keywords = Ember.A(), keys = Ember.A(['id']);
     record.eachAttribute(function(key) {
       keys.push(key);
     });

@@ -63,15 +63,7 @@ export default Ember.Mixin.create(Ember.Evented, {
     var handler;
     var errHandler;
 
-    events.forEach(function(eventName) {
-      handler    = this.buildHandler(eventName);
-      errHandler = this.buildErrorHandler(eventName);
-
-      this._fbEventHandlers[eventName] = handler;
-      ref.on(eventName, handler, errHandler, this);
-    }, this);
-
-    this._listenPromise = new Ember.RSVP.Promise(function(resolve, reject) {
+    var promise = this._listenPromise = new Ember.RSVP.Promise(function(resolve, reject) {
       _this.one("firebaseValue",      resolve);
       _this.one("firebaseValueError", reject);
     }, "FP: Value "+ref.toString()).catch(function(e) {
@@ -81,7 +73,15 @@ export default Ember.Mixin.create(Ember.Evented, {
       _this._listenPromise = null;
     });
 
-    return this._listenPromise;
+    events.forEach(function(eventName) {
+      handler    = this.buildHandler(eventName);
+      errHandler = this.buildErrorHandler(eventName);
+
+      this._fbEventHandlers[eventName] = handler;
+      ref.on(eventName, handler, errHandler, this);
+    }, this);
+
+    return promise;
   },
 
   buildErrorHandler: function(eventName) {

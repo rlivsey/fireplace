@@ -1,7 +1,7 @@
 import './helpers/polyfill';
 
 // make sure we're not using Firebase itself
-MockFirebase.override();
+window.MockFirebase.override();
 
 import resolver from './helpers/resolver';
 import {

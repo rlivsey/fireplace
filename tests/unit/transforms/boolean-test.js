@@ -1,17 +1,18 @@
 import BooleanTransform from 'fireplace/transforms/boolean';
-import { transforms } from '../../helpers/transforms';
+import {module, test} from 'qunit';
+import '../../helpers/transforms';
 
 module('Transforms - boolean');
 
-test('transforms booleans', function() {
+test('transforms booleans', function(assert) {
   var transform = BooleanTransform.create();
 
-  transforms(transform, "1",        true);
-  transforms(transform, "",         false);
-  transforms(transform, 1,          true);
-  transforms(transform, 0,          false);
-  transforms(transform, null,       false);
-  transforms(transform, undefined,  false);
-  transforms(transform, true,       true);
-  transforms(transform, false,      false);
+  assert.transforms(transform, "1",        true);
+  assert.transforms(transform, "",         false);
+  assert.transforms(transform, 1,          true);
+  assert.transforms(transform, 0,          false);
+  assert.transforms(transform, null,       false);
+  assert.transforms(transform, undefined,  false);
+  assert.transforms(transform, true,       true);
+  assert.transforms(transform, false,      false);
 });

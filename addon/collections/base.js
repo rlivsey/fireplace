@@ -102,7 +102,7 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
 
   setupContent: Ember.on('init', function() {
     if (!get(this, 'content')) {
-      set(this, 'content', []);
+      set(this, 'content', Ember.A());
     }
   }),
 

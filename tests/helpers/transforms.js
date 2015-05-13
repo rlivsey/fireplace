@@ -1,12 +1,12 @@
-export function serializes(transform, from, to, message) {
-  deepEqual(transform.serialize(from), to, message);
-}
+window.QUnit.assert.serializes = function(transform, from, to, message) {
+  this.deepEqual(transform.serialize(from), to, message);
+};
 
-export function deserializes(transform, from, to, message) {
-  deepEqual(transform.deserialize(from), to, message);
-}
+window.QUnit.assert.deserializes = function(transform, from, to, message) {
+  this.deepEqual(transform.deserialize(from), to, message);
+};
 
-export function transforms(transform, from, to, message) {
-  serializes(transform, from, to, (message ? "serializing: "+message : undefined));
-  deserializes(transform, from, to, (message ? "deserializing: "+message : undefined));
-}
+window.QUnit.assert.transforms = function(transform, from, to, message) {
+  this.serializes(transform, from, to, (message ? "serializing: "+message : undefined));
+  this.deserializes(transform, from, to, (message ? "deserializing: "+message : undefined));
+};

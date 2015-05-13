@@ -1,5 +1,7 @@
 import Ember from 'ember';
 
+import {module, test} from 'qunit';
+
 import Model from 'fireplace/model/model';
 import Store from 'fireplace/store';
 import attr  from 'fireplace/model/attr';
@@ -12,7 +14,7 @@ var set = Ember.set;
 
 var Person;
 module("Model Firebase events", {
-  setup: function() {
+  beforeEach: function() {
     Person = Model.extend({
       firstName: attr(),
       lastName:  attr()
@@ -21,21 +23,21 @@ module("Model Firebase events", {
   }
 });
 
-test("onFirebaseChildAdded sets an attribute", function() {
+test("onFirebaseChildAdded sets an attribute", function(assert) {
   var person   = Person.create();
   var snapshot = makeSnapshot("first_name", "John");
 
   // to make sure it's notified of changes
-  equal(get(person, "firstName"), undefined, "should not yet be set");
+  assert.equal(get(person, "firstName"), undefined, "should not yet be set");
 
   Ember.run(function() {
     person.onFirebaseChildAdded(snapshot);
   });
 
-  equal(get(person, "firstName"), "John", "sets the attribute");
+  assert.equal(get(person, "firstName"), "John", "sets the attribute");
 });
 
-test("onFirebaseChildRemoved clears an attribute", function() {
+test("onFirebaseChildRemoved clears an attribute", function(assert) {
   var person   = Person.create({firstName: "Bobby", snapshot: makeSnapshot("123", {first_name: "Bobby"})});
 
   // child_removed sends the old value with the snapshot, not null
@@ -45,10 +47,10 @@ test("onFirebaseChildRemoved clears an attribute", function() {
     person.onFirebaseChildRemoved(snapshot);
   });
 
-  equal(get(person, "firstName"), null, "clears the attribute");
+  assert.equal(get(person, "firstName"), null, "clears the attribute");
 });
 
-test("onFirebaseChildChanged updates an attribute", function() {
+test("onFirebaseChildChanged updates an attribute", function(assert) {
   var person   = Person.create({firstName: "Bobby"});
   var snapshot = makeSnapshot("first_name", "Johnny");
 
@@ -56,24 +58,24 @@ test("onFirebaseChildChanged updates an attribute", function() {
     person.onFirebaseChildChanged(snapshot);
   });
 
-  equal(get(person, "firstName"), "Johnny", "updates the attribute");
+  assert.equal(get(person, "firstName"), "Johnny", "updates the attribute");
 });
 
-test("onFirebaseValue destroys the object if snapshot value is null", function() {
+test("onFirebaseValue destroys the object if snapshot value is null", function(assert) {
   var person   = Person.create({store: Store.create({firebaseRoot: "https://foo.firebaseio.com"})});
   var snapshot = makeSnapshot("123", null);
 
-  ok(!person.isDestroyed, "is not destroyed");
+  assert.ok(!person.isDestroyed, "is not destroyed");
 
   Ember.run(function() {
     person.onFirebaseValue(snapshot);
   });
 
-  ok(person.isDestroyed, "is now destroyed");
+  assert.ok(person.isDestroyed, "is now destroyed");
 });
 
 module("Model Firebase events with relationship", {
-  setup: function() {
+  beforeEach: function() {
     Person = Model.extend({
       firstName: attr(),
       lastName:  attr(),
@@ -84,8 +86,8 @@ module("Model Firebase events with relationship", {
 
 // firebase triggers child_added events first, then value
 // so we need to be able to handle not having the snapshot yet
-test("handles child_added events occurring before value", function() {
-  expect(4);
+test("handles child_added events occurring before value", function(assert) {
+  assert.expect(4);
 
   var store  = Store.create({firebaseRoot: "https://foo.firebaseio.com"});
   var person = Person.create({store: store});
@@ -96,7 +98,7 @@ test("handles child_added events occurring before value", function() {
 
   var mockAvatar = "an avatar";
   store.findOne = function(type, id, query) {
-    equal(id, "123", "calls find for the avatar with the correct ID");
+    assert.equal(id, "123", "calls find for the avatar with the correct ID");
     return mockAvatar;
   };
 
@@ -107,7 +109,7 @@ test("handles child_added events occurring before value", function() {
     // ... at some point later person.onFirebaseValue(...) will be called
   });
 
-  equal(get(person, "firstName"), "Ted",      "sets the first name");
-  equal(get(person, "lastName"),  "Johnson",  "sets the last name");
-  equal(get(person, "avatar"),    mockAvatar, "finds the avatar");
+  assert.equal(get(person, "firstName"), "Ted",      "sets the first name");
+  assert.equal(get(person, "lastName"),  "Johnson",  "sets the last name");
+  assert.equal(get(person, "avatar"),    mockAvatar, "finds the avatar");
 });

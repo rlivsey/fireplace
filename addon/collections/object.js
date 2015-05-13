@@ -24,7 +24,7 @@ export default Collection.extend({
     var snapshot = get(this, "snapshot");
     if (!snapshot) { return; }
 
-    var content = [], _this = this;
+    var content = Ember.A(), _this = this;
     snapshot.forEach(function(child) {
       content.push(_this.modelFromSnapshot(child));
     });

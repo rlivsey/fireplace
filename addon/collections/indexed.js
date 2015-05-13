@@ -33,7 +33,7 @@ export default Collection.extend({
     var snapshot = get(this, "snapshot");
     if (!snapshot) { return; }
 
-    var content = [], _this = this;
+    var content = Ember.A(), _this = this;
     snapshot.forEach(function(child) {
       content.push(_this.itemFromSnapshot(child));
     });
@@ -57,7 +57,7 @@ export default Collection.extend({
 
     if (anyTransformed) {
       this._updatingContent = true;
-      set(this, "content", transformed);
+      set(this, "content", Ember.A(transformed));
       this._updatingContent = false;
     }
   })),

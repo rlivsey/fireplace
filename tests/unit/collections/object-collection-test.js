@@ -1,5 +1,7 @@
 import Ember from 'ember';
 
+import {module, test} from 'qunit';
+
 import Model from 'fireplace/model/model';
 import Store from 'fireplace/store';
 import attr  from 'fireplace/model/attr';
@@ -12,7 +14,8 @@ var get  = Ember.get;
 var container, store, Person, People, firebase;
 
 function setupEnv() {
-  firebase  = new MockFirebase("https://something.firebaseio.com");
+  firebase  = new window.window.MockFirebase("https://something.firebaseio.com");
+  firebase.autoFlush(true);
 
   container = new Ember.Container();
   store     = Store.create({
@@ -35,50 +38,48 @@ function setupEnv() {
   firebase.child("people/123").setWithPriority({name: "Tom"},   10);
   firebase.child("people/234").setWithPriority({name: "Dick"},  20);
   firebase.child("people/456").setWithPriority({name: "Harry"}, 30);
-  firebase.flush();
 }
 
 module("ObjectCollection - initializing", {
-  setup: setupEnv
+  beforeEach: setupEnv
 });
 
-test("inflates from a snapshot if one exists", function() {
+test("inflates from a snapshot if one exists", function(assert) {
   var snap   = getSnapshot(firebase, "people");
   var people = People.create({snapshot: snap});
 
-  equal(get(people, "length"), 3, "added 3 items");
+  assert.equal(get(people, "length"), 3, "added 3 items");
 
   var person = people.objectAt(0);
-  ok(person instanceof Person, "has instantiated the models");
-  deepEqual(people.mapBy("name"), ["Tom", "Dick", "Harry"], "has assigned the attributes");
-  deepEqual(people.mapBy("priority"), [10,20,30], "has assigned the priorities");
+  assert.ok(person instanceof Person, "has instantiated the models");
+  assert.deepEqual(people.mapBy("name"), ["Tom", "Dick", "Harry"], "has assigned the attributes");
+  assert.deepEqual(people.mapBy("priority"), [10,20,30], "has assigned the priorities");
 });
 
-test("fetches from Firebase when start listening", function() {
+test("fetches from Firebase when start listening", function(assert) {
   var people = People.create();
   people.listenToFirebase();
-  firebase.flush();
 
-  equal(get(people, "length"), 3, "added 3 items");
+  assert.equal(get(people, "length"), 3, "added 3 items");
 
   var person = people.objectAt(0);
-  ok(person instanceof Person, "has instantiated the models");
-  deepEqual(people.mapBy("name"), ["Tom", "Dick", "Harry"], "has assigned the attributes");
-  deepEqual(people.mapBy("priority"), [10,20,30], "has assigned the priorities");
+  assert.ok(person instanceof Person, "has instantiated the models");
+  assert.deepEqual(people.mapBy("name"), ["Tom", "Dick", "Harry"], "has assigned the attributes");
+  assert.deepEqual(people.mapBy("priority"), [10,20,30], "has assigned the priorities");
 });
 
 
 module("ObjectCollection - references", {
-  setup: setupEnv
+  beforeEach: setupEnv
 });
 
-test("generates a reference based on its model", function() {
+test("generates a reference based on its model", function(assert) {
   var people = People.create({store: store});
   var ref = people.buildFirebaseReference();
-  equal(ref.toString(), firebase.child("people").toString(), "reference should be based off the model");
+  assert.equal(ref.toString(), firebase.child("people").toString(), "reference should be based off the model");
 });
 
-test("Adding an item sets its reference to be a child of the collection", function() {
+test("Adding an item sets its reference to be a child of the collection", function(assert) {
   var collectionRef = firebase.child("some/other/path");
 
   var people = People.create({store: store, firebaseReference: collectionRef});
@@ -87,14 +88,14 @@ test("Adding an item sets its reference to be a child of the collection", functi
   people.pushObject(person);
 
   var ref = person.buildFirebaseReference();
-  equal(ref.toString(), collectionRef.child("987").toString(), "reference should be child of the collection");
+  assert.equal(ref.toString(), collectionRef.child("987").toString(), "reference should be child of the collection");
 });
 
 // This is important so you can remove an object and then delete it to persist the change
 // otherwise you'd remove it and if you delete then it'll try and delete the wrong path
 // although in that case you could just delete the object and it'll get removed from the
 // collection anyway...
-test("Removing an item doesn't lose its reference", function() {
+test("Removing an item doesn't lose its reference", function(assert) {
   var collectionRef = firebase.child("some/other/path");
 
   var people = People.create({store: store, firebaseReference: collectionRef});
@@ -104,61 +105,57 @@ test("Removing an item doesn't lose its reference", function() {
   people.removeObject(person);
 
   var ref = person.buildFirebaseReference();
-  equal(ref.toString(), collectionRef.child("987").toString(), "reference still should be child of the collection");
+  assert.equal(ref.toString(), collectionRef.child("987").toString(), "reference still should be child of the collection");
 });
 
 
 module("ObjectCollection - fetching", {
-  setup: setupEnv
+  beforeEach: setupEnv
 });
 
-test("fetch returns a promise proxy which resolves when the collection has a value", function() {
-  expect(4);
+test("fetch returns a promise proxy which resolves when the collection has a value", function(assert) {
+  assert.expect(2);
+  var done = assert.async();
 
   var people = People.create();
   var promise = people.fetch();
 
   promise.then(function(c) {
-    equal(c, people, "resolves with itself");
-    equal(people.get("length"), 3, "has the items");
-  });
-
-  ok(promise.get("isPending"));
-  firebase.flush();
-  ok(!promise.get("isPending"));
+    assert.equal(c, people, "resolves with itself");
+    assert.equal(people.get("length"), 3, "has the items");
+  }).finally(done);
 });
 
-test("resolves immediately if already listening to firebase", function() {
-  expect(2);
+test("resolves immediately if already listening to firebase", function(assert) {
+  assert.expect(2);
 
   var people = People.create();
   people.listenToFirebase();
-  firebase.flush();
 
   Ember.run(function() {
     people.fetch().then(function(c) {
-      equal(c, people, "resolves with itself");
-      equal(people.get("length"), 3, "has the items");
+      assert.equal(c, people, "resolves with itself");
+      assert.equal(people.get("length"), 3, "has the items");
     });
   });
 });
 
 module("ObjectCollection - serializing", {
-  setup: setupEnv
+  beforeEach: setupEnv
 });
 
-test("serializes children to Firebase JSON", function() {
+test("serializes children to Firebase JSON", function(assert) {
   var people = People.create({
-    content: [
+    content: Ember.A([
       store.createRecord("person", {id: "123", name: "Tom"}),
       store.createRecord("person", {id: "234", name: "Dick"}),
       store.createRecord("person", {id: "345", name: "Harry"})
-    ]
+    ])
   });
 
   var json = people.toFirebaseJSON();
 
-  deepEqual(json, {
+  assert.deepEqual(json, {
     123: {
       name: "Tom"
     },
@@ -171,18 +168,18 @@ test("serializes children to Firebase JSON", function() {
   });
 });
 
-test("serializes children to Firebase JSON includes priorities", function() {
+test("serializes children to Firebase JSON includes priorities", function(assert) {
   var people = People.create({
-    content: [
+    content: Ember.A([
       store.createRecord("person", {id: "123", priority: 1, name: "Tom"}),
       store.createRecord("person", {id: "234", priority: 2, name: "Dick"}),
       store.createRecord("person", {id: "345", priority: 3, name: "Harry"})
-    ]
+    ])
   });
 
   var json = people.toFirebaseJSON();
 
-  deepEqual(json, {
+  assert.deepEqual(json, {
     123: {
       ".value": { name: "Tom" },
       ".priority": 1
@@ -202,74 +199,69 @@ test("serializes children to Firebase JSON includes priorities", function() {
 
 var collection;
 module("ObjectCollection - receiving updates from Firebase", {
-  setup: function() {
+  beforeEach: function() {
     setupEnv();
     collection = People.create();
     collection.listenToFirebase();
-    firebase.flush();
   }
 });
 
-test("adding item to the end", function() {
+test("adding item to the end", function(assert) {
   firebase.child("people/987").setWithPriority({ name: "George" }, 50);
-  firebase.flush();
 
-  equal(collection.get("length"), 4, "adds an item");
-  equal(collection.get("lastObject.name"), "George", "adds to the right place");
+  assert.equal(collection.get("length"), 4, "adds an item");
+  assert.equal(collection.get("lastObject.name"), "George", "adds to the right place");
 });
 
-test("adding item to the start", function() {
+test("adding item to the start", function(assert) {
   firebase.child("people/987").setWithPriority({ name: "George" }, 1);
-  firebase.flush();
 
-  equal(collection.get("length"), 4, "adds an item");
-  equal(collection.get("firstObject.name"), "George", "adds to the right place");
+  assert.equal(collection.get("length"), 4, "adds an item");
+  assert.equal(collection.get("firstObject.name"), "George", "adds to the right place");
 });
 
-test("adding item in the middle", function() {
+test("adding item in the middle", function(assert) {
   firebase.child("people/987").setWithPriority({ name: "George" }, 25);
-  firebase.flush();
 
-  equal(collection.get("length"), 4, "adds an item");
-  equal(collection.objectAt(2).get("name"), "George", "adds to the right place");
+  assert.equal(collection.get("length"), 4, "adds an item");
+  assert.equal(collection.objectAt(2).get("name"), "George", "adds to the right place");
 });
 
-test("removing an item", function() {
+test("removing an item", function(assert) {
   firebase.child("people/234").remove();
-  firebase.flush();
 
-  equal(collection.get("length"), 2, "adds an item");
-  deepEqual(collection.mapBy("name"), ["Tom", "Harry"], "removes the right item");
+  assert.equal(collection.get("length"), 2, "adds an item");
+  assert.deepEqual(collection.mapBy("name"), ["Tom", "Harry"], "removes the right item");
 });
 
-test("moving an item", function() {
+test("moving an item", function(assert) {
   firebase.child("people/234").setPriority(1);
-  firebase.flush();
 
-  deepEqual(collection.mapBy("name"), ["Dick", "Tom", "Harry"], "moves the item");
-  deepEqual(collection.mapBy("priority"), [1, 10, 30], "updates the priorities");
+  assert.deepEqual(collection.mapBy("name"), ["Dick", "Tom", "Harry"], "moves the item");
+  assert.deepEqual(collection.mapBy("priority"), [1, 10, 30], "updates the priorities");
 });
 
-test("listening to firebase recurses to its children", function() {
+test("listening to firebase recurses to its children", function(assert) {
   collection.stopListeningToFirebase();
-  ok(!get(collection, "isListeningToFirebase"), "collection isn't listening");
-  ok(collection.everyBy("isListeningToFirebase", false), "none are listening");
+  assert.ok(!get(collection, "isListeningToFirebase"), "collection isn't listening");
+  assert.ok(collection.everyBy("isListeningToFirebase", false), "none are listening");
 
   collection.listenToFirebase();
 
-  ok(get(collection, "isListeningToFirebase"), "collection is listening");
-  ok(collection.everyBy("isListeningToFirebase", true), "all are listening");
+  assert.ok(get(collection, "isListeningToFirebase"), "collection is listening");
+  assert.ok(collection.everyBy("isListeningToFirebase", true), "all are listening");
 
   collection.stopListeningToFirebase();
 
-  ok(!get(collection, "isListeningToFirebase"), "collection isn't listening");
-  ok(collection.everyBy("isListeningToFirebase", false), "none are listening");
+  assert.ok(!get(collection, "isListeningToFirebase"), "collection isn't listening");
+  assert.ok(collection.everyBy("isListeningToFirebase", false), "none are listening");
 });
 
 var Thing, Other;
 module("ObjectCollection - polymorphism", {
-  setup: function() {
-    firebase  = new MockFirebase("https://something.firebaseio.com");
+  beforeEach: function(assert) {
+    firebase  = new window.MockFirebase("https://something.firebaseio.com");
+    firebase.autoFlush(true);
 
     container = new Ember.Container();
     store     = Store.create({
@@ -304,12 +296,11 @@ module("ObjectCollection - polymorphism", {
 
     collection = PolyCollection.create();
     collection.listenToFirebase();
-    firebase.flush();
   }
 });
 
-test("loads the right record types", function() {
-  ok(collection.objectAt(0) instanceof Thing);
-  ok(collection.objectAt(1) instanceof Other);
-  ok(collection.objectAt(2) instanceof Thing);
+test("loads the right record types", function(assert) {
+  assert.ok(collection.objectAt(0) instanceof Thing);
+  assert.ok(collection.objectAt(1) instanceof Other);
+  assert.ok(collection.objectAt(2) instanceof Thing);
 });

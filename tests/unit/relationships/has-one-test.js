@@ -1,5 +1,7 @@
 import Ember from 'ember';
 
+import {module, test} from 'qunit';
+
 import {
   Store, Model, hasOne, attr
 } from 'fireplace';
@@ -7,9 +9,9 @@ import {
 var container, firebase, store;
 
 module("Relationships - hasOne - embedded with ID", {
-  setup: function() {
+  beforeEach: function() {
     container = new Ember.Container();
-    firebase  = new MockFirebase("https://something.firebaseio.com");
+    firebase  = new window.MockFirebase("https://something.firebaseio.com");
     firebase.autoFlush(true);
 
     store = Store.create({
@@ -33,8 +35,9 @@ module("Relationships - hasOne - embedded with ID", {
 });
 
 // Duplicates model/serializing test
-asyncTest("includes the ID in the firebase data", function(done) {
-  expect(1);
+test("includes the ID in the firebase data", function(assert) {
+  assert.expect(1);
+  var done = assert.async();
 
   var address = store.createRecord("address", {
     id:     "address-1",
@@ -52,7 +55,7 @@ asyncTest("includes the ID in the firebase data", function(done) {
     return person.save();
   }).then(function() {
     firebase.child("people/person-1").once("value", function(snap) {
-      deepEqual(snap.val(), {
+      assert.deepEqual(snap.val(), {
         name: "Bob Johnson",
         address: {
           id:     "address-1",
@@ -60,13 +63,14 @@ asyncTest("includes the ID in the firebase data", function(done) {
           city:   "Barsville"
         }
       });
-      QUnit.start();
+      done();
     });
   });
 });
 
-asyncTest("includes the ID when re-hydrating the models", function() {
-  expect(1);
+test("includes the ID when re-hydrating the models", function(assert) {
+  assert.expect(1);
+  var done = assert.async();
 
   firebase.child("people/person-1").set({
     name: "Bob Johnson",
@@ -78,9 +82,9 @@ asyncTest("includes the ID when re-hydrating the models", function() {
   }, function() {
     store.findOne("person", "person-1").then(function(person) {
       var address = person.get("address");
-      equal(address.get("id"), "an-address");
+      assert.equal(address.get("id"), "an-address");
     }).finally(function() {
-      QUnit.start();
+      done();
     });
   });
 });
