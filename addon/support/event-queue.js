@@ -9,7 +9,7 @@ var EventQueue = function() {
 export default EventQueue;
 
 EventQueue.prototype = {
-  enqueue: function(fn, context) {
+  enqueue(fn, context) {
     this.pending.push([fn, context]);
 
     if (!this.running) {
@@ -22,7 +22,7 @@ EventQueue.prototype = {
     }
   },
 
-  flush: function() {
+  flush() {
     var batch;
 
     // if a batch queues items itself we want to make sure we run those too
@@ -36,7 +36,7 @@ EventQueue.prototype = {
     this.running = false;
   },
 
-  runBatch: function(batch) {
+  runBatch(batch) {
     var context;
     var fn;
 

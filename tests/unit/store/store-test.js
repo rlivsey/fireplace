@@ -14,7 +14,7 @@ var set = Ember.set;
 var store, container, Person, firebase;
 
 module("Store", {
-  beforeEach: function() {
+  beforeEach() {
     container = new Ember.Container();
     firebase  = new window.MockFirebase("https://something.firebaseio.com");
     firebase.autoFlush(true);

@@ -12,7 +12,7 @@ export default Collection.extend({
 
   as: null, // the meta model wrapper to use
 
-  toFirebaseJSON: function() {
+  toFirebaseJSON() {
     var value;
     return this.reduce(function(json, item) {
       if (item instanceof MetaModel) {
@@ -63,21 +63,21 @@ export default Collection.extend({
   })),
 
   // if we're listening, then our meta model items should be too
-  listenToFirebase: function() {
+  listenToFirebase() {
     if (get(this, "as")) {
       this.invoke("listenToFirebase");
     }
     return this._super();
   },
 
-  stopListeningToFirebase: function() {
+  stopListeningToFirebase() {
     if (get(this, "as")) {
       this.invoke("stopListeningToFirebase");
     }
     return this._super();
   },
 
-  fetch: function() {
+  fetch() {
     var promise = this.listenToFirebase().
       then(this._fetchAll.bind(this)).
       then(Ember.K.bind(this));
@@ -85,13 +85,13 @@ export default Collection.extend({
     return PromiseProxy.create({promise: promise});
   },
 
-  _fetchAll: function() {
+  _fetchAll() {
     return Ember.RSVP.all(get(this, "content").map(function(item, index) {
       return this.objectAtContentAsPromise(index);
     }, this));
   },
 
-  itemFromSnapshot: function(snapshot) {
+  itemFromSnapshot(snapshot) {
     return {
       id:       snapshot.key(),
       snapshot: snapshot,
@@ -99,7 +99,7 @@ export default Collection.extend({
     };
   },
 
-  itemFromRecord: function(record) {
+  itemFromRecord(record) {
     return {
       id:       get(record, 'id'),
       snapshot: null,
@@ -107,7 +107,7 @@ export default Collection.extend({
     };
   },
 
-  replaceContent: function(start, numRemoved, objectsAdded) {
+  replaceContent(start, numRemoved, objectsAdded) {
     objectsAdded = objectsAdded.map(function(object) {
       if (object instanceof MetaModel) {
         object.set("parent", this);
@@ -121,7 +121,7 @@ export default Collection.extend({
     return this._super(start, numRemoved, objectsAdded);
   },
 
-  objectAtContent: function(idx) {
+  objectAtContent(idx) {
     var content = get(this, "content");
     if (!content || !content.length) {
       return;
@@ -150,7 +150,7 @@ export default Collection.extend({
     return item.record;
   },
 
-  objectAtContentAsPromise: function(idx) {
+  objectAtContentAsPromise(idx) {
     var content = get(this, "content");
     if (!content || !content.length) {
       return Ember.RSVP.reject();
@@ -180,7 +180,7 @@ export default Collection.extend({
   },
 
   // TODO - handle findOne failing (permissions / 404)
-  findFetchRecordFromItem: function(item, returnPromise) {
+  findFetchRecordFromItem(item, returnPromise) {
     var store  = get(this, "store"),
         query  = get(this, "query"),
         type   = this.modelClassFromSnapshot(item.snapshot),
@@ -198,7 +198,7 @@ export default Collection.extend({
     }
   },
 
-  wrapRecordInMetaObjectIfNeccessary: function(record, snapshot) {
+  wrapRecordInMetaObjectIfNeccessary(record, snapshot) {
     var as = get(this, "as");
     if (!as || record instanceof MetaModel) {
       return record;
@@ -220,7 +220,7 @@ export default Collection.extend({
     return meta;
   },
 
-  onFirebaseChildAdded: function(snapshot, prevItemName) {
+  onFirebaseChildAdded(snapshot, prevItemName) {
     var id      = snapshot.key(),
         content = get(this, "content");
 
@@ -230,7 +230,7 @@ export default Collection.extend({
     this.insertAfter(prevItemName, item, content);
   },
 
-  onFirebaseChildRemoved: function(snapshot) {
+  onFirebaseChildRemoved(snapshot) {
     var content = get(this, "content"),
         item    = content.findBy('id', snapshot.key());
 
@@ -239,7 +239,7 @@ export default Collection.extend({
     content.removeObject(item);
   },
 
-  onFirebaseChildMoved: function(snapshot, prevItemName) {
+  onFirebaseChildMoved(snapshot, prevItemName) {
     var content = get(this, "content"),
         item    = content.findBy('id', snapshot.key());
 
@@ -257,7 +257,7 @@ export default Collection.extend({
     this.insertAfter(prevItemName, item, content);
   },
 
-  onFirebaseChildChanged: function(snapshot) {
+  onFirebaseChildChanged(snapshot) {
     var content = get(this, "content"),
         item    = content.findBy('id', snapshot.key());
 

@@ -9,7 +9,7 @@ import {
 var container, firebase, store;
 
 module("Relationships - hasOne - embedded with ID", {
-  beforeEach: function() {
+  beforeEach() {
     container = new Ember.Container();
     firebase  = new window.MockFirebase("https://something.firebaseio.com");
     firebase.autoFlush(true);

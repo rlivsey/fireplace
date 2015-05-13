@@ -9,13 +9,13 @@ export default Ember.Mixin.create(Ember.Evented, {
   concatenatedProperties: ['firebaseEvents'],
   firebaseEvents:         ['value'], // always listen to value for listenToFirebase promise
 
-  buildFirebaseReference: function() {
+  buildFirebaseReference() {
     Ember.assert("You must override buildFirebaseReference");
   },
 
   // override to limit the reference by startAt/endAt/limit
   // this is mainly for collections
-  buildFirebaseQuery: function() {
+  buildFirebaseQuery() {
     return this.buildFirebaseReference();
   },
 
@@ -23,17 +23,17 @@ export default Ember.Mixin.create(Ember.Evented, {
     return !!this._settingFromFirebase;
   }).volatile(),
 
-  settingFromFirebase: function(fn) {
+  settingFromFirebase(fn) {
     this._settingFromFirebase = true;
     fn.call(this);
     this._settingFromFirebase = false;
   },
 
-  willDestroy: function() {
+  willDestroy() {
     this.stopListeningToFirebase();
   },
 
-  listenToFirebase: function() {
+  listenToFirebase() {
     if (this.isDestroying || this.isDestroyed) {
       return Ember.RSVP.reject();
     }
@@ -84,14 +84,14 @@ export default Ember.Mixin.create(Ember.Evented, {
     return promise;
   },
 
-  buildErrorHandler: function(eventName) {
+  buildErrorHandler(eventName) {
     var triggerName = 'firebase' + classify(eventName) + "Error";
     return function(e) {
       this.trigger(triggerName, e);
     };
   },
 
-  buildHandler: function(eventName) {
+  buildHandler(eventName) {
     var classyName  = classify(eventName);
     var handlerName = 'onFirebase' + classyName;
     var triggerName = 'firebase'   + classyName;
@@ -113,7 +113,7 @@ export default Ember.Mixin.create(Ember.Evented, {
     };
   },
 
-  stopListeningToFirebase: function() {
+  stopListeningToFirebase() {
     this._listenPromise = null;
 
     if (!get(this, 'isListeningToFirebase')) {

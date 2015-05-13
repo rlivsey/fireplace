@@ -8,7 +8,7 @@ import { makeSnapshot } from '../../helpers/firebase';
 
 var snapshot;
 module('MutableSnapshot - with no snapshot', {
-  beforeEach: function() {
+  beforeEach() {
     snapshot = new MutableSnapshot();
   }
 });
@@ -37,7 +37,7 @@ test("can set and retreive a child", function(assert) {
 });
 
 module('MutableSnapshot - wrapping a snapshot', {
-  beforeEach: function() {
+  beforeEach() {
     var wrapped = makeSnapshot("snap", {title: "Bob"}, 123);
     snapshot = new MutableSnapshot(wrapped);
   }

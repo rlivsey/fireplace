@@ -10,18 +10,18 @@ var underscore = Ember.String.underscore;
 var LEGACY_MAP = Ember.Map.prototype.forEach.length === 2;
 
 export default Ember.DataAdapter.extend({
-  getFilters: function() {
+  getFilters() {
     return [
       { name: 'isLive',     desc: 'Live'    },
       { name: 'isNew',      desc: 'New'     }
     ];
   },
 
-  detect: function(klass) {
+  detect(klass) {
     return klass !== Model && Model.detect(klass);
   },
 
-  columnsForType: function(type) {
+  columnsForType(type) {
     var columns = [{ name: 'id', desc: 'Id' }], count = 0, self = this;
     get(type, 'attributes').forEach(function(meta, name) {
         if (LEGACY_MAP) { var tmp = name; name = meta; meta = tmp; }
@@ -33,18 +33,18 @@ export default Ember.DataAdapter.extend({
     return columns;
   },
 
-  getRecords: function(type) {
+  getRecords(type) {
     return this.get('store').all(type);
   },
 
-  recordReferenceToString: function(record) {
+  recordReferenceToString(record) {
     var ref  = record.buildFirebaseReference(),
         root = ref.root().toString();
 
     return ref.toString().slice(root.length);
   },
 
-  getRecordColumnValues: function(record) {
+  getRecordColumnValues(record) {
     var self  = this,
         count = 0;
 
@@ -63,7 +63,7 @@ export default Ember.DataAdapter.extend({
     return columnValues;
   },
 
-  getRecordKeywords: function(record) {
+  getRecordKeywords(record) {
     var keywords = Ember.A(), keys = Ember.A(['id']);
     record.eachAttribute(function(key) {
       keys.push(key);
@@ -74,14 +74,14 @@ export default Ember.DataAdapter.extend({
     return keywords;
   },
 
-  getRecordFilterValues: function(record) {
+  getRecordFilterValues(record) {
     return {
       isLive:    record.get('isListeningToFirebase'),
       isNew:     record.get('isNew')
     };
   },
 
-  getRecordColor: function(record) {
+  getRecordColor(record) {
     var color = 'black';
     if (record.get('isListeningToFirebase')) {
       color = 'green';
@@ -91,7 +91,7 @@ export default Ember.DataAdapter.extend({
     return color;
   },
 
-  observeRecord: function(record, recordUpdated) {
+  observeRecord(record, recordUpdated) {
     var releaseMethods = Ember.A(), self = this,
         keysToObserve = Ember.A(['id', 'isListeningToFirebase', 'isNew']);
 

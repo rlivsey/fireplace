@@ -34,14 +34,14 @@ export default function(type, options) {
   };
 
   return Ember.computed({
-    get: function(key) {
+    get(key) {
       var collection = buildCollection(this, key, meta.type, false, options);
       if (get(this, "isListeningToFirebase")) {
         collection.listenToFirebase();
       }
       return collection;
     },
-    set: function(key, value) {
+    set(key, value) {
       if (isNone(value)) {
         return null;
       }

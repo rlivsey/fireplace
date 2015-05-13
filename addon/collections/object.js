@@ -9,7 +9,7 @@ var set = Ember.set;
 
 export default Collection.extend({
 
-  toFirebaseJSON: function() {
+  toFirebaseJSON() {
     return this.reduce(function(json, item) {
       json[get(item, 'id')] = item.toFirebaseJSON(true);
       return json;
@@ -36,17 +36,17 @@ export default Collection.extend({
   }),
 
   // if we're listening, then our existing children should be too
-  listenToFirebase: function() {
+  listenToFirebase() {
     this.get("content").invoke("listenToFirebase");
     return this._super();
   },
 
-  stopListeningToFirebase: function() {
+  stopListeningToFirebase() {
     this.get("content").invoke("stopListeningToFirebase");
     return this._super();
   },
 
-  replaceContent: function(start, numRemoved, objectsAdded) {
+  replaceContent(start, numRemoved, objectsAdded) {
     this.setupParentage(objectsAdded);
     return this._super(start, numRemoved, objectsAdded);
   },
@@ -54,7 +54,7 @@ export default Collection.extend({
   // when we have a value (which is when listenToFirebase resolves)
   // then we know we have all our content because it all comes in
   // the same result
-  fetch: function() {
+  fetch() {
     var promise = this.listenToFirebase().then(Ember.K.bind(this));
     return PromiseProxy.create({promise: promise});
   },
@@ -65,7 +65,7 @@ export default Collection.extend({
     }
   })),
 
-  setupParentage: function(items) {
+  setupParentage(items) {
     items.forEach(function(item) {
       item.setProperties({
         parent:    this,
@@ -74,7 +74,7 @@ export default Collection.extend({
     }, this);
   },
 
-  modelFromSnapshot: function(snapshot) {
+  modelFromSnapshot(snapshot) {
     var modelName = this.modelClassFromSnapshot(snapshot);
     var store     = get(this, 'store');
     var query     = get(this, 'query') || {};
@@ -88,7 +88,7 @@ export default Collection.extend({
   // TODO / OPTIMIZE - faster way of checking for existing inclusion instead of findBy("id") each check
   // on replaceContent we can build an ID map and then check that
 
-  onFirebaseChildAdded: function(snapshot, prevItemName) {
+  onFirebaseChildAdded(snapshot, prevItemName) {
     var id = snapshot.key();
 
     if (this.findBy('id', id)) { return; }
@@ -103,14 +103,14 @@ export default Collection.extend({
 
   // TODO - should we destroy the item when removed?
   // TODO - should the item be removed from the store's cache?
-  onFirebaseChildRemoved: function(snapshot) {
+  onFirebaseChildRemoved(snapshot) {
     var item = this.findBy('id', snapshot.key());
     if (!item) { return; }
     this.removeObject(item);
     item.stopListeningToFirebase();
   },
 
-  onFirebaseChildMoved: function(snapshot, prevItemName) {
+  onFirebaseChildMoved(snapshot, prevItemName) {
     var item = this.findBy('id', snapshot.key());
     if (!item) { return; }
 

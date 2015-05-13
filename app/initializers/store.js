@@ -1,7 +1,7 @@
 export default {
   name: 'fireplace:inject-store',
 
-  initialize: function(container, application) {
+  initialize(container, application) {
     application.inject('controller',   'store', 'store:main');
     application.inject('route',        'store', 'store:main');
     application.inject('data-adapter', 'store', 'store:main');

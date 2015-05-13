@@ -32,7 +32,7 @@ var rootRef = "https://foobar.firebaseio.com";
 var Person;
 
 module("Model - class buildFirebaseReference", {
-  beforeEach: function() {
+  beforeEach() {
     store = Store.create({
       firebaseRoot: rootRef
     });
@@ -86,7 +86,7 @@ test("uses firebasePath as a function", function(assert) {
   var refOptions = {name: "bar"};
 
   Person.reopenClass({
-    firebasePath: function(opts) {
+    firebasePath(opts) {
       assert.equal(get(opts, "name"), "bar", "passes the options from buildFirebaseReference through to firebasePath");
       assert.ok(opts instanceof Ember.Object, "turns plain options hash to Ember.Object so we can use opts.get etc...");
       return "foo/"+opts.get("name");
@@ -102,7 +102,7 @@ test("expands the result of firebasePath function", function(assert) {
   var refOptions = {id: "bar"};
 
   Person.reopenClass({
-    firebasePath: function() {
+    firebasePath() {
       return "foo/{{id}}";
     }
   });
@@ -116,7 +116,7 @@ test("overriding firebasePathOptions", function(assert) {
 
   Person.reopenClass({
     firebasePath: "people/{{type}}/{{id}}",
-    firebasePathOptions: function(opts) {
+    firebasePathOptions(opts) {
       opts.type = "foo";
       return opts;
     }
@@ -128,7 +128,7 @@ test("overriding firebasePathOptions", function(assert) {
 
 test("firebasePath can return a reference", function(assert) {
   Person.reopenClass({
-    firebasePath: function(opts) {
+    firebasePath(opts) {
       // normally so you can do opts.get("something").buildFirebaseReference().parent().child("/foo")
       // to build up the hierarchy with firebase objects
       return new Firebase("https://somewhere.firebaseio.com/foo/bar/baz");
@@ -141,7 +141,7 @@ test("firebasePath can return a reference", function(assert) {
 });
 
 module("Model - instance buildFirebaseReference", {
-  beforeEach: function() {
+  beforeEach() {
     store = Store.create({
       firebaseRoot: rootRef
     });
@@ -173,7 +173,7 @@ test("uses class reference with ID appended", function(assert) {
 
 test("passes itself to class.buildFirebaseReference", function(assert) {
   Person.reopenClass({
-    firebasePath: function(opts) {
+    firebasePath(opts) {
       return "persons/"+opts.get("foo");
     }
   });

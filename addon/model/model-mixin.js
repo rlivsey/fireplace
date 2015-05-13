@@ -37,11 +37,11 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
 
   // wrapped MutableSnapshot, will never be null
   snapshot: Ember.computed("_snapshot", {
-    get: function() {
+    get() {
       var snapshot = get(this, "_snapshot");
       return new MutableSnapshot(snapshot);
     },
-    set: function(key, value) {
+    set(key, value) {
       if (value instanceof MutableSnapshot) {
         value = value.snapshot;
       }
@@ -50,7 +50,7 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
     }
   }),
 
-  willDestroy: function() {
+  willDestroy() {
     var store = get(this, "store");
     store.teardownRecord(this);
 
@@ -70,7 +70,7 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
     this._super();
   },
 
-  eachActiveRelation: function(cb) {
+  eachActiveRelation(cb) {
     var item;
     get(this.constructor, 'relationships').forEach(function(name/*, meta */) {
       item = cacheFor(this, name);
@@ -78,7 +78,7 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
     }, this);
   },
 
-  listenToFirebase: function() {
+  listenToFirebase() {
     if (!get(this, 'isListeningToFirebase')) {
       this.eachActiveRelation(function(item) {
         item.listenToFirebase();
@@ -87,7 +87,7 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
     return this._super();
   },
 
-  stopListeningToFirebase: function() {
+  stopListeningToFirebase() {
     if (get(this, 'isListeningToFirebase')) {
       this.eachActiveRelation(function(item) {
         item.stopListeningToFirebase();
@@ -96,7 +96,7 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
     return this._super();
   },
 
-  setAttributeFromSnapshot: function(snapshot, valueRemoved) {
+  setAttributeFromSnapshot(snapshot, valueRemoved) {
     var key       = snapshot.key();
     var attribute = this.attributeNameFromKey(key);
     if (!attribute) { return; }
@@ -126,7 +126,7 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
     });
   },
 
-  notifyRelationshipOfChange: function(snapshot, valueRemoved) {
+  notifyRelationshipOfChange(snapshot, valueRemoved) {
     var key       = snapshot.key();
     var attribute = this.relationshipNameFromKey(key);
 
@@ -147,22 +147,22 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
     }
   },
 
-  onFirebaseChildAdded: function(snapshot) {
+  onFirebaseChildAdded(snapshot) {
     this.setAttributeFromSnapshot(snapshot);
     this.notifyRelationshipOfChange(snapshot);
   },
 
-  onFirebaseChildRemoved: function(snapshot) {
+  onFirebaseChildRemoved(snapshot) {
     this.setAttributeFromSnapshot(snapshot, true);
     this.notifyRelationshipOfChange(snapshot, true);
   },
 
-  onFirebaseChildChanged: function(snapshot) {
+  onFirebaseChildChanged(snapshot) {
     this.setAttributeFromSnapshot(snapshot);
     this.notifyRelationshipOfChange(snapshot);
   },
 
-  onFirebaseValue: function(snapshot) {
+  onFirebaseValue(snapshot) {
     // apparently we don't exist
     if (snapshot && !snapshot.val()) {
       this.destroy();
@@ -171,20 +171,20 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
     }
   },
 
-  update: function(key, value) {
+  update(key, value) {
     set(this, key, value);
     return this.save(key);
   },
 
-  save: function(key) {
+  save(key) {
     return get(this, 'store').saveRecord(this, key);
   },
 
-  delete: function() {
+  delete() {
     return get(this, 'store').deleteRecord(this);
   },
 
-  toFirebaseJSON: function(includePriority) {
+  toFirebaseJSON(includePriority) {
     var attributes    = get(this.constructor, 'attributes'),
         relationships = get(this.constructor, 'relationships'),
         container     = get(this, "container"),
@@ -242,7 +242,7 @@ export var ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relations
     return includePriority ? this.wrapValueAndPriority(json) : json;
   },
 
-  wrapValueAndPriority: function(json) {
+  wrapValueAndPriority(json) {
     var priority = get(this, 'priority');
     if (isNone(priority)) {
       return json;

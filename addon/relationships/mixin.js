@@ -35,23 +35,23 @@ export var RelationshipsClassMixin = Ember.Mixin.create({
     return map;
   }),
 
-  relationshipNameFromKey: function(key) {
+  relationshipNameFromKey(key) {
     var meta = get(this, 'relationshipsByKey').get(key);
     return meta && meta.name;
   },
 
-  relationshipKeyFromName: function(name) {
+  relationshipKeyFromName(name) {
     var meta = get(this, 'relationships').get(name);
     return meta && meta.key;
   }
 });
 
 export var RelationshipsMixin = Ember.Mixin.create({
-  relationshipNameFromKey: function(key) {
+  relationshipNameFromKey(key) {
     return this.constructor.relationshipNameFromKey(key);
   },
 
-  relationshipKeyFromName: function(name) {
+  relationshipKeyFromName(name) {
     return this.constructor.relationshipKeyFromName(name);
   }
 });

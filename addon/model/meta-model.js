@@ -17,7 +17,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
   // meta is the simple value of the snapshot
   // if attributes are defined then you can't also have a meta value
   meta: Ember.computed("snapshot", {
-    get: function() {
+    get() {
       var attributes    = get(this.constructor, 'attributes');
       var relationships = get(this.constructor, 'relationships');
 
@@ -27,7 +27,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
 
       return get(this, "snapshot").val();
     },
-    set: function(key, value) {
+    set(key, value) {
       var attributes    = get(this.constructor, 'attributes');
       var relationships = get(this.constructor, 'relationships');
 
@@ -39,7 +39,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
     }
   }),
 
-  buildFirebaseReference: function(){
+  buildFirebaseReference(){
     var id        = get(this, 'id'),
         parent    = get(this, 'parent');
 
@@ -48,7 +48,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
     return parent.buildFirebaseReference().child(id);
   },
 
-  toFirebaseJSON: function(includePriority) {
+  toFirebaseJSON(includePriority) {
     var attributes    = get(this.constructor, 'attributes'),
         relationships = get(this.constructor, 'relationships');
 
@@ -74,7 +74,7 @@ var MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
     }
   },
 
-  saveContent: function() {
+  saveContent() {
     return this.get("content").save();
   },
 

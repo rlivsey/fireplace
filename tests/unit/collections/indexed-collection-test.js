@@ -85,7 +85,7 @@ test("wraps plain objects in meta models if necessary", function(assert) {
 });
 
 module("IndexedCollection - fetching", {
-  beforeEach: function() {
+  beforeEach() {
     setupEnv();
 
     // stick some data in to find
@@ -311,7 +311,7 @@ test("adding an item doesn't change its reference", function(assert) {
 
 var collection;
 module("IndexedCollection - receiving updates from Firebase", {
-  beforeEach: function() {
+  beforeEach() {
     setupEnv();
 
     firebase.child("people").set({
@@ -374,7 +374,7 @@ test("moving item", function(assert) {
 
 
 module("IndexedCollection - with meta receiving updates from Firebase", {
-  beforeEach: function() {
+  beforeEach() {
     setupEnv();
 
     var Member = MetaModel.extend({

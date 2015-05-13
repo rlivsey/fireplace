@@ -15,7 +15,7 @@ import Transform         from 'fireplace/transforms/base';
 var container, store;
 
 module("Model#toFirebaseJSON", {
-  beforeEach: function() {
+  beforeEach() {
     container = new Ember.Container();
     store = Store.create();
   }
@@ -72,8 +72,8 @@ test("transforms attribute values with named serializer", function(assert) {
   });
 
   container.register("transform:capitals", Transform.extend({
-    deserialize: function(value) { return value; },
-    serialize: function(value) {
+    deserialize(value) { return value; },
+    serialize(value) {
       assert.ok(true, "serialize called");
       return value.toUpperCase();
     },
@@ -93,7 +93,7 @@ test("transforms attribute values with inline serializer", function(assert) {
   assert.expect(2);
 
   var Person = Model.extend({
-    name: attr({serialize: function(value) {
+    name: attr({serialize(value) {
       assert.ok(true, "serialize called");
       return value.toUpperCase();
     }})

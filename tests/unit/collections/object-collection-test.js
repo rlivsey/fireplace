@@ -199,7 +199,7 @@ test("serializes children to Firebase JSON includes priorities", function(assert
 
 var collection;
 module("ObjectCollection - receiving updates from Firebase", {
-  beforeEach: function() {
+  beforeEach() {
     setupEnv();
     collection = People.create();
     collection.listenToFirebase();
@@ -259,7 +259,7 @@ test("listening to firebase recurses to its children", function(assert) {
 
 var Thing, Other;
 module("ObjectCollection - polymorphism", {
-  beforeEach: function(assert) {
+  beforeEach(assert) {
     firebase  = new window.MockFirebase("https://something.firebaseio.com");
     firebase.autoFlush(true);
 
@@ -289,7 +289,7 @@ module("ObjectCollection - polymorphism", {
     var PolyCollection = ObjectCollection.extend({
       store: store,
       firebaseReference: firebase.child("things"),
-      modelClassFromSnapshot: function(snapshot) {
+      modelClassFromSnapshot(snapshot) {
         return snapshot.val().type;
       }
     });

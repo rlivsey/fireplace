@@ -34,7 +34,7 @@ export default Ember.ObjectProxy.extend(Ember.PromiseProxyMixin, {
     }
   })),
 
-  _forwardToContent: function(prop) {
+  _forwardToContent(prop) {
     this[prop] = function() {
       var content = this.get("content");
       return content[prop].apply(content, arguments);
@@ -43,10 +43,10 @@ export default Ember.ObjectProxy.extend(Ember.PromiseProxyMixin, {
 
   // re-implemented from Ember so we can call our own observePromise
   promise: Ember.computed({
-    get: function() {
+    get() {
       throw new Ember.Error("PromiseProxy's promise must be set");
     },
-    set: function(key, promise) {
+    set(key, promise) {
       promise = resolve(promise);
       observePromise(this, promise);
       return promise.then(); // fork the promise.

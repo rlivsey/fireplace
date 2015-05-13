@@ -3,11 +3,11 @@ import Transform from './base';
 
 export default Transform.extend({
 
-  deserialize: function(serialized) {
+  deserialize(serialized) {
     return Ember.isEmpty(serialized) ? null : Number(serialized);
   },
 
-  serialize: function(deserialized) {
+  serialize(deserialized) {
     return Ember.isEmpty(deserialized) ? null : Number(deserialized);
   }
 });

@@ -35,7 +35,7 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
     return this.buildFirebaseReference().toString();
   }),
 
-  buildFirebaseReference: function() {
+  buildFirebaseReference() {
     // do we have an explicit reference?
     var ref = get(this, 'firebaseReference');
     if (ref) {
@@ -67,7 +67,7 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
     return modelClass.buildFirebaseReference(store);
   },
 
-  buildFirebaseQuery: function() {
+  buildFirebaseQuery() {
     var reference = this.buildFirebaseReference(),
         options = getProperties(this, 'startAt', 'endAt', 'limit');
 
@@ -86,17 +86,17 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
     return reference;
   },
 
-  save: function() {
+  save() {
     return this.store.saveCollection(this);
   },
 
-  modelClassFromSnapshot: function(snap) {
+  modelClassFromSnapshot(snap) {
     var modelName = get(this, 'model');
     var baseClass = this.store.modelFor(modelName);
     return baseClass.typeFromSnapshot(snap);
   },
 
-  onFirebaseValue: function(snapshot) {
+  onFirebaseValue(snapshot) {
     set(this, "snapshot", snapshot);
   },
 
@@ -106,7 +106,7 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
     }
   }),
 
-  insertAfter: function(prevItemName, item, collection) {
+  insertAfter(prevItemName, item, collection) {
     collection = collection || this;
 
     var previous, previousIndex;

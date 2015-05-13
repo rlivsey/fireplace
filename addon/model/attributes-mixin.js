@@ -35,34 +35,34 @@ export var AttributesClassMixin = Ember.Mixin.create({
     return map;
   }),
 
-  eachAttribute: function(callback, binding) {
+  eachAttribute(callback, binding) {
     get(this, 'attributes').forEach(function(meta, name) {
       if (LEGACY_MAP) { var tmp = name; name = meta; meta = tmp; }
       callback.call(binding, name, meta);
     }, binding);
   },
 
-  attributeNameFromKey: function(key) {
+  attributeNameFromKey(key) {
     var meta = get(this, 'attributesByKey').get(key);
     return meta && meta.name;
   },
 
-  attributeKeyFromName: function(name) {
+  attributeKeyFromName(name) {
     var meta = get(this, 'attributes').get(name);
     return meta && meta.key;
   }
 });
 
 export var AttributesMixin = Ember.Mixin.create({
-  eachAttribute: function(callback, binding) {
+  eachAttribute(callback, binding) {
     this.constructor.eachAttribute(callback, binding);
   },
 
-  attributeNameFromKey: function(key) {
+  attributeNameFromKey(key) {
     return this.constructor.attributeNameFromKey(key);
   },
 
-  attributeKeyFromName: function(key) {
+  attributeKeyFromName(key) {
     return this.constructor.attributeKeyFromName(key);
   }
 });

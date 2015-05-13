@@ -1,11 +1,11 @@
 import Transform from './base';
 
 export default Transform.extend({
-  deserialize: function(serialized) {
+  deserialize(serialized) {
     return Boolean(serialized);
   },
 
-  serialize: function(deserialized) {
+  serialize(deserialized) {
     return Boolean(deserialized);
   }
 });

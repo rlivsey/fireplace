@@ -34,7 +34,7 @@ export default function(type, options) {
   };
 
   return Ember.computed({
-    get: function(name) {
+    get(name) {
       var store    = get(this, "store");
       var snapshot = get(this, "snapshot");
       var childSnap;
@@ -83,7 +83,7 @@ export default function(type, options) {
         return store.findOne(meta.type, itemID, query);
       }
     },
-    set: function(name, value) {
+    set(name, value) {
       if (isNone(value)) {
         return null;
       }

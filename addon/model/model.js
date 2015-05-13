@@ -14,11 +14,11 @@ var pluralize  = Ember.String.pluralize;
 
 var Model = Ember.Object.extend(ModelMixin, {
   id: Ember.computed({
-    get: function() {
+    get() {
       var store = get(this, 'store');
       return this.constructor.buildFirebaseRootReference(store).push().key();
     },
-    set: function(key, value) {
+    set(key, value) {
       return value;
     }
   }),
@@ -27,7 +27,7 @@ var Model = Ember.Object.extend(ModelMixin, {
     return this.buildFirebaseReference().toString();
   }),
 
-  buildFirebaseReference: function(){
+  buildFirebaseReference(){
     var id        = get(this, 'id'),
         parent    = get(this, 'parent'),
         parentKey = get(this, 'parentKey'),
@@ -52,30 +52,30 @@ var Model = Ember.Object.extend(ModelMixin, {
 export default Model;
 
 Model.reopenClass(ModelClassMixin, {
-  firebasePath: function(/* opts */) {
+  firebasePath(/* opts */) {
     // typeKey is set in the store when looking up the factory
     Ember.assert("No typeKey set, you must use the store to create/find records", !!this.typeKey);
     return pluralize(underscore(this.typeKey));
   },
 
   // override for polymophism
-  typeFromSnapshot: function(/* snapshot */) {
+  typeFromSnapshot(/* snapshot */) {
     return this;
   },
 
   // defaults to the store's root reference, normally won't be overridden
   // unless you have a different firebase per model, which could cause oddness!
-  buildFirebaseRootReference: function(store) {
+  buildFirebaseRootReference(store) {
     return store.buildFirebaseRootReference();
   },
 
   // override if you want to do something different based on the options
   // can be handy for polymorphism
-  firebasePathOptions: function(opts) {
+  firebasePathOptions(opts) {
     return opts;
   },
 
-  buildFirebaseReference: function(store, opts) {
+  buildFirebaseReference(store, opts) {
     opts = this.firebasePathOptions(opts || {});
 
     var path = this.firebasePath;

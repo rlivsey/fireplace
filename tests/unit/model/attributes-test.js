@@ -14,7 +14,7 @@ var set = Ember.set;
 var container;
 
 module("Model - Attributes", {
-  beforeEach: function() {
+  beforeEach() {
     container = new Ember.Container();
   }
 });
@@ -42,7 +42,7 @@ test("An attribute can have a default value", function(assert) {
 
 test("An attribute can have a default function", function(assert) {
   var Page = Model.extend({
-    title: attr({default: function() { return "The default"; }})
+    title: attr({default() { return "The default"; }})
   });
 
   var page = Page.create();
@@ -55,7 +55,7 @@ test("An attribute can have a default function", function(assert) {
 test("Default value functions are called in the object's context", function(assert) {
   var Page = Model.extend({
     defaultTitle: "default from this",
-    title: attr({default: function() { return get(this, 'defaultTitle'); }})
+    title: attr({default() { return get(this, 'defaultTitle'); }})
   });
 
   var page = Page.create();
@@ -131,7 +131,7 @@ test("attribute transforms are looked up on the container", function(assert) {
   assert.expect(2);
 
   container.register("transform:capitals", Transform.extend({
-    deserialize: function(value) {
+    deserialize(value) {
       assert.ok(true, "deserialize called");
       return value.toUpperCase();
     }
@@ -153,7 +153,7 @@ test("An attribute can have a local deserializer function", function(assert) {
   assert.expect(2);
 
   var Page = Model.extend({
-    title: attr({deserialize: function(value) {
+    title: attr({deserialize(value) {
       assert.ok(true, "deserialize called");
       return value.toUpperCase();
     }})

@@ -36,7 +36,7 @@ export default Model.extend({
 // app/routes/people.js
 import Ember from 'ember';
 export default Ember.Route.extend({
-  model: function() {
+  model() {
     // list all people
     return this.store.fetch("person");
   }
@@ -47,7 +47,7 @@ export default Ember.Route.extend({
 // app/routes/person.js
 import Ember from 'ember';
 export default Ember.Route.extend({
-  model: function(params) {
+  model(params) {
     return this.store.fetch("person", params.person_id);
   }
 });

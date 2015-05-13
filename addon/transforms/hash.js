@@ -1,11 +1,11 @@
 import Transform from './base';
 
 export default Transform.extend({
-  serialize: function(hash, options, container) {
+  serialize(hash, options, container) {
     return transformHash("serialize", hash, options, container);
   },
 
-  deserialize: function(hash, options, container) {
+  deserialize(hash, options, container) {
     return transformHash("deserialize", hash, options, container);
   }
 });

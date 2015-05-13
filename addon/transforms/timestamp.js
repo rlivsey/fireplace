@@ -7,14 +7,14 @@ export function now() {
 }
 
 export default Transform.extend({
-  deserialize: function(value) {
+  deserialize(value) {
     if (!value) {
       return null;
     }
     return new Date(value);
   },
 
-  serialize: function(value) {
+  serialize(value) {
     if (value === Firebase.ServerValue.TIMESTAMP) {
       return value;
     }

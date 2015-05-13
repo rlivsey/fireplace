@@ -4,7 +4,7 @@ import {module, test} from 'qunit';
 
 var queue;
 module("Support - EventQueue", {
-  beforeEach: function() {
+  beforeEach() {
     queue = new EventQueue();
   }
 });

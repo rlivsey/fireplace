@@ -19,7 +19,7 @@ export default function(type, options) {
   };
 
   return Ember.computed({
-    get: function(name) {
+    get(name) {
       var container = get(this, 'container');
       var dataKey   = this.attributeKeyFromName(name);
       var snapshot  = get(this, 'snapshot');
@@ -34,7 +34,7 @@ export default function(type, options) {
       return value;
     },
 
-    set: function(name, value) {
+    set(name, value) {
       if (isNone(value)) {
         value = getDefaultValue(this, options);
       }

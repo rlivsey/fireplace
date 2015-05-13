@@ -14,7 +14,7 @@ var set = Ember.set;
 
 var Person;
 module("Model Firebase events", {
-  beforeEach: function() {
+  beforeEach() {
     Person = Model.extend({
       firstName: attr(),
       lastName:  attr()
@@ -75,7 +75,7 @@ test("onFirebaseValue destroys the object if snapshot value is null", function(a
 });
 
 module("Model Firebase events with relationship", {
-  beforeEach: function() {
+  beforeEach() {
     Person = Model.extend({
       firstName: attr(),
       lastName:  attr(),
