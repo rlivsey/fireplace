@@ -6,23 +6,23 @@ module.exports = {
                         // default is already specified in
                         // the consuming app's bower.json
     },
-    // {
-    //   name: "ember-release",
-    //   dependencies: {
-    //     "ember": "release"
-    //   }
-    // },
-    // {
-    //   name: "ember-beta",
-    //   dependencies: {
-    //     "ember": "beta"
-    //   }
-    // },
-    // {
-    //   name: "ember-canary",
-    //   dependencies: {
-    //     "ember": "canary"
-    //   }
-    // }
+    {
+      name: "ember-release",
+      dependencies: {
+        "ember": "release"
+      }
+    },
+    {
+      name: "ember-beta",
+      dependencies: {
+        "ember": "beta"
+      }
+    },
+    {
+      name: "ember-canary",
+      dependencies: {
+        "ember": "canary"
+      }
+    }
   ]
 };
