@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import expandPath from '../utils/expand-path';
+import { extractQueryOptions } from '../utils/query';
 
 // options
 // embedded: (true)|false
@@ -35,27 +36,26 @@ export default function(type, options) {
 
   return Ember.computed({
     get(key) {
-      const collection = buildCollection(this, key, meta.type, false, options);
+      const dataKey    = this.relationshipKeyFromName(key);
+      const snapshot   = get(this, "snapshot").child(dataKey).snapshot;
+      const collection = buildCollection(this, key, meta.type, options, { snapshot });
+
       if (get(this, "isListeningToFirebase")) {
         collection.listenToFirebase();
       }
       return collection;
     },
-    set(key, value) {
-      if (isNone(value)) {
+    set(key, content) {
+      if (isNone(content)) {
         return null;
       }
-      return buildCollection(this, key, meta.type, true, options, {
-        content: value
-      });
+
+      return buildCollection(this, key, meta.type, options, { content });
     }
   }).meta(meta);
 }
 
-// regardless of getting or setting, we create a new collection
-// TODO - update the old one if there is one hanging around
-// TODO - use store.findQuery for this
-function buildCollection(model, name, type, isSetter, options, attrs) {
+function buildCollection(model, name, type, options, attrs) {
   const store          = get(model, "store");
   const container      = get(model, "container");
   const collectionName = options.collection || (options.embedded ? "object" : "indexed");
@@ -73,27 +73,10 @@ function buildCollection(model, name, type, isSetter, options, attrs) {
     store:     store,
     model:     type,
     query:     query,
-    as:        options.as,
+    as:        options.as
+  }, extractQueryOptions(options));
 
-    // TODO - allow these to be functions?
-    startAt:   options.startAt,
-    endAt:     options.endAt,
-    limit:     options.limit
-  });
-
-  if (!options.detached) {
-    collectionOpts.parent    = model;
-    collectionOpts.parentKey = name;
-
-    if (!isSetter) {
-      const dataKey   = model.relationshipKeyFromName(name);
-      const snapshot  = get(model, "snapshot");
-
-      // collections use an actual snapshot, not a MutableSnapshot
-      // TODO - should be able to pass the mutable one?
-      collectionOpts.snapshot = snapshot.child(dataKey).snapshot;
-    }
-  } else {
+  if (options.detached) {
     const modelClass = store.modelFor(type);
 
     let reference;
@@ -111,6 +94,9 @@ function buildCollection(model, name, type, isSetter, options, attrs) {
     }
 
     collectionOpts.firebaseReference = reference;
+  } else {
+    collectionOpts.parent    = model;
+    collectionOpts.parentKey = name;
   }
 
   return collectionType.create(collectionOpts);

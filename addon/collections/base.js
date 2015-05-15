@@ -6,6 +6,19 @@ const get           = Ember.get;
 const set           = Ember.set;
 const getProperties = Ember.getProperties;
 
+export const QUERY_OPTIONS = [
+  'equalTo',
+  'limit',
+  'limitToFirst',
+  'limitToLast',
+  'orderByChild',
+  'orderByKey',
+  'orderByPriority',
+  'orderByValue',
+  'startAt',
+  'endAt'
+];
+
 export default Ember.ArrayProxy.extend(LiveMixin, {
   firebaseEvents: ['child_added', 'child_removed', 'child_moved'],
 
@@ -16,9 +29,16 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
   query:     null,
 
   // filtering
-  startAt: null,
-  endAt:   null,
-  limit:   null,
+  equalTo:         null, // value, or {value, key}
+  limit:           null, // limit
+  limitToFirst:    null, // limit
+  limitToLast:     null, // limit
+  orderByChild:    null, // key
+  orderByKey:      null, // true
+  orderByPriority: null, // true
+  orderByValue:    null, // true
+  startAt:         null, // value, or {value, key}
+  endAt:           null, // value, or {value, key}
 
   onFirebaseChildAdded:   null,
   onFirebaseChildRemoved: null,
@@ -69,18 +89,61 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
 
   buildFirebaseQuery() {
     let reference = this.buildFirebaseReference();
-    const options = getProperties(this, 'startAt', 'endAt', 'limit');
+    const options = getProperties(this, QUERY_OPTIONS);
 
     if (options.startAt) {
-      reference = reference.startAt(options.startAt);
+      if (Ember.typeOf(options.startAt) === 'object') {
+        reference = reference.startAt(options.startAt.value, options.startAt.key);
+      } else {
+        reference = reference.startAt(options.startAt);
+      }
     }
 
     if (options.endAt) {
-      reference = reference.endAt(options.endAt);
+      if (Ember.typeOf(options.endAt) === 'object') {
+        reference = reference.endAt(options.endAt.value, options.endAt.key);
+      } else {
+        reference = reference.endAt(options.endAt);
+      }
+    }
+
+    if (options.equalTo) {
+      if (Ember.typeOf(options.equalTo) === 'object') {
+        reference = reference.equalTo(options.equalTo.value, options.equalTo.key);
+      } else {
+        reference = reference.equalTo(options.equalTo);
+      }
     }
 
     if (options.limit) {
+      Ember.deprecate("limit is deprecated, use limitToFirst or limitToEnd instead");
       reference = reference.limit(options.limit);
+    }
+
+    if (options.limitToFirst) {
+      reference = reference.limitToFirst(options.limitToFirst);
+    }
+
+    if (options.limitToLast) {
+      reference = reference.limitToLast(options.limitToLast);
+    }
+
+    Ember.assert("you can only order by one thing at a time", [options.orderByChild, options.orderByKey, options.orderByPriority, options.orderByValue].filter(o => o).length <= 1);
+
+    if (options.orderByChild) {
+      reference = reference.orderByChild(options.orderByChild);
+    }
+
+    if (options.orderByKey) {
+      reference = reference.orderByKey();
+    }
+
+    if (options.orderByValue) {
+      reference = reference.orderByValue();
+    }
+
+    if (options.orderByPriority) {
+      reference = reference.orderByPriority();
     }
 
     return reference;

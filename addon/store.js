@@ -4,6 +4,11 @@ import EventQueue   from './support/event-queue';
 import PromiseModel from './model/promise-model';
 import MetaModel    from './model/meta-model';
 
+import {
+  hasQueryOptions,
+  extractQueryOptions
+} from './utils/query';
+
 const get         = Ember.get;
 const guidFor     = Ember.guidFor;
 const camelize    = Ember.String.camelize;
@@ -202,7 +207,7 @@ export default Ember.Object.extend({
     options = options || {};
 
     // switch order if query is the options
-    if (query.startAt || query.endAt || query.limit || query.path || query.collection) {
+    if (hasQueryOptions(query) || query.path || query.collection) {
       options = query;
       query   = {};
     }
@@ -263,15 +268,14 @@ export default Ember.Object.extend({
     const type      = options.collection || "object";
     const factory   = container.lookupFactory("collection:"+type);
 
-    const collection = factory.create({
+    const collection = factory.create(Ember.$.extend({
       store: this,
       model: model,
       query: query,
-      firebaseReference: ref,
-      startAt: options.startAt,
-      endAt: options.endAt,
-      limit: options.limit
-    });
+      firebaseReference: ref
+    }, extractQueryOptions(options)));
+
+    // const collection = buildCollection();
 
     if (returnPromise) {
       return collection.fetch();
