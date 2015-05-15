@@ -91,6 +91,28 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
     let reference = this.buildFirebaseReference();
     const options = getProperties(this, QUERY_OPTIONS);
 
+    Ember.assert("you can only order by one thing at a time", [options.orderByChild, options.orderByKey, options.orderByPriority, options.orderByValue].filter(o => o).length <= 1);
+
+    // Ordering has to come first
+
+    if (options.orderByChild) {
+      reference = reference.orderByChild(options.orderByChild);
+    }
+
+    if (options.orderByKey) {
+      reference = reference.orderByKey();
+    }
+
+    if (options.orderByValue) {
+      reference = reference.orderByValue();
+    }
+
+    if (options.orderByPriority) {
+      reference = reference.orderByPriority();
+    }
+
+    // Now we've ordered, we can filter
+
     if (options.startAt) {
       if (Ember.typeOf(options.startAt) === 'object') {
         reference = reference.startAt(options.startAt.value, options.startAt.key);
@@ -126,24 +148,6 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
 
     if (options.limitToLast) {
       reference = reference.limitToLast(options.limitToLast);
-    }
-
-    Ember.assert("you can only order by one thing at a time", [options.orderByChild, options.orderByKey, options.orderByPriority, options.orderByValue].filter(o => o).length <= 1);
-
-    if (options.orderByChild) {
-      reference = reference.orderByChild(options.orderByChild);
-    }
-
-    if (options.orderByKey) {
-      reference = reference.orderByKey();
-    }
-
-    if (options.orderByValue) {
-      reference = reference.orderByValue();
-    }
-
-    if (options.orderByPriority) {
-      reference = reference.orderByPriority();
     }
 
     return reference;
