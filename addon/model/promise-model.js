@@ -35,9 +35,9 @@ export default Ember.ObjectProxy.extend(Ember.PromiseProxyMixin, {
   })),
 
   _forwardToContent(prop) {
-    this[prop] = () => {
+    this[prop] = (...args) => {
       const content = this.get("content");
-      return content[prop].apply(content, arguments);
+      return content[prop].apply(content, args);
     };
   },
 
