@@ -196,7 +196,12 @@ export default Collection.extend({
 
   wrapRecordInMetaObjectIfNeccessary(record, snapshot) {
     const as = get(this, "as");
-    if (!as || record instanceof MetaModel) {
+    if (!as) {
+      return record;
+    }
+
+    if (record instanceof MetaModel) {
+      set(record, "parent", this);
       return record;
     }
 

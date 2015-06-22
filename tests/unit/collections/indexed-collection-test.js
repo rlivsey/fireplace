@@ -84,6 +84,25 @@ test("wraps plain objects in meta models if necessary", function(assert) {
   assert.equal(get(obj, 'content'), person, "meta model has item as content");
 });
 
+test("sets parent on meta models", function(assert) {
+  var Member = MetaModel.extend({
+    level: attr()
+  });
+
+  container.register("model:member", Member);
+
+  var person = store.createRecord("person", {id: "123", name: "Tom"});
+  var member = store.createRecord("member", { content: person, level: "admin" });
+  var people = PeopleIndex.create({
+    as: Member,
+    content: Ember.A([member])
+  });
+
+  var obj = people.get("firstObject");
+
+  assert.equal(get(obj, "parent"), people, "sets parent to collection");
+});
+
 module("IndexedCollection - fetching", {
   beforeEach() {
     setupEnv();
@@ -212,8 +231,6 @@ test("sets the parent for meta-models so references are all setup", function(ass
 });
 
 test("doesn't set the parent for non-meta-models", function(assert) {
-  var Member = MetaModel.extend();
-
   var people = PeopleIndex.create();
 
   var person = store.createRecord(Person, {id: "123"});
