@@ -2,6 +2,8 @@
 
 ## Master
 
+## v0.3.3
+
 * Fixed MetaModel parent not being set when replacing whole content (or initializing) an IndexedCollection
 * use new-style computed property getters & setters (removes deprecation warnings in canary)
 
