@@ -1,27 +1,34 @@
 module.exports = {
   scenarios: [
     {
-      name: "default",
-      dependencies: { } // no dependencies needed as the
-                        // default is already specified in
-                        // the consuming app's bower.json
+      name: 'default',
+      dependencies: { }
     },
     {
-      name: "ember-release",
+      name: 'ember-release',
       dependencies: {
-        "ember": "release"
+        'ember': 'components/ember#release'
+      },
+      resolutions: {
+        'ember': 'release'
       }
     },
     {
-      name: "ember-beta",
+      name: 'ember-beta',
       dependencies: {
-        "ember": "beta"
+        'ember': 'components/ember#beta'
+      },
+      resolutions: {
+        'ember': 'beta'
       }
     },
     {
-      name: "ember-canary",
+      name: 'ember-canary',
       dependencies: {
-        "ember": "canary"
+        'ember': 'components/ember#canary'
+      },
+      resolutions: {
+        'ember': 'canary'
       }
     }
   ]
