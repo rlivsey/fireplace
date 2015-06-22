@@ -66,7 +66,7 @@ export const ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relatio
   },
 
   eachActiveRelation(cb) {
-    get(this.constructor, 'relationships').forEach(name => {
+    get(this.constructor, 'relationships').forEach((meta, name) => {
       const item = cacheFor(this, name);
       if (item) { cb(item); }
     });
