@@ -5,7 +5,11 @@ export default function deepEqual(a, b) {
     return true;
   }
 
-  if (typeof a !== 'object' || typeof b !== 'object') {
+  if (!a || !b) {
+    return false;
+  }
+
+  if (a && typeof a !== 'object' || typeof b !== 'object') {
     return false;
   }
 

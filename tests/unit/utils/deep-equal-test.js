@@ -28,3 +28,11 @@ test('deeply nested equal objects are equal', function(assert) {
 test('deeply nested unequal objects are not equal', function(assert) {
   assert.ok(!deepEqual({a: {b: 1}}, {a: {b: 2}}));
 });
+
+test("null doesn't break comparisons", function(assert) {
+  assert.ok(!deepEqual(null, '1'));
+  assert.ok(!deepEqual('1', null));
+  assert.ok(!deepEqual(null, {a: 1}));
+  assert.ok(!deepEqual({a: 1}, null));
+  assert.ok(deepEqual(null, null));
+});
