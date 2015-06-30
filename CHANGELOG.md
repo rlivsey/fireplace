@@ -2,6 +2,10 @@
 
 ## Master
 
+## v0.3.5
+
+* Bugfix - handle null values in deepEqual comparison
+
 ## v0.3.4
 
 * Fixed issue where hash attributes would be marked as changed when they were not
