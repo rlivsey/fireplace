@@ -2,6 +2,10 @@
 
 ## Master
 
+## v0.3.4
+
+* Fixed issue where hash attributes would be marked as changed when they were not
+
 ## v0.3.3
 
 * Fixed MetaModel parent not being set when replacing whole content (or initializing) an IndexedCollection
