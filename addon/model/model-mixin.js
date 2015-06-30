@@ -2,6 +2,7 @@ import Ember from 'ember';
 
 import MutableSnapshot from '../support/mutable-snapshot';
 import { serialize } from '../transforms/base';
+import deepEqual from '../utils/deep-equal';
 
 import LiveMixin from './live-mixin';
 import {
@@ -106,7 +107,8 @@ export const ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relatio
 
     // don't bother triggering a property change if nothing has changed
     // eg if we've got a snapshot & then started listening
-    if (currentData === newVal) {
+    // do deep comparison in-case this is a hash type
+    if (deepEqual(currentData, newVal)) {
       return;
     }
 
