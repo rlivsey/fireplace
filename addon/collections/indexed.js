@@ -36,7 +36,9 @@ export default Collection.extend({
     const content = [];
 
     // snapshot doesn't implement map
-    snapshot.forEach(child => content.push(this.itemFromSnapshot(child)));
+    snapshot.forEach(child => {
+      content.push(this.itemFromSnapshot(child)); // avoid implicit return as Snapshot#forEach cancels if you return true
+    });
 
     set(this, "content", Ember.A(content));
   }),

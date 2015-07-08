@@ -27,7 +27,9 @@ export default Collection.extend({
     // snapshot doesn't implement map
 
     const content = [];
-    snapshot.forEach(child => content.push(this.modelFromSnapshot(child) ));
+    snapshot.forEach(child => {
+      content.push(this.modelFromSnapshot(child));  // avoid implicit return as Snapshot#forEach cancels if you return true
+    });
 
     // The observer happens too late for the initial content
     // so force it to setup right away
