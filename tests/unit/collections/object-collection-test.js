@@ -244,17 +244,17 @@ test("moving an item", function(assert) {
 test("listening to firebase recurses to its children", function(assert) {
   collection.stopListeningToFirebase();
   assert.ok(!get(collection, "isListeningToFirebase"), "collection isn't listening");
-  assert.ok(collection.everyBy("isListeningToFirebase", false), "none are listening");
+  assert.ok(collection.isEvery("isListeningToFirebase", false), "none are listening");
 
   collection.listenToFirebase();
 
   assert.ok(get(collection, "isListeningToFirebase"), "collection is listening");
-  assert.ok(collection.everyBy("isListeningToFirebase", true), "all are listening");
+  assert.ok(collection.isEvery("isListeningToFirebase", true), "all are listening");
 
   collection.stopListeningToFirebase();
 
   assert.ok(!get(collection, "isListeningToFirebase"), "collection isn't listening");
-  assert.ok(collection.everyBy("isListeningToFirebase", false), "none are listening");
+  assert.ok(collection.isEvery("isListeningToFirebase", false), "none are listening");
 });
 
 var Thing, Other;
