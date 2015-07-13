@@ -2,6 +2,11 @@
 
 ## Master
 
+## v0.3.6
+
+* Remove deprecated usage of `isEvery` and `findProperty`
+* Fix accidental early exiting of Snapshot#forEach when setting up collection
+
 ## v0.3.5
 
 * Bugfix - handle null values in deepEqual comparison
