@@ -180,7 +180,7 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
     let previousIndex;
 
     if (prevItemName) {
-      previous = collection.findProperty('id', prevItemName);
+      previous = collection.findBy('id', prevItemName);
       if (previous) {
         previousIndex = collection.indexOf(previous);
         collection.insertAt(previousIndex + 1, item);
