@@ -2,6 +2,8 @@
 
 ## Master
 
+## v0.3.7
+
 * use `ember-inflector` from NPM instead of Bower
 
 ## v0.3.6
