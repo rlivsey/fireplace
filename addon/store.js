@@ -5,6 +5,10 @@ import PromiseModel from './model/promise-model';
 import MetaModel    from './model/meta-model';
 
 import {
+  singularize
+} from 'ember-inflector';
+
+import {
   hasQueryOptions,
   extractQueryOptions
 } from './utils/query';
@@ -12,7 +16,6 @@ import {
 const get         = Ember.get;
 const guidFor     = Ember.guidFor;
 const camelize    = Ember.String.camelize;
-const singularize = Ember.String.singularize;
 
 export default Ember.Object.extend({
 

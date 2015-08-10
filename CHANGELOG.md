@@ -2,6 +2,8 @@
 
 ## Master
 
+* use `ember-inflector` from NPM instead of Bower
+
 ## v0.3.6
 
 * Remove deprecated usage of `isEvery` and `findProperty`

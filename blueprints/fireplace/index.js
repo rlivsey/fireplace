@@ -9,10 +9,6 @@ module.exports = {
       {
         name: 'firebase',
         target: '^2.2.4'
-      },
-      {
-        name: 'ember-inflector',
-        target: '^1.3.1'
       }
     ]);
   }
