@@ -2,6 +2,10 @@
 
 ## Master
 
+## v0.3.8
+
+* fix queries with falsey values
+
 ## v0.3.7
 
 * use `ember-inflector` from NPM instead of Bower
