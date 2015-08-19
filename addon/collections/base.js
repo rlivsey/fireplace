@@ -113,7 +113,7 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
 
     // Now we've ordered, we can filter
 
-    if (options.startAt) {
+    if (options.startAt !== null) {
       if (Ember.typeOf(options.startAt) === 'object') {
         reference = reference.startAt(options.startAt.value, options.startAt.key);
       } else {
@@ -121,7 +121,7 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
       }
     }
 
-    if (options.endAt) {
+    if (options.endAt !== null) {
       if (Ember.typeOf(options.endAt) === 'object') {
         reference = reference.endAt(options.endAt.value, options.endAt.key);
       } else {
@@ -129,7 +129,7 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
       }
     }
 
-    if (options.equalTo) {
+    if (options.equalTo !== null) {
       if (Ember.typeOf(options.equalTo) === 'object') {
         reference = reference.equalTo(options.equalTo.value, options.equalTo.key);
       } else {
@@ -137,16 +137,16 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
       }
     }
 
-    if (options.limit) {
+    if (options.limit !== null) {
       Ember.deprecate("limit is deprecated, use limitToFirst or limitToEnd instead");
       reference = reference.limit(options.limit);
     }
 
-    if (options.limitToFirst) {
+    if (options.limitToFirst !== null) {
       reference = reference.limitToFirst(options.limitToFirst);
     }
 
-    if (options.limitToLast) {
+    if (options.limitToLast !== null) {
       reference = reference.limitToLast(options.limitToLast);
     }
 

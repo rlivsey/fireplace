@@ -216,6 +216,18 @@ test("equalTo", function(assert) {
   collection.buildFirebaseQuery();
 });
 
+test("equalTo - with falsy value", function(assert) {
+  const reference = {
+    equalTo: (value, key) => {
+      assert.equal(value,  false);
+      assert.equal(key,    undefined);
+    }
+  };
+
+  const collection = Collection.create({ firebaseReference: reference, equalTo: false });
+  collection.buildFirebaseQuery();
+});
+
 test("equalTo - value and key", function(assert) {
   const reference = {
     equalTo: (value, key) => {
