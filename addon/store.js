@@ -17,7 +17,7 @@ const get         = Ember.get;
 const guidFor     = Ember.guidFor;
 const camelize    = Ember.String.camelize;
 
-export default Ember.Object.extend({
+export default Ember.Service.extend({
 
   firebaseRoot: null,
 

@@ -2,6 +2,8 @@
 
 ## Master
 
+* Moved Store to be a service, so now located at `app/services/store.js` vs `app/stores/main.js`
+
 ## v0.3.8
 
 * fix queries with falsey values
