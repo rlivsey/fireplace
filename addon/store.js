@@ -37,9 +37,9 @@ export default Ember.Service.extend({
   // no need to re-join, just save or discard your changes & firebase
   // takes care of keeping the other models in sync
   fork() {
-    return this.constructor.create({
-      container: get(this, "container")
-    });
+    const container = get(this, "container");
+    const factory = container.lookupFactory("service:store");
+    return factory.create();
   },
 
   buildFirebaseRootReference(){
@@ -305,12 +305,9 @@ export default Ember.Service.extend({
   },
 
   buildRecord(type, id, attributes) {
-    const container = get(this, "container");
-    const factory   = this.modelFor(type);
-
+    const factory = this.modelFor(type);
     const record = factory.create({
-      store:     this,
-      container: container
+      store: this
     });
 
     if (attributes) {
