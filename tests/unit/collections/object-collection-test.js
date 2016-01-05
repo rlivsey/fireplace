@@ -7,7 +7,7 @@ import Store from 'fireplace/store';
 import attr  from 'fireplace/model/attr';
 import ObjectCollection from 'fireplace/collections/object';
 
-import { makeSnapshot, getSnapshot } from '../../helpers/firebase';
+import { getSnapshot } from '../../helpers/firebase';
 
 var get  = Ember.get;
 
@@ -259,7 +259,7 @@ test("listening to firebase recurses to its children", function(assert) {
 
 var Thing, Other;
 module("ObjectCollection - polymorphism", {
-  beforeEach(assert) {
+  beforeEach(/*assert*/) {
     firebase  = new window.MockFirebase("https://something.firebaseio.com");
     firebase.autoFlush(true);
 

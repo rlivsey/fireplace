@@ -10,7 +10,6 @@ import one   from 'fireplace/relationships/has-one';
 import { makeSnapshot } from '../../helpers/firebase';
 
 var get = Ember.get;
-var set = Ember.set;
 
 var Person;
 module("Model Firebase events", {
@@ -97,7 +96,7 @@ test("handles child_added events occurring before value", function(assert) {
   var avatarSnap    = makeSnapshot("avatar",     "123");
 
   var mockAvatar = "an avatar";
-  store.findOne = function(type, id, query) {
+  store.findOne = function(type, id/*, query*/) {
     assert.equal(id, "123", "calls find for the avatar with the correct ID");
     return mockAvatar;
   };

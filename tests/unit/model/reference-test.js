@@ -128,7 +128,7 @@ test("overriding firebasePathOptions", function(assert) {
 
 test("firebasePath can return a reference", function(assert) {
   Person.reopenClass({
-    firebasePath(opts) {
+    firebasePath(/*opts*/) {
       // normally so you can do opts.get("something").buildFirebaseReference().parent().child("/foo")
       // to build up the hierarchy with firebase objects
       return new Firebase("https://somewhere.firebaseio.com/foo/bar/baz");

@@ -9,7 +9,6 @@ import ObjectCollection from 'fireplace/collections/object';
 import IndexedCollection from 'fireplace/collections/indexed';
 
 var get = Ember.get;
-var set = Ember.set;
 
 var store, container, Person, firebase;
 
@@ -108,7 +107,7 @@ test("saveRecord when record has been deleted", function(assert) {
 
   person.set("isDeleted", true);
 
-  store.saveRecord(person).catch(function(e){
+  store.saveRecord(person).catch(function(/*e*/){
     assert.ok(true, "fails with error");
   }).finally(done);
 

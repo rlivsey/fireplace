@@ -1,12 +1,6 @@
-import Ember from 'ember';
-
 import { module, test } from 'qunit';
 
 import Collection from 'fireplace/collections/base';
-
-let collection;
-
-const reference = {};
 
 module("Collection Queries", {
   beforeEach: function() {

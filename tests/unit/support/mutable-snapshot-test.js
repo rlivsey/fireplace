@@ -1,5 +1,3 @@
-import Ember from 'ember';
-
 import {module, test} from 'qunit';
 
 import MutableSnapshot from 'fireplace/support/mutable-snapshot';
