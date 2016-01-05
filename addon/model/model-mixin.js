@@ -1,5 +1,7 @@
 import Ember from 'ember';
 
+import getOwner from 'ember-getowner-polyfill';
+
 import MutableSnapshot from '../support/mutable-snapshot';
 import { serialize } from '../transforms/base';
 import deepEqual from '../utils/deep-equal';
@@ -176,9 +178,15 @@ export const ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relatio
   toFirebaseJSON(includePriority) {
     const attributes    = get(this.constructor, 'attributes');
     const relationships = get(this.constructor, 'relationships');
-    const container     = get(this, "container");
     const snapshot      = get(this, "_snapshot");
     const json          = {};
+
+    // default MODEL_FACTORY_INJECTIONS setting means the model doesn't have an owner
+    // we could set this to true, but that would break Ember Data should you be using both
+    // so get the store's owner instead and use that
+
+    const store     = get(this, "store");
+    const container = getOwner(store);
 
     attributes.forEach((meta, name) => {
       const value = get(this, name);

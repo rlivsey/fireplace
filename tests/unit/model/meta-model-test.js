@@ -1,61 +1,81 @@
 import Ember from 'ember';
 
-import {module, test} from 'qunit';
+import {module } from 'qunit';
+import { moduleFor, test } from 'ember-qunit';
 
 import MetaModel from 'fireplace/model/meta-model';
 import Model     from 'fireplace/model/model';
 import attr      from 'fireplace/model/attr';
 
-var get = Ember.get;
+const get = Ember.get;
 
-module("MetaModel - serializing");
+moduleFor("service:store", "MetaModel - serializing", {
+  subject(options, factory) {
+    const firebase = new window.MockFirebase("https://something.firebaseio.com");
+    firebase.autoFlush(true);
+
+    return factory.create({
+      firebaseRoot: firebase
+    });
+  }
+});
 
 test("with no attributes / relationships or meta data", function(assert) {
-
-  var Member = MetaModel.extend();
-  var member = Member.create();
+  this.register("model:member", MetaModel.extend());
+  const member = this.subject().createRecord("member");
 
   assert.equal(member.toFirebaseJSON(), true, "defaults to true");
 });
 
 test("with a meta value", function(assert) {
-  var Member = MetaModel.extend();
-  var member = Member.create({meta: "admin"});
+  this.register("model:member", MetaModel.extend());
+
+  const member = this.subject().createRecord("member", {
+    meta: "admin"
+  });
 
   assert.equal(member.toFirebaseJSON(), "admin", "serializes the meta value");
 });
 
 test("with attributes / relationships", function(assert) {
-  var Member = MetaModel.extend({
+  this.register("model:member", MetaModel.extend({
     level: attr()
+  }));
+
+  const member = this.subject().createRecord("member", {
+    level: "admin"
   });
-  var member = Member.create({level: "admin"});
 
   assert.deepEqual(member.toFirebaseJSON(), {level: "admin"}, "serializes attributes");
 });
 
 test("with attributes / relationships which are null", function(assert) {
-  var Member = MetaModel.extend({
+  this.register("model:member", MetaModel.extend({
     level: attr()
+  }));
+
+  const member = this.subject().createRecord("member", {
+    level: null
   });
-  var member = Member.create({level: null});
 
   assert.deepEqual(member.toFirebaseJSON(), true, "falls back to true");
 });
 
 // if you've got attributes, then meta should be ignored
 test("with attributes / relationships which are null and a meta value", function(assert) {
-  var Member = MetaModel.extend({
+  this.register("model:member", MetaModel.extend({
     level: attr()
-  });
-  var member = Member.create({level: null, meta: "something"});
+  }));
+  const member = this.subject().createRecord("member", { level: null, meta: "something" });
 
   assert.deepEqual(member.toFirebaseJSON(), true, "falls back to true, and not the meta value");
 });
 
 test("with priority", function(assert) {
-  var Member = MetaModel.extend();
-  var member = Member.create({priority: 123});
+  this.register("model:member", MetaModel.extend());
+  const member = this.subject().createRecord("member", {
+    priority: 123
+  });
 
   assert.deepEqual(member.toFirebaseJSON(true), {
     ".value": true,
@@ -66,11 +86,11 @@ test("with priority", function(assert) {
 module("MetaModel - properties");
 
 test("should not bleed own properties into content", function(assert) {
-  var Meta  = MetaModel.extend();
-  var Child = Model.extend();
+  const Meta  = MetaModel.extend();
+  const Child = Model.extend();
 
-  var child = Child.create();
-  var meta  = Meta.create({content: child});
+  const child = Child.create();
+  const meta  = Meta.create({content: child});
 
   meta.setProperties({
     meta:      "meta",
@@ -86,11 +106,11 @@ test("should not bleed own properties into content", function(assert) {
 });
 
 test("uses child's ID", function(assert) {
-  var Meta  = MetaModel.extend();
-  var Child = Model.extend();
+  const Meta  = MetaModel.extend();
+  const Child = Model.extend();
 
-  var child = Child.create({id: 123});
-  var meta  = Meta.create({content: child});
+  const child = Child.create({id: 123});
+  const meta  = Meta.create({content: child});
 
   assert.equal(get(meta, 'id'), 123, "should have child ID");
 });
@@ -100,11 +120,11 @@ module("MetaModel - content");
 test("saveContent saves a meta model's content", function(assert) {
   assert.expect(1);
 
-  var Meta  = MetaModel.extend();
-  var Child = Model.extend();
+  const Meta  = MetaModel.extend();
+  const Child = Model.extend();
 
-  var child = Child.create({id: 123});
-  var meta  = Meta.create({content: child});
+  const child = Child.create({id: 123});
+  const meta  = Meta.create({content: child});
 
   child.save = function() {
     assert.ok(true, "called save on the content");
@@ -118,11 +138,11 @@ module("MetaModel - changes");
 test("considers a change having come from firebase if either itself or its content is being updated", function(assert) {
   assert.expect(2);
 
-  var Meta  = MetaModel.extend();
-  var Child = Model.extend();
+  const Meta  = MetaModel.extend();
+  const Child = Model.extend();
 
-  var child = Child.create({id: 123});
-  var meta  = Meta.create({content: child});
+  const child = Child.create({id: 123});
+  const meta  = Meta.create({content: child});
 
   child._settingFromFirebase = true;
   assert.ok(get(meta, 'changeCameFromFirebase'), "should think change came from Firebase");

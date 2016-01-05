@@ -1,65 +1,66 @@
 import Ember from 'ember';
 
-import {module, test} from 'qunit';
+import { moduleFor, test } from 'ember-qunit';
 
 import Model from 'fireplace/model/model';
-import Store from 'fireplace/store';
 import attr  from 'fireplace/model/attr';
 import MetaModel from 'fireplace/model/meta-model';
 import IndexedCollection from 'fireplace/collections/indexed';
 
 import { makeSnapshot } from '../../helpers/firebase';
 
-var get = Ember.get;
+const get = Ember.get;
 
-var container, store, Person, PeopleIndex, firebase;
+let store, Person, Member, PeopleIndex, firebase;
 
 function setupEnv() {
   firebase  = new window.MockFirebase("https://something.firebaseio.com");
   firebase.autoFlush(true);
 
-  container = new Ember.Container();
-  store     = Store.create({
-    container:    container,
-    firebaseRoot: firebase
-  });
+  store = this.container.lookup("service:store");
+  store.set("firebaseRoot", firebase);
 
   Person = Model.extend({
     name: attr(),
     priority: null
   });
-  Person.typeKey = "Person";
-  container.register("model:person", Person);
+
+  Member = MetaModel.extend({
+    level: attr()
+  });
+
+  this.register("model:person", Person);
+  this.register("model:member", Member);
 
   PeopleIndex = IndexedCollection.extend({
     firebaseReference: firebase.child("people-index"),
     store: store,
-    model: Person
+    model: "person"
   });
 }
 
-module("IndexedCollection - initializing", {
+moduleFor("collection:indexed", "IndexedCollection - initializing", {
+  needs: ["service:store"],
   beforeEach: setupEnv
 });
 
 test("inflates from a snapshot if one exists", function(assert) {
-  var snap = makeSnapshot("people-index", {
+  const snap = makeSnapshot("people-index", {
     123: true,
     234: true,
     456: true
   });
 
-  var tom   = store.createRecord("person", {id: "123", name: "Tom"});
+  const tom   = store.createRecord("person", {id: "123", name: "Tom"});
   store.saveRecord(tom);
 
-  var dick  = store.createRecord("person", {id: "234", name: "Dick"});
+  const dick  = store.createRecord("person", {id: "234", name: "Dick"});
   store.saveRecord(dick);
 
-  var harry = store.createRecord("person", {id: "456", name: "Harry"});
+  const harry = store.createRecord("person", {id: "456", name: "Harry"});
   store.saveRecord(harry);
 
-
-  var people = PeopleIndex.create({store: store, snapshot: snap});
+  const people = PeopleIndex.create({ snapshot: snap });
 
   assert.equal(get(people, "length"), 3, "added 3 items");
   assert.equal(people.get("firstObject.name"), "Tom");
@@ -68,50 +69,41 @@ test("inflates from a snapshot if one exists", function(assert) {
 
 
 test("wraps plain objects in meta models if necessary", function(assert) {
-  var Member = MetaModel.extend({
-    level: attr()
-  });
-
-  var person = store.createRecord("person", {id: "123", name: "Tom"});
-  var people = PeopleIndex.create({
-    as: Member,
+  const person = store.createRecord("person", {id: "123", name: "Tom"});
+  const people = PeopleIndex.create({
+    as: "member",
     content: Ember.A([person])
   });
 
-  var obj = people.get("firstObject");
+  const obj = people.get("firstObject");
 
   assert.ok(obj instanceof Member, "item is wrapped in meta model");
   assert.equal(get(obj, 'content'), person, "meta model has item as content");
 });
 
 test("sets parent on meta models", function(assert) {
-  var Member = MetaModel.extend({
-    level: attr()
-  });
-
-  container.register("model:member", Member);
-
-  var person = store.createRecord("person", {id: "123", name: "Tom"});
-  var member = store.createRecord("member", { content: person, level: "admin" });
-  var people = PeopleIndex.create({
-    as: Member,
+  const person = store.createRecord("person", {id: "123", name: "Tom"});
+  const member = store.createRecord("member", { content: person, level: "admin" });
+  const people = PeopleIndex.create({
+    as: "member",
     content: Ember.A([member])
   });
 
-  var obj = people.get("firstObject");
+  const obj = people.get("firstObject");
 
   assert.equal(get(obj, "parent"), people, "sets parent to collection");
 });
 
-module("IndexedCollection - fetching", {
+moduleFor("collection:indexed", "IndexedCollection - fetching", {
+  needs: ["service:store"],
   beforeEach() {
-    setupEnv();
+    setupEnv.call(this);
 
     // stick some data in to find
     firebase.child("people").set({
-      tom:   {name: "Tom"},
-      dick:  {name: "Dick"},
-      harry: {name: "Harry"}
+      tom:   { name: "Tom" },
+      dick:  { name: "Dick" },
+      harry: { name: "Harry" }
     });
 
     firebase.child("people-index").set({
@@ -119,18 +111,17 @@ module("IndexedCollection - fetching", {
       dick:  true,
       harry: true
     });
-
   }
 });
 
+
 test("fetch returns a promise proxy which resolves when the collection has a value", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(2);
 
-  var people = PeopleIndex.create();
-  var promise = people.fetch();
+  const people = PeopleIndex.create();
 
-  promise.then(function(c) {
+  people.fetch().then(function(c) {
     assert.equal(c, people, "resolves with itself");
     assert.equal(people.get("length"), 3, "has the items");
   }).finally(done);
@@ -139,7 +130,7 @@ test("fetch returns a promise proxy which resolves when the collection has a val
 test("resolves immediately if already listening to firebase", function(assert) {
   assert.expect(2);
 
-  var people = PeopleIndex.create();
+  const people = PeopleIndex.create();
   people.listenToFirebase();
 
   Ember.run(function() {
@@ -151,13 +142,13 @@ test("resolves immediately if already listening to firebase", function(assert) {
 });
 
 
-
-module("IndexedCollection - serializing", {
+moduleFor("collection:indexed", "IndexedCollection - Serializing", {
+  needs: ["service:store"],
   beforeEach: setupEnv
 });
 
 test("serializes children as id => true if they are plain models", function(assert) {
-  var people = PeopleIndex.create({
+  const people = PeopleIndex.create({
     content: Ember.A([
       store.createRecord("person", {id: "123", name: "Tom"}),
       store.createRecord("person", {id: "234", name: "Dick"}),
@@ -165,7 +156,7 @@ test("serializes children as id => true if they are plain models", function(asse
     ])
   });
 
-  var json = people.toFirebaseJSON();
+  const json = people.toFirebaseJSON();
 
   assert.deepEqual(json, {
     123: true,
@@ -176,28 +167,24 @@ test("serializes children as id => true if they are plain models", function(asse
 
 
 test("serializes children as id => meta model JSON if they are meta models", function(assert) {
-  var Member = MetaModel.extend({
-    level: attr()
-  });
-
-  var people = PeopleIndex.create({
+  const people = PeopleIndex.create({
     content: Ember.A([
-      store.createRecord(Member, {
+      store.createRecord("member", {
         level: "member",
-        content: store.createRecord(Person, {id: "123", name: "Tom"})
+        content: store.createRecord("person", {id: "123", name: "Tom"})
       }),
-      store.createRecord(Member, {
+      store.createRecord("member", {
         level: "admin",
-        content: store.createRecord(Person, {id: "234", name: "Dick"})
+        content: store.createRecord("person", {id: "234", name: "Dick"})
       }),
-      store.createRecord(Member, {
+      store.createRecord("member", {
         level: "member",
-        content: store.createRecord(Person, {id: "345", name: "Harry"}
+        content: store.createRecord("person", {id: "345", name: "Harry"}
       )})
     ])
   });
 
-  var json = people.toFirebaseJSON();
+  const json = people.toFirebaseJSON();
 
   assert.deepEqual(json, {
     123: {
@@ -213,17 +200,16 @@ test("serializes children as id => meta model JSON if they are meta models", fun
 });
 
 
-module("IndexedCollection - adding items", {
+moduleFor("collection:indexed", "IndexedCollection - adding items", {
+  needs: ["service:store"],
   beforeEach: setupEnv
 });
 
 test("sets the parent for meta-models so references are all setup", function(assert) {
-  var Member = MetaModel.extend();
+  const people = PeopleIndex.create();
 
-  var people = PeopleIndex.create();
-
-  var person = store.createRecord(Person, {id: "123"});
-  var member = store.createRecord(Member, {content: person});
+  const person = store.createRecord("person", {id: "123"});
+  const member = store.createRecord("member", {content: person});
 
   people.pushObject(member);
 
@@ -231,25 +217,21 @@ test("sets the parent for meta-models so references are all setup", function(ass
 });
 
 test("doesn't set the parent for non-meta-models", function(assert) {
-  var people = PeopleIndex.create();
+  const people = PeopleIndex.create();
 
-  var person = store.createRecord(Person, {id: "123"});
+  const person = store.createRecord("person", {id: "123"});
   people.pushObject(person);
 
   assert.ok(!person.get("parent"), "parent is not set");
 });
 
 test("wraps objects in their meta models if `as` is set", function(assert) {
-  var Member = MetaModel.extend({
-    level: attr()
-  });
+  const people = PeopleIndex.create({as: "member"});
 
-  var people = PeopleIndex.create({as: Member});
-
-  var person = store.createRecord(Person, {id: "123"});
+  const person = store.createRecord("person", {id: "123"});
   people.pushObject(person);
 
-  var obj = people.get("firstObject");
+  const obj = people.get("firstObject");
 
   assert.ok(obj instanceof Member, "item is wrapped in meta model");
   assert.ok(get(obj, 'content') instanceof Person, "content is a person");
@@ -257,29 +239,25 @@ test("wraps objects in their meta models if `as` is set", function(assert) {
 });
 
 test("doesn't double wrap", function(assert) {
-  var Member = MetaModel.extend({
-    level: attr()
-  });
+  const people = PeopleIndex.create({as: "member"});
 
-  var people = PeopleIndex.create({as: Member});
-
-  var person = store.createRecord(Person, {id: "123"});
-  var member = store.createRecord(Member, {content: person});
+  const person = store.createRecord("person", {id: "123"});
+  const member = store.createRecord("member", {content: person});
   people.pushObject(member);
 
-  var obj = people.get("firstObject");
+  const obj = people.get("firstObject");
 
   assert.ok(obj instanceof Member, "item is wrapped in meta model");
   assert.equal(get(obj, 'content'), person, "meta model has item as content");
 });
 
-
-module("IndexedCollection - finding items", {
+moduleFor("collection:indexed", "IndexedCollection - finding items", {
+  needs: ["service:store"],
   beforeEach: setupEnv
 });
 
 test("fetches associated item by the ID", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
 
   firebase.child("people").set({
     tom:   {name: "Tom"},
@@ -287,7 +265,7 @@ test("fetches associated item by the ID", function(assert) {
     harry: {name: "Harry"}
   });
 
-  var people = PeopleIndex.create({
+  const people = PeopleIndex.create({
     store: store,
     content: Ember.A([ // poke in the internal format, should never do this for reals
       {id: "tom"},
@@ -302,22 +280,22 @@ test("fetches associated item by the ID", function(assert) {
   }).finally(done);
 });
 
-
-module("IndexedCollection - references", {
+moduleFor("collection:indexed", "IndexedCollection - references", {
+  needs: ["service:store"],
   beforeEach: setupEnv
 });
 
 test("generates a reference based on its model", function(assert) {
-  var people = PeopleIndex.create({store: store, firebaseReference: null});
-  var ref = people.buildFirebaseReference();
+  const people = PeopleIndex.create({ firebaseReference: null });
+  const ref = people.buildFirebaseReference();
   assert.equal(ref.toString(), firebase.child("people").toString(), "reference should be based off the model");
 });
 
 test("adding an item doesn't change its reference", function(assert) {
-  var people = PeopleIndex.create({store: store});
-  var person = store.createRecord(Person, {id: "123"});
+  const people = PeopleIndex.create();
+  const person = store.createRecord("person", {id: "123"});
 
-  var ref = person.buildFirebaseReference();
+  let ref = person.buildFirebaseReference();
   assert.equal(ref.toString(), firebase.child("people/123").toString(), "reference should be based of the model ID");
 
   people.pushObject(person);
@@ -327,11 +305,11 @@ test("adding an item doesn't change its reference", function(assert) {
 });
 
 
-
-var collection;
-module("IndexedCollection - receiving updates from Firebase", {
+let collection;
+moduleFor("collection:indexed", "IndexedCollection - receiving updates from Firebase", {
+  needs: ["service:store"],
   beforeEach() {
-    setupEnv();
+    setupEnv.call(this);
 
     firebase.child("people").set({
       tom:   {name: "Tom"},
@@ -342,10 +320,11 @@ module("IndexedCollection - receiving updates from Firebase", {
       harry: true
     });
 
-    collection = PeopleIndex.create({store: store, model: Person});
+    collection = PeopleIndex.create({ model: "person" });
     collection.listenToFirebase();
   }
 });
+
 
 test("populates", function(assert) {
   collection.mapBy("name"); // force a fetch
@@ -391,14 +370,10 @@ test("moving item", function(assert) {
   assert.deepEqual(collection.mapBy("priority"), [null, null, null], "doesn't change underlying object's priority");
 });
 
-
-module("IndexedCollection - with meta receiving updates from Firebase", {
+moduleFor("collection:indexed", "IndexedCollection - with meta receiving updates from Firebase", {
+  needs: ["service:store"],
   beforeEach() {
-    setupEnv();
-
-    var Member = MetaModel.extend({
-      level: attr()
-    });
+    setupEnv.call(this);
 
     firebase.child("people").set({
       tom:   {name: "Tom"},
@@ -409,7 +384,7 @@ module("IndexedCollection - with meta receiving updates from Firebase", {
       harry: { level: "senior" }
     });
 
-    collection = PeopleIndex.create({store: store, model: Person, as: Member});
+    collection = PeopleIndex.create({ model: "person", as: "member" });
     collection.listenToFirebase();
   }
 });
@@ -446,7 +421,7 @@ test("moving item", function(assert) {
 });
 
 test("updating meta info", function(assert) {
-  var harry = collection.objectAt(0);
+  const harry = collection.objectAt(0);
   assert.equal(harry.get("level"), "senior");
 
   firebase.child("people-index/harry").set({level: "junior"});

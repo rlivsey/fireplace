@@ -1,30 +1,36 @@
 import Ember from 'ember';
 
-import {module, test} from 'qunit';
+import { moduleFor, test } from 'ember-qunit';
 
 import Model from 'fireplace/model/model';
-import Store from 'fireplace/store';
 import attr  from 'fireplace/model/attr';
 import one   from 'fireplace/relationships/has-one';
 
 import { makeSnapshot } from '../../helpers/firebase';
 
-var get = Ember.get;
+const get = Ember.get;
 
-var Person;
-module("Model Firebase events", {
-  beforeEach() {
-    Person = Model.extend({
-      firstName: attr(),
-      lastName:  attr()
+moduleFor("service:store", "Model Firebase events", {
+  subject(options, factory) {
+    const firebase = new window.MockFirebase("https://something.firebaseio.com");
+    firebase.autoFlush(true);
+
+    return factory.create({
+      firebaseRoot: firebase
     });
-    Person.typeKey = "Person";
+  },
+  beforeEach() {
+    this.register("model:person", Model.extend({
+      firstName: attr(),
+      lastName:  attr(),
+      avatar: one({embedded: false})
+    }));
   }
 });
 
 test("onFirebaseChildAdded sets an attribute", function(assert) {
-  var person   = Person.create();
-  var snapshot = makeSnapshot("first_name", "John");
+  const person   = this.subject().createRecord("person");
+  const snapshot = makeSnapshot("first_name", "John");
 
   // to make sure it's notified of changes
   assert.equal(get(person, "firstName"), undefined, "should not yet be set");
@@ -37,10 +43,10 @@ test("onFirebaseChildAdded sets an attribute", function(assert) {
 });
 
 test("onFirebaseChildRemoved clears an attribute", function(assert) {
-  var person   = Person.create({firstName: "Bobby", snapshot: makeSnapshot("123", {first_name: "Bobby"})});
+  const person   = this.subject().createRecord("person", {firstName: "Bobby", snapshot: makeSnapshot("123", {first_name: "Bobby"})});
 
   // child_removed sends the old value with the snapshot, not null
-  var snapshot = makeSnapshot("first_name", "Bobby");
+  const snapshot = makeSnapshot("first_name", "Bobby");
 
   Ember.run(function() {
     person.onFirebaseChildRemoved(snapshot);
@@ -50,8 +56,8 @@ test("onFirebaseChildRemoved clears an attribute", function(assert) {
 });
 
 test("onFirebaseChildChanged updates an attribute", function(assert) {
-  var person   = Person.create({firstName: "Bobby"});
-  var snapshot = makeSnapshot("first_name", "Johnny");
+  const person   = this.subject().createRecord("person", {firstName: "Bobby"});
+  const snapshot = makeSnapshot("first_name", "Johnny");
 
   Ember.run(function() {
     person.onFirebaseChildChanged(snapshot);
@@ -61,8 +67,8 @@ test("onFirebaseChildChanged updates an attribute", function(assert) {
 });
 
 test("onFirebaseValue destroys the object if snapshot value is null", function(assert) {
-  var person   = Person.create({store: Store.create({firebaseRoot: "https://foo.firebaseio.com"})});
-  var snapshot = makeSnapshot("123", null);
+  const person   = this.subject().createRecord("person");
+  const snapshot = makeSnapshot("123", null);
 
   assert.ok(!person.isDestroyed, "is not destroyed");
 
@@ -73,30 +79,19 @@ test("onFirebaseValue destroys the object if snapshot value is null", function(a
   assert.ok(person.isDestroyed, "is now destroyed");
 });
 
-module("Model Firebase events with relationship", {
-  beforeEach() {
-    Person = Model.extend({
-      firstName: attr(),
-      lastName:  attr(),
-      avatar: one({embedded: false})
-    });
-  }
-});
-
 // firebase triggers child_added events first, then value
 // so we need to be able to handle not having the snapshot yet
 test("handles child_added events occurring before value", function(assert) {
   assert.expect(4);
 
-  var store  = Store.create({firebaseRoot: "https://foo.firebaseio.com"});
-  var person = Person.create({store: store});
+  const person = this.subject().createRecord("person");
 
-  var firstNameSnap = makeSnapshot("first_name", "Ted");
-  var lastNameSnap  = makeSnapshot("last_name",  "Johnson");
-  var avatarSnap    = makeSnapshot("avatar",     "123");
+  const firstNameSnap = makeSnapshot("first_name", "Ted");
+  const lastNameSnap  = makeSnapshot("last_name",  "Johnson");
+  const avatarSnap    = makeSnapshot("avatar",     "123");
 
-  var mockAvatar = "an avatar";
-  store.findOne = function(type, id/*, query*/) {
+  const mockAvatar = "an avatar";
+  this.subject().findOne = function(type, id/*, query*/) {
     assert.equal(id, "123", "calls find for the avatar with the correct ID");
     return mockAvatar;
   };

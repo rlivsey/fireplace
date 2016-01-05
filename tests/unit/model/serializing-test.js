@@ -1,23 +1,25 @@
 import Ember from 'ember';
 
-import {module, test} from 'qunit';
+import { moduleFor, test } from 'ember-qunit';
 
-import attr  from 'fireplace/model/attr';
-import one   from 'fireplace/relationships/has-one';
-import many  from 'fireplace/relationships/has-many';
-import Store from 'fireplace/store';
-import Model from 'fireplace/model/model';
+import attr      from 'fireplace/model/attr';
+import one       from 'fireplace/relationships/has-one';
+import many      from 'fireplace/relationships/has-many';
+import Model     from 'fireplace/model/model';
+import Transform from 'fireplace/transforms/base';
 
-import ObjectCollection  from 'fireplace/collections/object';
-import IndexedCollection from 'fireplace/collections/indexed';
-import Transform         from 'fireplace/transforms/base';
+moduleFor("service:store", "Model#toFirebaseJSON", {
+  needs: [
+    "collection:object",
+    "collection:indexed"
+  ],
+  subject(options, factory) {
+    const firebase  = new window.MockFirebase("https://something.firebaseio.com");
+    firebase.autoFlush(true);
 
-var container, store;
-
-module("Model#toFirebaseJSON", {
-  beforeEach() {
-    container = new Ember.Container();
-    store = Store.create();
+    return factory.create({
+      firebaseRoot: firebase
+    });
   }
 });
 
@@ -31,12 +33,12 @@ window.QUnit.assert.serializesWithPriorityTo = function(obj, json, message) {
 
 
 test("serializes attributes", function(assert) {
-  var Person = Model.extend({
+  this.register("model:person", Model.extend({
     firstName: attr(),
     lastName:  attr()
-  });
+  }));
 
-  var person = Person.create({
+  const person = this.subject().createRecord("person", {
     firstName: "Bob",
     lastName: "Johnson"
   });
@@ -48,12 +50,12 @@ test("serializes attributes", function(assert) {
 });
 
 test("allows overriding key names", function(assert) {
-  var Person = Model.extend({
+  this.register("model:person", Model.extend({
     firstName: attr(),
     lastName:  attr({key: "surname"})
-  });
+  }));
 
-  var person = Person.create({
+  const person = this.subject().createRecord("person", {
     firstName: "Bob",
     lastName: "Johnson"
   });
@@ -67,11 +69,7 @@ test("allows overriding key names", function(assert) {
 test("transforms attribute values with named serializer", function(assert) {
   assert.expect(2);
 
-  var Person = Model.extend({
-    name: attr("capitals")
-  });
-
-  container.register("transform:capitals", Transform.extend({
+  this.register("transform:capitals", Transform.extend({
     deserialize(value) { return value; },
     serialize(value) {
       assert.ok(true, "serialize called");
@@ -79,8 +77,11 @@ test("transforms attribute values with named serializer", function(assert) {
     },
   }));
 
-  var person = Person.create({
-    container: container,
+  this.register("model:person", Model.extend({
+    name: attr("capitals")
+  }));
+
+  const person = this.subject().createRecord("person", {
     name: "Bob Johnson"
   });
 
@@ -92,15 +93,14 @@ test("transforms attribute values with named serializer", function(assert) {
 test("transforms attribute values with inline serializer", function(assert) {
   assert.expect(2);
 
-  var Person = Model.extend({
+  this.register("model:person", Model.extend({
     name: attr({serialize(value) {
       assert.ok(true, "serialize called");
       return value.toUpperCase();
     }})
-  });
+  }));
 
-  var person = Person.create({
-    container: container,
+  const person = this.subject().createRecord("person", {
     name: "Bob Johnson"
   });
 
@@ -111,12 +111,12 @@ test("transforms attribute values with inline serializer", function(assert) {
 
 
 test("excludes null values", function(assert) {
-  var Person = Model.extend({
+  this.register("model:person", Model.extend({
     firstName: attr(),
     lastName:  attr()
-  });
+  }));
 
-  var person = Person.create({
+  const person = this.subject().createRecord("person", {
     firstName: "Bob"
   });
 
@@ -126,11 +126,11 @@ test("excludes null values", function(assert) {
 });
 
 test("uses priority/value export format if specified", function(assert) {
-  var Person = Model.extend({
+  this.register("model:person", Model.extend({
     name: attr()
-  });
+  }));
 
-  var person = Person.create({
+  const person = this.subject().createRecord("person", {
     priority: 123,
     name: "Bob"
   });
@@ -144,11 +144,11 @@ test("uses priority/value export format if specified", function(assert) {
 });
 
 test("doesn't use priority/value export format if specified but no priority is set", function(assert) {
-  var Person = Model.extend({
+  this.register("model:person", Model.extend({
     name: attr()
-  });
+  }));
 
-  var person = Person.create({
+  const person = this.subject().createRecord("person", {
     name: "Bob"
   });
 
@@ -158,19 +158,19 @@ test("doesn't use priority/value export format if specified but no priority is s
 });
 
 test("serializes hasOne embedded relationships", function(assert) {
-  var Avatar = Model.extend({
+  this.register("model:avatar", Model.extend({
     image: attr()
-  });
+  }));
 
-  var Person = Model.extend({
+  this.register("model:person", Model.extend({
     name: attr(),
-    avatar: one(Avatar)
-  });
+    avatar: one("avatar")
+  }));
 
-  var person = Person.create({
-    id: 123,
+  const person = this.subject().createRecord("person", {
+    id: "123",
     name: "Ted Thompson",
-    avatar: Avatar.create({
+    avatar: this.subject().createRecord("avatar", {
       image: "my-face.png"
     })
   });
@@ -184,19 +184,19 @@ test("serializes hasOne embedded relationships", function(assert) {
 });
 
 test("serializes hasOne embedded relationships (with ID)", function(assert) {
-  var Avatar = Model.extend({
+  this.register("model:avatar", Model.extend({
     image: attr()
-  });
+  }));
 
-  var Person = Model.extend({
+  this.register("model:person", Model.extend({
     name: attr(),
-    avatar: one(Avatar, { id: true })
-  });
+    avatar: one("avatar", { id: true })
+  }));
 
-  var person = Person.create({
-    id: 123,
+  const person = this.subject().createRecord("person", {
+    id: "123",
     name: "Ted Thompson",
-    avatar: Avatar.create({
+    avatar: this.subject().createRecord("avatar", {
       id:    "an-avatar",
       image: "my-face.png"
     })
@@ -212,48 +212,47 @@ test("serializes hasOne embedded relationships (with ID)", function(assert) {
 });
 
 test("serializes hasOne non-embedded relationships", function(assert) {
-  var Avatar = Model.extend({
+  this.register("model:avatar", Model.extend({
     image: attr()
-  });
+  }));
 
-  var Person = Model.extend({
+  this.register("model:person", Model.extend({
     name: attr(),
-    avatar: one(Avatar, {embedded: false})
-  });
+    avatar: one("avatar", {embedded: false})
+  }));
 
-  var person = Person.create({
-    id: 123,
+  const person = this.subject().createRecord("person", {
+    id: "123",
     name: "Ted Thompson",
-    avatar: Avatar.create({
-      id: 234,
+    avatar: this.subject().createRecord("avatar", {
+      id: "234",
       image: "my-face.png"
     })
   });
 
   assert.serializesTo(person, {
     name: "Ted Thompson",
-    avatar: 234
+    avatar: "234"
   });
 });
 
 test("serializes hasMany embedded relationships", function(assert) {
-  container.register("collection:object", ObjectCollection);
-
-  var Address = Model.extend({
+  this.register("model:address", Model.extend({
     street: attr()
-  });
+  }));
 
-  var Person = Model.extend({
+  this.register("model:person", Model.extend({
     name: attr(),
-    addresses: many(Address)
-  });
+    addresses: many("address")
+  }));
 
-  var person = Person.create({
-    container: container,
-    store: store,
+  const person = this.subject().createRecord("person", {
     name: "Eric Wimp",
     addresses: Ember.A([
-      Address.create({street: "29 Acacia Road", id: "home"})
+      this.subject().createRecord("address", {
+        id: "home",
+        street: "29 Acacia Road"
+      })
     ])
   });
 
@@ -268,30 +267,30 @@ test("serializes hasMany embedded relationships", function(assert) {
 });
 
 test("serializes hasMany non-embedded relationships", function(assert) {
-  container.register("collection:indexed", IndexedCollection);
 
-  var Address = Model.extend({
+  this.register("model:address", Model.extend({
     street: attr()
-  });
+  }));
 
-  var Person = Model.extend({
+  this.register("model:person", Model.extend({
     name: attr(),
-    addresses: many(Address, {embedded: false})
-  });
+    addresses: many("address", {embedded: false})
+  }));
 
-  var person = Person.create({
-    container: container,
-    store: store,
+  const person = this.subject().createRecord("person", {
     name: "Eric Wimp",
     addresses: Ember.A([
-      Address.create({id: 234, street: "29 Acacia Road"})
+      this.subject().createRecord("address", {
+        id: "home",
+        street: "29 Acacia Road"
+      })
     ])
   });
 
   assert.serializesTo(person, {
     name: "Eric Wimp",
     addresses: {
-      234: true
+      home: true
     }
   });
 });

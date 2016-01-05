@@ -5,7 +5,7 @@ import '../../helpers/transforms';
 module('Transforms - number');
 
 test('transforms numbers', function(assert) {
-  var transform = NumberTransform.create();
+  const transform = NumberTransform.create();
 
   assert.transforms(transform, "1",       1);
   assert.transforms(transform, "0",       0);

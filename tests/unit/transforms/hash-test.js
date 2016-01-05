@@ -1,4 +1,3 @@
-import Ember from 'ember';
 import {module, test} from 'qunit';
 import HashTransform from 'fireplace/transforms/hash';
 import TimestampTransform from 'fireplace/transforms/timestamp';
@@ -7,7 +6,7 @@ import '../../helpers/transforms';
 module('Transforms - hash');
 
 test('transforms plain hashes', function(assert) {
-  var transform = HashTransform.create();
+  const transform = HashTransform.create();
 
   assert.transforms(transform, null, null);
   assert.transforms(transform, undefined, null);
@@ -16,13 +15,15 @@ test('transforms plain hashes', function(assert) {
 });
 
 test("transforms each item with specified transform", function(assert) {
-  var transform = HashTransform.create();
-  var container = new Ember.Container();
+  const transform = HashTransform.create();
+  const container = {
+    lookup() {
+      return TimestampTransform.create();
+    }
+  };
 
-  container.register('transform:timestamp', TimestampTransform);
-
-  var date      = new Date(Date.UTC(1981, 7, 21, 12, 30));
-  var timestamp = 367245000000;
+  const date      = new Date(Date.UTC(1981, 7, 21, 12, 30));
+  const timestamp = 367245000000;
 
   assert.deepEqual(transform.serialize({a: date}, {of: "timestamp"}, container), {a: timestamp});
   assert.deepEqual(transform.deserialize({a: timestamp}, {of: "timestamp"}, container), {a: date});

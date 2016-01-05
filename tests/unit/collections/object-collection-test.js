@@ -1,38 +1,34 @@
 import Ember from 'ember';
 
-import {module, test} from 'qunit';
+import { moduleFor, test } from 'ember-qunit';
 
 import Model from 'fireplace/model/model';
-import Store from 'fireplace/store';
 import attr  from 'fireplace/model/attr';
 import ObjectCollection from 'fireplace/collections/object';
 
 import { getSnapshot } from '../../helpers/firebase';
 
-var get  = Ember.get;
+const get  = Ember.get;
 
-var container, store, Person, People, firebase;
+let store, Person, People, firebase;
 
 function setupEnv() {
   firebase  = new window.window.MockFirebase("https://something.firebaseio.com");
   firebase.autoFlush(true);
 
-  container = new Ember.Container();
-  store     = Store.create({
-    container:    container,
-    firebaseRoot: firebase
-  });
+  store = this.container.lookup("service:store");
+  store.set("firebaseRoot", firebase);
 
   Person = Model.extend({
     name: attr(),
     priority: null
   });
-  Person.typeKey = "Person";
-  container.register("model:person", Person);
+
+  this.register("model:person", Person);
 
   People = ObjectCollection.extend({
-    model: Person,
-    store: store
+    model: "person",
+    store
   });
 
   firebase.child("people/123").setWithPriority({name: "Tom"},   10);
@@ -40,54 +36,55 @@ function setupEnv() {
   firebase.child("people/456").setWithPriority({name: "Harry"}, 30);
 }
 
-module("ObjectCollection - initializing", {
+moduleFor("collection:object", "ObjectCollection - initializing", {
+  needs: ["service:store"],
   beforeEach: setupEnv
 });
 
 test("inflates from a snapshot if one exists", function(assert) {
-  var snap   = getSnapshot(firebase, "people");
-  var people = People.create({snapshot: snap});
+  const snap   = getSnapshot(firebase, "people");
+  const people = People.create({snapshot: snap});
 
   assert.equal(get(people, "length"), 3, "added 3 items");
 
-  var person = people.objectAt(0);
+  const person = people.objectAt(0);
   assert.ok(person instanceof Person, "has instantiated the models");
   assert.deepEqual(people.mapBy("name"), ["Tom", "Dick", "Harry"], "has assigned the attributes");
   assert.deepEqual(people.mapBy("priority"), [10,20,30], "has assigned the priorities");
 });
 
 test("fetches from Firebase when start listening", function(assert) {
-  var people = People.create();
+  const people = People.create();
   people.listenToFirebase();
 
   assert.equal(get(people, "length"), 3, "added 3 items");
 
-  var person = people.objectAt(0);
+  const person = people.objectAt(0);
   assert.ok(person instanceof Person, "has instantiated the models");
   assert.deepEqual(people.mapBy("name"), ["Tom", "Dick", "Harry"], "has assigned the attributes");
   assert.deepEqual(people.mapBy("priority"), [10,20,30], "has assigned the priorities");
 });
 
-
-module("ObjectCollection - references", {
+moduleFor("collection:object", "ObjectCollection - references", {
+  needs: ["service:store"],
   beforeEach: setupEnv
 });
 
 test("generates a reference based on its model", function(assert) {
-  var people = People.create({store: store});
-  var ref = people.buildFirebaseReference();
+  const people = People.create();
+  const ref = people.buildFirebaseReference();
   assert.equal(ref.toString(), firebase.child("people").toString(), "reference should be based off the model");
 });
 
 test("Adding an item sets its reference to be a child of the collection", function(assert) {
-  var collectionRef = firebase.child("some/other/path");
+  const collectionRef = firebase.child("some/other/path");
 
-  var people = People.create({store: store, firebaseReference: collectionRef});
-  var person = store.createRecord("person", {id: "987", name: "Bob"});
+  const people = People.create({ firebaseReference: collectionRef });
+  const person = store.createRecord("person", {id: "987", name: "Bob"});
 
   people.pushObject(person);
 
-  var ref = person.buildFirebaseReference();
+  const ref = person.buildFirebaseReference();
   assert.equal(ref.toString(), collectionRef.child("987").toString(), "reference should be child of the collection");
 });
 
@@ -96,29 +93,29 @@ test("Adding an item sets its reference to be a child of the collection", functi
 // although in that case you could just delete the object and it'll get removed from the
 // collection anyway...
 test("Removing an item doesn't lose its reference", function(assert) {
-  var collectionRef = firebase.child("some/other/path");
+  const collectionRef = firebase.child("some/other/path");
 
-  var people = People.create({store: store, firebaseReference: collectionRef});
-  var person = store.createRecord("person", {id: "987", name: "Bob"});
+  const people = People.create({store: store, firebaseReference: collectionRef});
+  const person = store.createRecord("person", {id: "987", name: "Bob"});
 
   people.pushObject(person);
   people.removeObject(person);
 
-  var ref = person.buildFirebaseReference();
+  const ref = person.buildFirebaseReference();
   assert.equal(ref.toString(), collectionRef.child("987").toString(), "reference still should be child of the collection");
 });
 
-
-module("ObjectCollection - fetching", {
+moduleFor("collection:object", "ObjectCollection - fetching", {
+  needs: ["service:store"],
   beforeEach: setupEnv
 });
 
 test("fetch returns a promise proxy which resolves when the collection has a value", function(assert) {
   assert.expect(2);
-  var done = assert.async();
+  const done = assert.async();
 
-  var people = People.create();
-  var promise = people.fetch();
+  const people = People.create();
+  const promise = people.fetch();
 
   promise.then(function(c) {
     assert.equal(c, people, "resolves with itself");
@@ -129,7 +126,7 @@ test("fetch returns a promise proxy which resolves when the collection has a val
 test("resolves immediately if already listening to firebase", function(assert) {
   assert.expect(2);
 
-  var people = People.create();
+  const people = People.create();
   people.listenToFirebase();
 
   Ember.run(function() {
@@ -140,12 +137,13 @@ test("resolves immediately if already listening to firebase", function(assert) {
   });
 });
 
-module("ObjectCollection - serializing", {
+moduleFor("collection:object", "ObjectCollection - serializing", {
+  needs: ["service:store"],
   beforeEach: setupEnv
 });
 
 test("serializes children to Firebase JSON", function(assert) {
-  var people = People.create({
+  const people = People.create({
     content: Ember.A([
       store.createRecord("person", {id: "123", name: "Tom"}),
       store.createRecord("person", {id: "234", name: "Dick"}),
@@ -153,7 +151,7 @@ test("serializes children to Firebase JSON", function(assert) {
     ])
   });
 
-  var json = people.toFirebaseJSON();
+  const json = people.toFirebaseJSON();
 
   assert.deepEqual(json, {
     123: {
@@ -169,7 +167,7 @@ test("serializes children to Firebase JSON", function(assert) {
 });
 
 test("serializes children to Firebase JSON includes priorities", function(assert) {
-  var people = People.create({
+  const people = People.create({
     content: Ember.A([
       store.createRecord("person", {id: "123", priority: 1, name: "Tom"}),
       store.createRecord("person", {id: "234", priority: 2, name: "Dick"}),
@@ -177,7 +175,7 @@ test("serializes children to Firebase JSON includes priorities", function(assert
     ])
   });
 
-  var json = people.toFirebaseJSON();
+  const json = people.toFirebaseJSON();
 
   assert.deepEqual(json, {
     123: {
@@ -196,11 +194,11 @@ test("serializes children to Firebase JSON includes priorities", function(assert
 
 });
 
-
-var collection;
-module("ObjectCollection - receiving updates from Firebase", {
+let collection;
+moduleFor("collection:object", "ObjectCollection - receiving updates from Firebase", {
+  needs: ["service:store"],
   beforeEach() {
-    setupEnv();
+    setupEnv.call(this);
     collection = People.create();
     collection.listenToFirebase();
   }
@@ -257,36 +255,32 @@ test("listening to firebase recurses to its children", function(assert) {
   assert.ok(collection.isEvery("isListeningToFirebase", false), "none are listening");
 });
 
-var Thing, Other;
-module("ObjectCollection - polymorphism", {
-  beforeEach(/*assert*/) {
-    firebase  = new window.MockFirebase("https://something.firebaseio.com");
+let Thing, Other;
+moduleFor("collection:object", "ObjectCollection - polymorphism", {
+  needs: ["service:store"],
+  beforeEach() {
+    firebase  = new window.window.MockFirebase("https://something.firebaseio.com");
     firebase.autoFlush(true);
 
-    container = new Ember.Container();
-    store     = Store.create({
-      container:    container,
-      firebaseRoot: firebase
-    });
+    store = this.container.lookup("service:store");
+    store.set("firebaseRoot", firebase);
 
     Thing = Model.extend({
       name: attr()
     });
-    Thing.typeKey = "Thing";
 
     Other = Model.extend({
       name: attr()
     });
-    Thing.typeKey = "Other";
 
-    container.register("model:thing", Thing);
-    container.register("model:other", Other);
+    this.register("model:thing", Thing);
+    this.register("model:other", Other);
 
     firebase.child("things/123").set({name: "One",   type: "thing"});
     firebase.child("things/234").set({name: "Two",   type: "other"});
     firebase.child("things/456").set({name: "Three", type: "thing"});
 
-    var PolyCollection = ObjectCollection.extend({
+    const PolyCollection = ObjectCollection.extend({
       store: store,
       firebaseReference: firebase.child("things"),
       modelClassFromSnapshot(snapshot) {

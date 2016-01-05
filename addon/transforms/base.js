@@ -14,14 +14,14 @@ export function serialize(obj, value, meta, container) {
 }
 
 export function transform(kind, obj, value, meta, container) {
-  const type    = meta.type;
-  const options = meta.options;
+  const type      = meta.type;
+  const options   = meta.options;
 
   if (options[kind]) {
     return options[kind].call(obj, value);
   }
 
-  if (!type || !container) {
+  if (!type) {
     return value;
   }
 
@@ -30,5 +30,5 @@ export function transform(kind, obj, value, meta, container) {
     return value;
   }
 
-  return transformer[kind](value, options, container);
+  return transformer[kind](value, options);
 }

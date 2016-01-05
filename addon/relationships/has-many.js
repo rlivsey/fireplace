@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import getOwner from 'ember-getowner-polyfill';
 import expandPath from '../utils/expand-path';
 import { extractQueryOptions } from '../utils/query';
 
@@ -57,9 +58,9 @@ export default function(type, options) {
 
 function buildCollection(model, name, type, options, attrs) {
   const store          = get(model, "store");
-  const container      = get(model, "container");
+  const container      = getOwner(store);
   const collectionName = options.collection || (options.embedded ? "object" : "indexed");
-  const collectionType = container.lookupFactory("collection:"+collectionName);
+  const collectionType = container._lookupFactory("collection:"+collectionName);
 
   let query = options.query;
 

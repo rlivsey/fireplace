@@ -5,7 +5,7 @@ import '../../helpers/transforms';
 module('Transforms - string');
 
 test('transforms strings', function(assert) {
-  var transform = StringTransform.create();
+  const transform = StringTransform.create();
 
   assert.transforms(transform, "Scumbag Livsey", "Scumbag Livsey", "leaves strings alone");
   assert.transforms(transform, 1, "1",                             "converts numbers to strings");

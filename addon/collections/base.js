@@ -138,7 +138,10 @@ export default Ember.ArrayProxy.extend(LiveMixin, {
     }
 
     if (options.limit !== null) {
-      Ember.deprecate("limit is deprecated, use limitToFirst or limitToEnd instead");
+      Ember.deprecate("limit is deprecated, use limitToFirst or limitToEnd instead", false, {
+        id: 'fireplace.limit',
+        until: '1.0.0'
+      });
       reference = reference.limit(options.limit);
     }
 

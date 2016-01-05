@@ -1,5 +1,7 @@
 import Ember from 'ember';
 
+import getOwner from 'ember-getowner-polyfill';
+
 import EventQueue   from './support/event-queue';
 import PromiseModel from './model/promise-model';
 import MetaModel    from './model/meta-model';
@@ -37,9 +39,10 @@ export default Ember.Service.extend({
   // no need to re-join, just save or discard your changes & firebase
   // takes care of keeping the other models in sync
   fork() {
-    const container = get(this, "container");
-    const factory = container.lookupFactory("service:store");
-    return factory.create();
+    const factory = getOwner(this)._lookupFactory("service:store");
+    return factory.create({
+      firebaseRoot: get(this, "firebaseRoot")
+    });
   },
 
   buildFirebaseRootReference(){
@@ -267,9 +270,8 @@ export default Ember.Service.extend({
   },
 
   findFetchCollectionByReference(model, ref, query, options, returnPromise) {
-    const container = get(this, 'container');
     const type      = options.collection || "object";
-    const factory   = container.lookupFactory("collection:"+type);
+    const factory   = getOwner(this)._lookupFactory("collection:"+type);
 
     const collection = factory.create(Ember.$.extend({
       store: this,
@@ -277,8 +279,6 @@ export default Ember.Service.extend({
       query: query,
       firebaseReference: ref
     }, extractQueryOptions(options)));
-
-    // const collection = buildCollection();
 
     if (returnPromise) {
       return collection.fetch();
@@ -289,18 +289,15 @@ export default Ember.Service.extend({
   },
 
   modelFor(type) {
-    let factory;
-
-    if (typeof type === 'string') {
-      factory = get(this, 'container').lookupFactory('model:' + type);
-      Ember.assert("No model was found for '" + type + "'", !!factory);
-      factory.typeKey = factory.typeKey || this._normalizeTypeKey(type);
-    } else {
-      factory = type;
-      if (factory.typeKey) {
-        factory.typeKey = this._normalizeTypeKey(factory.typeKey);
-      }
+    if (typeof type !== 'string') {
+      return type;
     }
+
+    const container = getOwner(this);
+
+    const factory = container._lookupFactory('model:' + type);
+    Ember.assert("No model was found for '" + type + "'", !!factory);
+    factory.typeKey = factory.typeKey || this._normalizeTypeKey(type);
     return factory;
   },
 
@@ -357,7 +354,7 @@ export default Ember.Service.extend({
 
   // when record is destroyed, remove it from the cache etc...
   teardownRecord(record) {
-    const cache = this.cacheForType(record.constructor);
+    const cache = this.cacheForType(record.constructor.typeKey);
     const ref   = record.buildFirebaseReference().toString();
 
     delete cache.records[ref];

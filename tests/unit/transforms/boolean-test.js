@@ -5,7 +5,7 @@ import '../../helpers/transforms';
 module('Transforms - boolean');
 
 test('transforms booleans', function(assert) {
-  var transform = BooleanTransform.create();
+  const transform = BooleanTransform.create();
 
   assert.transforms(transform, "1",        true);
   assert.transforms(transform, "",         false);

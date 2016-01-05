@@ -1,51 +1,51 @@
-import Ember from 'ember';
-
-import {module, test} from 'qunit';
+import { moduleFor, test } from 'ember-qunit';
 
 import {
-  Store, Model, hasOne, attr
+  Model, hasOne, attr
 } from 'fireplace';
 
-var container, firebase, store;
+let firebase;
 
-module("Relationships - hasOne - embedded with ID", {
-  beforeEach() {
-    container = new Ember.Container();
+moduleFor("service:store", "Relationships - hasOne - embedded with ID", {
+  subject(options, factory) {
     firebase  = new window.MockFirebase("https://something.firebaseio.com");
     firebase.autoFlush(true);
 
-    store = Store.create({
-      container: container,
+    return factory.create({
       firebaseRoot: firebase
     });
+  },
 
-    var Address = Model.extend({
+  beforeEach() {
+    const Address = Model.extend({
       street: attr(),
       city:   attr()
     });
 
-    var Person = Model.extend({
+    const Person = Model.extend({
       name:    attr(),
       address: hasOne({id: true})
     });
 
-    container.register("model:person", Person);
-    container.register("model:address", Address);
+    this.register("model:person", Person);
+    this.register("model:address", Address);
   }
 });
 
 // Duplicates model/serializing test
 test("includes the ID in the firebase data", function(assert) {
   assert.expect(1);
-  var done = assert.async();
+  const done = assert.async();
 
-  var address = store.createRecord("address", {
+  const store = this.subject();
+
+  const address = store.createRecord("address", {
     id:     "address-1",
     street: "25 Foo Street",
     city:   "Barsville"
   });
 
-  var person;
+  let person;
   address.save().then(function() {
     person = store.createRecord("person", {
       id:   "person-1",
@@ -70,7 +70,9 @@ test("includes the ID in the firebase data", function(assert) {
 
 test("includes the ID when re-hydrating the models", function(assert) {
   assert.expect(1);
-  var done = assert.async();
+  const done = assert.async();
+
+  const store = this.subject();
 
   firebase.child("people/person-1").set({
     name: "Bob Johnson",
@@ -81,7 +83,7 @@ test("includes the ID when re-hydrating the models", function(assert) {
     }
   }, function() {
     store.findOne("person", "person-1").then(function(person) {
-      var address = person.get("address");
+      const address = person.get("address");
       assert.equal(address.get("id"), "an-address");
     }).finally(function() {
       done();

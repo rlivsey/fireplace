@@ -1,72 +1,68 @@
 import Ember from 'ember';
-
-import {module, test} from 'qunit';
+import { moduleFor, test } from 'ember-qunit';
 
 import Model from 'fireplace/model/model';
-import Store from 'fireplace/store';
 import attr from 'fireplace/model/attr';
 import ObjectCollection from 'fireplace/collections/object';
 import IndexedCollection from 'fireplace/collections/indexed';
 
-var get = Ember.get;
+const get = Ember.get;
 
-var store, container, Person, firebase;
+let firebase, Person;
 
-module("Store", {
-  beforeEach() {
-    container = new Ember.Container();
+moduleFor("service:store", "Store", {
+  needs: [
+    "collection:object",
+    "collection:indexed"
+  ],
+  subject(options, factory) {
     firebase  = new window.MockFirebase("https://something.firebaseio.com");
     firebase.autoFlush(true);
 
-    store = Store.create({
-      container: container,
+    return factory.create({
       firebaseRoot: firebase
     });
-
+  },
+  beforeEach() {
     Person = Model.extend({
       name: attr(),
       title: attr(),
       priority: null
     });
-    Person.typeKey = "Person";
 
-    container.register("model:person", Person);
-    container.register("collection:object", ObjectCollection);
+    this.register("model:person", Person);
   }
 });
 
 test("fork creates a new instance of the store with an empty cache", function(assert) {
-  var MainStore = Store.extend({
-    firebaseRoot: "https://something.firebaseio.com"
-  });
-
-  var main = MainStore.create({container: container});
-  main.createRecord("person", {name: "Bob"});
+  const main = this.subject();
+  main.createRecord("person", { name: "Bob" });
 
   assert.ok(main.all("person").length, "store has cached a record");
 
-  var forked = main.fork();
+  const forked = main.fork();
 
   assert.equal(get(main, "firebaseRoot"), get(forked, "firebaseRoot"), "fork has the same root");
   assert.ok(!forked.all("person").length, "fork has no cached records");
 });
 
+
 test("createRecord creates an instance of of the type", function(assert) {
-  var person = store.createRecord("person", {name: "Bob"});
+  const person = this.subject().createRecord("person", {name: "Bob"});
 
   assert.ok(person instanceof Person, "creates the right type");
 
-  assert.equal(get(person, "name"),      "Bob",     "initializes with the attributes");
-  assert.equal(get(person, "store"),     store,     "sets the store");
-  assert.equal(get(person, "container"), container, "sets the container");
+  assert.equal(get(person, "name"),  "Bob",          "initializes with the attributes");
+  assert.equal(get(person, "store"), this.subject(), "sets the store");
 });
 
 test("saveRecord when successful", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
+  const store = this.subject();
 
   assert.expect(4);
 
-  var person = store.createRecord("person", {name: "Bob"});
+  const person = store.createRecord("person", {name: "Bob"});
 
   person.on("save", function() {
     assert.ok(true, "triggers save event");
@@ -84,10 +80,12 @@ test("saveRecord when successful", function(assert) {
 });
 
 test("saveRecord when fails", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
+  const store = this.subject();
+
   assert.expect(2);
 
-  var person = store.createRecord("person", {name: "Bob"});
+  const person = store.createRecord("person", {name: "Bob"});
 
   person.buildFirebaseReference().failNext("set", new Error("an error"));
 
@@ -100,10 +98,12 @@ test("saveRecord when fails", function(assert) {
 
 
 test("saveRecord when record has been deleted", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
+  const store = this.subject();
+
   assert.expect(2);
 
-  var person = store.createRecord("person", {name: "Bob"});
+  const person = store.createRecord("person", {name: "Bob"});
 
   person.set("isDeleted", true);
 
@@ -116,10 +116,12 @@ test("saveRecord when record has been deleted", function(assert) {
 
 
 test("saveRecord with data", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
+  const store = this.subject();
+
   assert.expect(1);
 
-  var person = store.createRecord("person", {name: "Bob"});
+  const person = store.createRecord("person", {name: "Bob"});
 
   store.saveRecord(person);
 
@@ -131,10 +133,12 @@ test("saveRecord with data", function(assert) {
 
 
 test("saveRecord with priority", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
+  const store = this.subject();
+
   assert.expect(2);
 
-  var person = store.createRecord("person", {name: "Bob", priority: 123});
+  const person = store.createRecord("person", {name: "Bob", priority: 123});
 
   store.saveRecord(person);
 
@@ -146,10 +150,11 @@ test("saveRecord with priority", function(assert) {
 });
 
 test("saveRecord with specific key", function(assert) {
-  var done = assert.async();
+  const store = this.subject();
+  const done = assert.async();
   assert.expect(1);
 
-  var person = store.createRecord("person", {name: "Bob", title: "Mr"});
+  const person = store.createRecord("person", {name: "Bob", title: "Mr"});
 
   store.saveRecord(person, "name");
 
@@ -160,10 +165,11 @@ test("saveRecord with specific key", function(assert) {
 });
 
 test("saveRecord with specific key which is null", function(assert) {
-  var done = assert.async();
+  const store = this.subject();
+  const done = assert.async();
   assert.expect(1);
 
-  var person = store.createRecord("person", {title: "Mr", name: "Bob"});
+  const person = store.createRecord("person", {title: "Mr", name: "Bob"});
   store.saveRecord(person);
 
   person.set("name", null);
@@ -177,10 +183,11 @@ test("saveRecord with specific key which is null", function(assert) {
 
 
 test("saveRecord with priority key", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
+  const store = this.subject();
   assert.expect(1);
 
-  var person = store.createRecord("person", {name: "Bob"});
+  const person = store.createRecord("person", {name: "Bob"});
   store.saveRecord(person);
 
   person.set("priority", 42);
@@ -193,10 +200,12 @@ test("saveRecord with priority key", function(assert) {
 });
 
 test("deleteRecord when successful", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(4);
 
-  var person = store.createRecord("person", {name: "Bob"});
+  const store = this.subject();
+
+  const person = store.createRecord("person", {name: "Bob"});
   store.saveRecord(person);
 
   person.on("delete", function() {
@@ -216,10 +225,12 @@ test("deleteRecord when successful", function(assert) {
 
 
 test("deleteRecord when fails & listening to firebase", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(2);
 
-  var person = store.createRecord("person", {name: "Bob"});
+  const store = this.subject();
+
+  const person = store.createRecord("person", {name: "Bob"});
   store.saveRecord(person);
 
   // person.buildFirebaseReference().failNext("remove", "an error");
@@ -236,10 +247,12 @@ test("deleteRecord when fails & listening to firebase", function(assert) {
 
 
 test("deleteRecord when fails & not already listening to firebase", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(2);
 
-  var person = store.createRecord("person", {name: "Bob"});
+  const store = this.subject();
+
+  const person = store.createRecord("person", {name: "Bob"});
 
   store.saveRecord(person);
 
@@ -258,8 +271,10 @@ test("deleteRecord when fails & not already listening to firebase", function(ass
 });
 
 test("fetchOne successfully", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(3);
+
+  const store = this.subject();
 
   firebase.child("people/123").set({
     name: "Bob"
@@ -274,10 +289,12 @@ test("fetchOne successfully", function(assert) {
 });
 
 test("fetchOne from cache", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(3);
 
-  var person = store.createRecord(Person, {id: "123", name: "Bob"});
+  const store = this.subject();
+
+  const person = store.createRecord("person", {id: "123", name: "Bob"});
   store.saveRecord(person);
 
   store.fetchOne("person", "123").then(function(record) {
@@ -289,8 +306,11 @@ test("fetchOne from cache", function(assert) {
 });
 
 test("fetchOne which doesn't exist", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(1);
+
+  const store = this.subject();
+
   store.fetchOne("person", "123").catch(function(error) {
     assert.equal(error, "not found");
   }).finally(done);
@@ -298,10 +318,10 @@ test("fetchOne which doesn't exist", function(assert) {
 
 // this test is failing but not sure why / how to test it
 // test("fetchOne without permission", function(assert) {
-//   var done = assert.async();
+//   const done = assert.async();
 //   assert.expect(1);
 //
-//   var ref = firebase.child("people/123");
+//   const ref = firebase.child("people/123");
 //   ref.failNext("value", new Error("permission denied"));
 //
 //   store.fetchOne("person", "123").catch(function(error) {
@@ -310,8 +330,10 @@ test("fetchOne which doesn't exist", function(assert) {
 // });
 
 test("fetchAll successfully", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(3);
+
+  const store = this.subject();
 
   firebase.child("people").set({
     "123": {name: "Bob"},
@@ -326,8 +348,10 @@ test("fetchAll successfully", function(assert) {
 });
 
 test("fetchAll which doesn't exist still creates a collection", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(3);
+
+  const store = this.subject();
 
   store.fetchAll("person").then(function(collection) {
     assert.ok(collection instanceof ObjectCollection, "resolves with an ObjectCollection");
@@ -338,7 +362,7 @@ test("fetchAll which doesn't exist still creates a collection", function(assert)
 
 // this test is failing but not sure why / how to test it
 // test("fetchAll without permission", function(assert) {
-//   var done = assert.async();
+//   const done = assert.async();
 //   assert.expect(1);
 //
 //   firebase.child("people").forceCancel("permission denied");
@@ -349,8 +373,10 @@ test("fetchAll which doesn't exist still creates a collection", function(assert)
 // });
 
 test("fetchQuery with no options", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(3);
+
+  const store = this.subject();
 
   firebase.child("people").set({
     "a": {name: "Bob"},
@@ -368,8 +394,10 @@ test("fetchQuery with no options", function(assert) {
 
 
 test("fetchQuery with options", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(5);
+
+  const store = this.subject();
 
   firebase.child("people").set({
     "a": {name: "Bob"},
@@ -382,7 +410,7 @@ test("fetchQuery with options", function(assert) {
   firebase.child("people/c").setPriority(3);
   firebase.child("people/d").setPriority(4);
 
-  var query = {
+  const query = {
     startAt: 2,
     endAt:   3
   };
@@ -397,18 +425,20 @@ test("fetchQuery with options", function(assert) {
 });
 
 test("saveCollection when successful", function(assert) {
-  var done1 = assert.async();
-  var done2 = assert.async();
+  const done1 = assert.async();
+  const done2 = assert.async();
   assert.expect(2);
 
-  var ref = firebase.child("people-index");
+  const store = this.subject();
 
-  var index = IndexedCollection.create({
+  const ref = firebase.child("people-index");
+
+  const index = IndexedCollection.create({
     firebaseReference: ref,
     store: store
   });
 
-  var person = store.createRecord(Person, {id: "123", name: "Bob"});
+  const person = store.createRecord("person", {id: "123", name: "Bob"});
   index.pushObject(person);
 
   store.saveCollection(index).then(function(collection) {
@@ -422,17 +452,19 @@ test("saveCollection when successful", function(assert) {
 });
 
 test("saveCollection when fails", function(assert) {
-  var done = assert.async();
+  const done = assert.async();
   assert.expect(1);
 
-  var ref = firebase.child("people-index");
+  const store = this.subject();
 
-  var index = IndexedCollection.create({
+  const ref = firebase.child("people-index");
+
+  const index = IndexedCollection.create({
     firebaseReference: ref,
     store: store
   });
 
-  var person = store.createRecord(Person, {id: "123", name: "Bob"});
+  const person = store.createRecord("person", {id: "123", name: "Bob"});
   index.pushObject(person);
 
   ref.failNext("set", new Error("an error"));
@@ -445,7 +477,9 @@ test("saveCollection when fails", function(assert) {
 test("saveCollection with a query collection", function(assert) {
   assert.expect(1);
 
-  var index = IndexedCollection.create({ limit: 10 });
+  const store = this.subject();
+
+  const index = IndexedCollection.create({ limit: 10 });
 
   assert.throws(function() {
     store.saveCollection(index);
