@@ -1,8 +1,10 @@
 # CHANGELOG
 
-## Master
+## v0.4.0
 
 * Moved Store to be a service, so now located at `app/services/store.js` vs `app/stores/main.js`
+* Updated to Ember-CLI 2.2.0-beta.3
+* Use getOwner vs using container directly (with polyfill for older Ember versions)
 
 ## v0.3.8
 
