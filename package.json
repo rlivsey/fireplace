@@ -52,6 +52,9 @@
     "ember-firebase": "rlivsey/ember-firebase#fastboot"
   },
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "fastBootDependencies": [
+      "firebase"
+    ]
   }
 }
