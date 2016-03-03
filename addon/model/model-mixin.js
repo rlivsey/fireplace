@@ -68,23 +68,26 @@ export const ModelMixin = Ember.Mixin.create(LiveMixin, AttributesMixin, Relatio
     this._super();
   },
 
-  eachActiveRelation(cb) {
+  eachEmbeddedRelation(cb) {
     get(this.constructor, 'relationships').forEach((meta, name) => {
-      const item = cacheFor(this, name);
-      if (item) { cb(item); }
+      const options = meta.options || {};
+      if (options.embedded && !options.detached) {
+        const item = cacheFor(this, name);
+        if (item) { cb(item); }
+      }
     });
   },
 
   listenToFirebase() {
     if (!get(this, 'isListeningToFirebase')) {
-      this.eachActiveRelation(item => item.listenToFirebase() );
+      this.eachEmbeddedRelation(item => item.listenToFirebase() );
     }
     return this._super();
   },
 
   stopListeningToFirebase() {
     if (get(this, 'isListeningToFirebase')) {
-      this.eachActiveRelation(item => item.stopListeningToFirebase() );
+      this.eachEmbeddedRelation(item => item.stopListeningToFirebase() );
     }
     return this._super();
   },
