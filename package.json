@@ -48,7 +48,8 @@
   "dependencies": {
     "ember-getowner-polyfill": "1.0.0",
     "ember-cli-babel": "^5.1.5",
-    "ember-inflector": "^1.9.0"
+    "ember-inflector": "^1.9.0",
+    "ember-firebase": "rlivsey/ember-firebase#fastboot"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"

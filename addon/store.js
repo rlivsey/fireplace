@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import Firebase from 'firebase';
 
 import getOwner from 'ember-getowner-polyfill';
 
@@ -50,10 +51,10 @@ export default Ember.Service.extend({
   buildFirebaseRootReference(){
     const url = get(this, 'firebaseRoot');
     Ember.assert("Your store needs a firebaseRoot", !!url);
-    if (url instanceof window.Firebase) {
+    if (url instanceof Firebase) {
       return url;
     }
-    return new window.Firebase(url);
+    return new Firebase(url);
   },
 
   createRecord(type, attributes) {

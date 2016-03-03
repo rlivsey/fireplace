@@ -4,10 +4,9 @@ import {module, test} from 'qunit';
 
 import Store from 'fireplace/store';
 import Model from 'fireplace/model/model';
+import Firebase from 'firebase';
 
 const get = Ember.get;
-
-const Firebase = window.Firebase;
 
 let store;
 module("Store - buildFirebaseReference");

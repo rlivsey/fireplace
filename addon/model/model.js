@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import Firebase from 'firebase';
 
 import expandPath from '../utils/expand-path';
 import {
@@ -90,7 +91,7 @@ Model.reopenClass(ModelClassMixin, {
       path = expandPath(path, opts);
     }
 
-    if (path instanceof window.Firebase) {
+    if (path instanceof Firebase) {
       return path;
     }
 

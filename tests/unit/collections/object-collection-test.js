@@ -13,7 +13,7 @@ const get  = Ember.get;
 let store, Person, People, firebase;
 
 function setupEnv() {
-  firebase  = new window.window.MockFirebase("https://something.firebaseio.com");
+  firebase  = new window.MockFirebase("https://something.firebaseio.com");
   firebase.autoFlush(true);
 
   store = this.container.lookup("service:store");
@@ -259,7 +259,7 @@ let Thing, Other;
 moduleFor("collection:object", "ObjectCollection - polymorphism", {
   needs: ["service:store"],
   beforeEach() {
-    firebase  = new window.window.MockFirebase("https://something.firebaseio.com");
+    firebase  = new window.MockFirebase("https://something.firebaseio.com");
     firebase.autoFlush(true);
 
     store = this.container.lookup("service:store");
