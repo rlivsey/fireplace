@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import getOwner from 'ember-getowner-polyfill';
 import expandPath from '../utils/expand-path';
+import merge from '../utils/merge';
 import { extractQueryOptions } from '../utils/query';
 
 // options
@@ -70,7 +71,7 @@ function buildCollection(model, name, type, options, attrs) {
     query = query.call(model);
   }
 
-  const collectionOpts = Ember.$.extend({}, attrs || {}, {
+  const collectionOpts = merge(attrs || {}, {
     store:     store,
     model:     type,
     query:     query,

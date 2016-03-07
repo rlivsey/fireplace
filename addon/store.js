@@ -15,6 +15,8 @@ import {
   extractQueryOptions
 } from './utils/query';
 
+import merge from './utils/merge';
+
 const get         = Ember.get;
 const guidFor     = Ember.guidFor;
 const camelize    = Ember.String.camelize;
@@ -273,7 +275,7 @@ export default Ember.Service.extend({
     const type      = options.collection || "object";
     const factory   = getOwner(this)._lookupFactory("collection:"+type);
 
-    const collection = factory.create(Ember.$.extend({
+    const collection = factory.create(merge({
       store: this,
       model: model,
       query: query,

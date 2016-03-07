@@ -4,9 +4,10 @@ import {
   ModelClassMixin
 } from './model-mixin';
 
+import isEmptyObject from '../utils/is-empty-object';
+
 const get    = Ember.get;
 const isNone = Ember.isNone;
-
 
 const MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
   id:        Ember.computed.alias('content.id'),
@@ -57,7 +58,7 @@ const MetaModel = Ember.ObjectProxy.extend(ModelMixin, {
 
       // if attributes are null, then we'll get an empty object back
       // we don't want to save this as that'll be treated as deleting the meta model!
-      if (!Ember.$.isEmptyObject(attrJSON)) {
+      if (!isEmptyObject(attrJSON)) {
         return attrJSON;
       }
     }
