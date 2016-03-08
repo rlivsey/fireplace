@@ -85,12 +85,12 @@ export default Ember.Mixin.create(Ember.Evented, {
     //        but we don't want to stay listening.
     // TODO - split collection loading out from listening like we do individual records
     if (isFastboot()) {
-      promise.then(() => {
+      return promise.finally(() => {
         this.stopListeningToFirebase();
       });
+    } else {
+      return promise;
     }
-
-    return promise;
   },
 
   buildErrorHandler(eventName) {
