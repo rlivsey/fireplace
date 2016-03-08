@@ -38,10 +38,6 @@ export default Ember.Mixin.create(Ember.Evented, {
   },
 
   listenToFirebase() {
-    if (isFastboot()) {
-      return Ember.RSVP.resolve();
-    }
-
     if (this.isDestroying || this.isDestroyed) {
       return Ember.RSVP.reject();
     }
@@ -85,6 +81,15 @@ export default Ember.Mixin.create(Ember.Evented, {
       ref.on(eventName, handler, errHandler, this);
     });
 
+    // HACK - we need to start listening because that's how collections currently load
+    //        but we don't want to stay listening.
+    // TODO - split collection loading out from listening like we do individual records
+    if (isFastboot()) {
+      promise.then(() => {
+        this.stopListeningToFirebase();
+      });
+    }
+
     return promise;
   },
 
@@ -116,10 +121,6 @@ export default Ember.Mixin.create(Ember.Evented, {
   },
 
   stopListeningToFirebase() {
-    if (isFastboot()) {
-      return;
-    }
-
     this._listenPromise = null;
 
     if (!get(this, 'isListeningToFirebase')) {
