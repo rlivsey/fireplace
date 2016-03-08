@@ -4,6 +4,10 @@ const get      = Ember.get;
 const set      = Ember.set;
 const classify = Ember.String.classify;
 
+function isFastboot() {
+  return typeof FastBoot !== "undefined";
+}
+
 export default Ember.Mixin.create(Ember.Evented, {
   isListeningToFirebase:  false,
   concatenatedProperties: ['firebaseEvents'],
@@ -34,6 +38,10 @@ export default Ember.Mixin.create(Ember.Evented, {
   },
 
   listenToFirebase() {
+    if (isFastboot()) {
+      return Ember.RSVP.resolve();
+    }
+
     if (this.isDestroying || this.isDestroyed) {
       return Ember.RSVP.reject();
     }
@@ -108,6 +116,10 @@ export default Ember.Mixin.create(Ember.Evented, {
   },
 
   stopListeningToFirebase() {
+    if (isFastboot()) {
+      return;
+    }
+
     this._listenPromise = null;
 
     if (!get(this, 'isListeningToFirebase')) {
