@@ -322,7 +322,27 @@ export default Ember.Service.extend({
   },
 
   clearCache() {
+    if (this.cache) {
+      Object.keys(this.cache).forEach(key => {
+        const group = this.cache[key];
+        if (!group || !group.records) {
+          return;
+        }
+
+        Object.keys(group.records).forEach(ref => {
+          const item = group.records[ref];
+          if (item) {
+            item.stopListeningToFirebase();
+          }
+        });
+      });
+    }
     this.cache = {};
+  },
+
+  willDestroy() {
+    this.clearCache();
+    return this._super(...arguments);
   },
 
   cacheForType(type) {
