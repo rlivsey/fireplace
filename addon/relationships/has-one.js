@@ -93,6 +93,16 @@ export default function(type, options) {
           parent:    this,
           parentKey: name
         });
+      } else if (options.inverse) {
+        Ember.RSVP.resolve(value).then(resolvedValue => {
+          var inverseRelation = resolvedValue.constructor.metaForProperty(options.inverse);
+
+          if (inverseRelation.kind === 'hasMany') {
+            resolvedValue.get(options.inverse).addObject(this);
+          } else if (inverseRelation.kind === 'hasOne') {
+            resolvedValue.set(options.inverse, this);
+          }
+        });
       }
 
       return value;
