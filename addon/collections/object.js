@@ -58,7 +58,7 @@ export default Collection.extend({
   // then we know we have all our content because it all comes in
   // the same result
   fetch() {
-    const promise = this.listenToFirebase().then(Ember.K.bind(this));
+    const promise = this.listenToFirebase().then(function() {}.bind(this));
     return PromiseProxy.create({promise: promise});
   },
 

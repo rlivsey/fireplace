@@ -83,7 +83,7 @@ export default Collection.extend({
   fetch() {
     const promise = this.listenToFirebase().
       then(this._fetchAll.bind(this)).
-      then(Ember.K.bind(this));
+      then(function() {}.bind(this));
 
     return PromiseProxy.create({promise: promise});
   },
